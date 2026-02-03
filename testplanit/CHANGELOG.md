@@ -1,3 +1,10 @@
+## [0.11.15](https://github.com/TestPlanIt/testplanit/compare/v0.11.14...v0.11.15) (2026-02-03)
+
+
+### Bug Fixes
+
+* Long Text/Link case field default does not populate correctly. ([#59](https://github.com/TestPlanIt/testplanit/issues/59)) ([5fc335c](https://github.com/TestPlanIt/testplanit/commit/5fc335cc8e5a0cd20f04b71aac3cfb26cf71869e))
+
 ## [0.11.14](https://github.com/TestPlanIt/testplanit/compare/v0.11.13...v0.11.14) (2026-02-02)
 
 
