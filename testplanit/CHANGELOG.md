@@ -1,3 +1,10 @@
+## [0.11.16](https://github.com/TestPlanIt/testplanit/compare/v0.11.15...v0.11.16) (2026-02-05)
+
+
+### Bug Fixes
+
+* Handle default values for text long / link result fields ([#67](https://github.com/TestPlanIt/testplanit/issues/67)) ([f20a5d4](https://github.com/TestPlanIt/testplanit/commit/f20a5d43423a40e90b18b01d7ecb61fe35f06150))
+
 ## [0.11.15](https://github.com/TestPlanIt/testplanit/compare/v0.11.14...v0.11.15) (2026-02-03)
 
 
