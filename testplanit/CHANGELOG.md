@@ -1,3 +1,10 @@
+## [0.11.18](https://github.com/TestPlanIt/testplanit/compare/v0.11.17...v0.11.18) (2026-02-06)
+
+
+### Bug Fixes
+
+* Feat/multi tenant testmo import ([#68](https://github.com/TestPlanIt/testplanit/issues/68)) ([44cd5b4](https://github.com/TestPlanIt/testplanit/commit/44cd5b434b6f6f7606ca92cd11a94f7e1b7e0108))
+
 ## [0.11.17](https://github.com/TestPlanIt/testplanit/compare/v0.11.16...v0.11.17) (2026-02-06)
 
 
