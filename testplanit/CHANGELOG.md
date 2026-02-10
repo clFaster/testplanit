@@ -1,3 +1,10 @@
+## [0.11.20](https://github.com/TestPlanIt/testplanit/compare/v0.11.19...v0.11.20) (2026-02-10)
+
+
+### Bug Fixes
+
+* remap HTTP status codes to prevent nginx ingress interception of API error responses ([ccc1d62](https://github.com/TestPlanIt/testplanit/commit/ccc1d6205be66fe6fb0a0ecb66212c44ff45e8fc))
+
 ## [0.11.19](https://github.com/TestPlanIt/testplanit/compare/v0.11.18...v0.11.19) (2026-02-10)
 
 
