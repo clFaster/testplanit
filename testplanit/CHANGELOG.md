@@ -1,3 +1,10 @@
+## [0.11.19](https://github.com/TestPlanIt/testplanit/compare/v0.11.18...v0.11.19) (2026-02-10)
+
+
+### Bug Fixes
+
+* enhance multi-tenant support in notification service ([#69](https://github.com/TestPlanIt/testplanit/issues/69)) ([6d6037b](https://github.com/TestPlanIt/testplanit/commit/6d6037b93cb0816360788c38c45869aecab23dfa))
+
 ## [0.11.18](https://github.com/TestPlanIt/testplanit/compare/v0.11.17...v0.11.18) (2026-02-06)
 
 
