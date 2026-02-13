@@ -6,6 +6,11 @@ authors: [bdermanouelian]
 tags: [best-practices, thought-leadership]
 ---
 
+<figure>
+  <img src="/img/blog/byollm-select-source.png" alt="TestPlanIt AI-assisted Test Case Generation" />
+  <figcaption>TestPlanIt AI-assisted Test Case Generation</figcaption>
+</figure>
+
 Every test management vendor is racing to add AI-powered test case generation. And to their credit, most of them aren't charging extra for it — they're bundling it into their existing per-seat pricing. TestRail includes AI in both their Professional ($37/user/month) and Enterprise ($74/user/month) tiers. PractiTest bundles SmartFox AI into their $54/user/month Team plan. BrowserStack includes it in their paid tiers.
 
 So what's the problem?
@@ -27,6 +32,11 @@ There's a different approach. Plug in your own LLM and API key, choose the model
 1. **No usage caps or credit systems.** Regenerate when requirements change. Experiment with prompts. Generate edge cases, negative tests, accessibility scenarios — without watching a credit balance.
 
 1. **Prompts work out of the box — but you can see and customize them.** Built-in prompts handle the heavy lifting from day one. But unlike vendor black boxes, they're fully transparent and can be augmented to match your testing methodology without touching source code.
+
+<figure>
+  <img src="/img/blog/byollm-add-notes-guidance.png" alt="Augment prompts to match your testing methodology without touching source code." />
+  <figcaption>Augment prompts to match your testing methodology without touching source code.</figcaption>
+</figure>
 
 ---
 
@@ -54,11 +64,21 @@ TestPlanIt takes a different approach. It ships with built-in prompts that gener
 
 This gives you the best of both worlds: you start productive on day one, but you're never stuck with output you can't improve. That kind of iterative refinement compounds over time — your AI-generated test cases get meaningfully better because you're tuning the process, not filing feature requests and hoping.
 
+<figure>
+  <img src="/img/blog/byollm-review-import.png" alt="AI-generated test cases get meaningfully better because you're tuning the process." />
+  <figcaption>AI-generated test cases get meaningfully better because you're tuning the process.</figcaption>
+</figure>
+
 ### Model Flexibility Is a Real Advantage
 
 LLMs are evolving fast. Different models have genuinely different strengths — some handle complex business logic better, others excel at edge case identification, others are stronger with domain-specific jargon. The best model for generating test cases from a fintech requirements doc may not be the best for an embedded systems spec.
 
 When a vendor bundles AI, they pick one model (or one provider) for everyone. When you bring your own key, you can optimize for your domain. And when a better model ships next quarter — and one will — you can switch without waiting for your vendor to update.
+
+<figure>
+  <img src="/img/blog/byollm-edit-model-integration.png" alt="When a better model ships next quarter, you can switch without waiting for your vendor to update." />
+  <figcaption>When a better model ships next quarter, you can switch without waiting for your vendor to update.</figcaption>
+</figure>
 
 TestPlanIt takes this further by letting you assign a different LLM provider to each project. A team working on a healthcare platform can point their project at a model that excels with medical terminology and regulatory requirements, while a team building a consumer mobile app can use a different model optimized for UI and accessibility scenarios — all within the same TestPlanIt instance. This per-project flexibility means you're not just choosing the right model for your organization, you're choosing the right model for each specific context. As your projects evolve or new models emerge, you can re-tune individual projects without disrupting anyone else.
 
@@ -75,6 +95,11 @@ Not every vendor bundles cleanly. Qase's AIDEN system uses credits — included 
 AI test case generation is most valuable when you use it liberally — regenerating after requirement changes, trying different approaches, generating comprehensive coverage across functional, negative, accessibility, and performance scenarios. Credit systems encourage you to be conservative precisely when you should be thorough.
 
 Your own API key means your usage is bounded only by your actual budget, which for most teams is trivially small.
+
+<figure>
+  <img src="/img/blog/byollm-ai-models-list.png" alt="Usage is bounded only by your actual budget." />
+  <figcaption>Usage is bounded only by your actual budget.</figcaption>
+</figure>
 
 ## The Bigger Picture
 

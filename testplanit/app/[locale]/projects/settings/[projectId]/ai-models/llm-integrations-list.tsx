@@ -11,14 +11,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Sparkles,
   Check,
   Loader2,
   AlertTriangle,
   DollarSign,
   Zap,
-  Brain,
 } from "lucide-react";
+import {
+  getProviderColor,
+  getProviderIcon,
+} from "~/lib/llm/provider-styles";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -144,46 +146,6 @@ export function LlmIntegrationsList({
       toast.error(t("modelRemoveError"));
     } finally {
       setIsAssigning(null);
-    }
-  };
-
-  const getProviderIcon = (provider: string) => {
-    switch (provider) {
-      // Temporarily disabled for testing
-      // case "OPENAI":
-      //   return <Brain className="h-5 w-5 text-green-600" />;
-      // case "ANTHROPIC":
-      //   return <Sparkles className="h-5 w-5 text-orange-600" />;
-      // case "AZURE_OPENAI":
-      //   return <Zap className="h-5 w-5 text-blue-600" />;
-      case "GEMINI":
-        return <Sparkles className="h-5 w-5 text-blue-500" />;
-      case "OLLAMA":
-        return <Sparkles className="h-5 w-5 text-purple-600" />;
-      case "CUSTOM_LLM":
-        return <Brain className="h-5 w-5 text-gray-600" />;
-      default:
-        return <Sparkles className="h-5 w-5 text-gray-600" />;
-    }
-  };
-
-  const getProviderColor = (provider: string) => {
-    switch (provider) {
-      // Temporarily disabled for testing
-      // case "OPENAI":
-      //   return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-      // case "ANTHROPIC":
-      //   return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
-      // case "AZURE_OPENAI":
-      //   return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
-      case "GEMINI":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
-      case "OLLAMA":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
-      case "CUSTOM_LLM":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
     }
   };
 

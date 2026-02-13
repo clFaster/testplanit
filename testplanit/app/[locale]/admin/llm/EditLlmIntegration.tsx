@@ -64,7 +64,7 @@ const createFormSchema = (t: any) =>
 type FormData = z.infer<ReturnType<typeof createFormSchema>>;
 
 // Providers that support dynamic model fetching
-const PROVIDERS_WITH_DYNAMIC_MODELS = ["OPENAI", "GEMINI", "OLLAMA"];
+const PROVIDERS_WITH_DYNAMIC_MODELS = ["OPENAI", "ANTHROPIC", "GEMINI", "OLLAMA"];
 
 interface EditLlmIntegrationProps {
   integration: any;
@@ -183,8 +183,8 @@ export function EditLlmIntegration({ integration }: EditLlmIntegrationProps) {
       return;
     }
 
-    // For Gemini, we need an API key
-    if (["OPENAI", "GEMINI"].includes(integration.provider) && !apiKey) {
+    // For providers that require an API key, wait until one is provided
+    if (["OPENAI", "ANTHROPIC", "GEMINI"].includes(integration.provider) && !apiKey) {
       return;
     }
 
@@ -494,7 +494,7 @@ export function EditLlmIntegration({ integration }: EditLlmIntegrationProps) {
                         <FormDescription className="text-muted-foreground">
                           {integration?.provider === "GEMINI"
                             ? "Enter your API key and endpoint above. Models will be fetched automatically."
-                            : integration?.provider === "OPENAI"
+                            : integration?.provider === "OPENAI" || integration?.provider === "ANTHROPIC"
                               ? "Enter your API key above. We'll fetch the available models automatically."
                               : "Models will be fetched automatically from your Ollama instance."}
                         </FormDescription>

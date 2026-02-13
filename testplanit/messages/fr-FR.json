@@ -3542,7 +3542,11 @@
         "connectionSuccessfulDescription": "La connexion au modèle d'IA a été vérifiée et fonctionne correctement.",
         "failedToConnect": "Échec de la connexion au fournisseur de modèle d'IA",
         "integrationCreated": "L'intégration du modèle d'IA a été créée avec succès",
-        "failedToCreate": "Échec de l'intégration du modèle d'IA"
+        "failedToCreate": "Échec de l'intégration du modèle d'IA",
+        "validation": {
+          "nameRequired": "Le nom de l'intégration est requis.",
+          "defaultModelRequired": "Le modèle par défaut est requis"
+        }
       },
       "edit": {
         "title": "Intégration du modèle d'IA modifié",

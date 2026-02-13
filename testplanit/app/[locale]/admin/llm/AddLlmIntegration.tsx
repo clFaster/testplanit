@@ -35,6 +35,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Loader2, Info } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Prisma } from "@prisma/client";
 import { useCreateLlmIntegration } from "~/lib/hooks/llm-integration";
 import {
   useCreateLlmProviderConfig,
@@ -78,7 +79,7 @@ interface AddLlmIntegrationProps {
 }
 
 // Providers that support dynamic model fetching
-const PROVIDERS_WITH_DYNAMIC_MODELS = ["OPENAI", "GEMINI", "OLLAMA"];
+const PROVIDERS_WITH_DYNAMIC_MODELS = ["OPENAI", "ANTHROPIC", "GEMINI", "OLLAMA"];
 
 const providerDefaults: Record<string, Partial<FormData>> = {
   OPENAI: {
@@ -281,8 +282,8 @@ export function AddLlmIntegration({
       return;
     }
 
-    // For Gemini, we need an API key
-    if (["OPENAI", "GEMINI"].includes(provider) && !apiKey) {
+    // For providers that require an API key, wait until one is provided
+    if (["OPENAI", "ANTHROPIC", "GEMINI"].includes(provider) && !apiKey) {
       return;
     }
 
@@ -352,6 +353,14 @@ export function AddLlmIntegration({
       }
 
       // Create the integration using ZenStack hook
+      // Build settings object only with relevant fields for the provider
+      const settings: Record<string, string> = {};
+      if (values.provider === "AZURE_OPENAI") {
+        if (values.deploymentName) {
+          settings.deploymentName = values.deploymentName;
+        }
+      }
+
       const integrationData = {
         name: values.name,
         provider: values.provider,
@@ -361,10 +370,7 @@ export function AddLlmIntegration({
           endpoint: values.endpoint,
           baseUrl: values.endpoint,
         },
-        settings: {
-          deploymentName: values.deploymentName,
-          apiVersion: undefined, // Azure OpenAI disabled
-        },
+        settings: Object.keys(settings).length > 0 ? settings : Prisma.JsonNull,
       };
 
       const llmIntegration = await createLlmIntegration({
@@ -380,7 +386,7 @@ export function AddLlmIntegration({
             availableModels: {},
             maxTokensPerRequest: values.maxTokensPerRequest,
             maxRequestsPerMinute: values.maxRequestsPerMinute,
-            maxRequestsPerDay: undefined,
+            maxRequestsPerDay: null,
             costPerInputToken: values.costPerInputToken,
             costPerOutputToken: values.costPerOutputToken,
             monthlyBudget: values.monthlyBudget || 0,
@@ -399,8 +405,13 @@ export function AddLlmIntegration({
         onSuccess();
       }
     } catch (error: any) {
+      const message =
+        error?.info?.message ||
+        error?.info?.error ||
+        error?.message ||
+        "Unknown error occurred";
       toast.error(t("failedToCreate"), {
-        description: error.message || "Unknown error occurred",
+        description: message,
       });
     } finally {
       setLoading(false);
@@ -583,7 +594,7 @@ export function AddLlmIntegration({
                       <FormDescription className="text-muted-foreground">
                         {provider === "GEMINI"
                           ? "Enter your API key and endpoint above. Models will be fetched automatically."
-                          : provider === "OPENAI"
+                          : provider === "OPENAI" || provider === "ANTHROPIC"
                             ? "Enter your API key above. We'll fetch the available models automatically."
                             : "Models will be fetched automatically from your Ollama instance."}
                       </FormDescription>

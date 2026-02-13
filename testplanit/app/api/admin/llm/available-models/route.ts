@@ -20,6 +20,9 @@ export async function POST(request: NextRequest) {
       case "GEMINI":
         models = await fetchGeminiModels(apiKey, endpoint);
         break;
+      case "ANTHROPIC":
+        models = await fetchAnthropicModels(apiKey);
+        break;
       case "OLLAMA":
         models = await fetchOllamaModels(endpoint);
         break;
@@ -134,6 +137,53 @@ async function fetchGeminiModels(apiKey: string, endpoint?: string): Promise<str
   } catch (error) {
     console.error("Error fetching Gemini models:", error);
     throw new Error(`Failed to fetch Gemini models: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+async function fetchAnthropicModels(apiKey?: string): Promise<string[]> {
+  if (!apiKey) {
+    throw new Error("API key is required for Anthropic");
+  }
+
+  const url = "https://api.anthropic.com/v1/models?limit=1000";
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      signal: AbortSignal.timeout(10000),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Anthropic API error: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    if (data?.data && Array.isArray(data.data)) {
+      return data.data
+        .map((model: any) => model?.id)
+        .filter((id: unknown): id is string => typeof id === "string")
+        .sort();
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Error fetching Anthropic models:", error);
+    if (error instanceof Error && error.name === "TimeoutError") {
+      throw new Error(
+        "Anthropic API is not responding. Please check your API key and try again."
+      );
+    }
+    throw new Error(
+      `Failed to fetch Anthropic models: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
   }
 }
 

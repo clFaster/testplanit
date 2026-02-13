@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { DateFormatter } from "@/components/DateFormatter";
 import { Sparkles, CheckCircle, XCircle } from "lucide-react";
+import { getProviderColor } from "~/lib/llm/provider-styles";
 import { EditLlmIntegration } from "./EditLlmIntegration";
 import { DeleteLlmIntegration } from "./DeleteLlmIntegration";
 import { TestLlmIntegration } from "./TestLlmIntegration";
@@ -57,26 +58,11 @@ export const getColumns = (
     enableSorting: true,
     enableResizing: true,
     size: 150,
-    cell: ({ row }) => {
-      const providerColors: Record<string, string> = {
-        OPENAI:
-          "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-        ANTHROPIC:
-          "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-        AZURE_OPENAI:
-          "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-        OLLAMA:
-          "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-        CUSTOM_LLM:
-          "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
-      };
-
-      return (
-        <Badge className={providerColors[row.original.provider] || ""}>
-          {row.original.provider.replace("_", " ")}
-        </Badge>
-      );
-    },
+    cell: ({ row }) => (
+      <Badge className={getProviderColor(row.original.provider)}>
+        {row.original.provider.replace("_", " ")}
+      </Badge>
+    ),
   },
   {
     id: "status",
