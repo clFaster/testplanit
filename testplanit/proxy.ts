@@ -3,6 +3,7 @@ import { locales, defaultLocale } from "./i18n/navigation";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
+import { checkApiRateLimit, type RateLimitResult } from "~/lib/api-rate-limit";
 
 const middleware = createMiddleware({
   // A list of all locales that are supported
@@ -124,16 +125,61 @@ export default async function middlewareWithPreferences(request: NextRequest) {
   const isApiRoute = pathname.startsWith("/api/");
   const isAuthRoute = pathname.startsWith("/api/auth/");
 
-  // Auth routes should pass through without any middleware processing
-  if (isAuthRoute) {
+  // Auth and health routes should pass through without any middleware processing
+  if (isAuthRoute || pathname === "/api/health") {
     return NextResponse.next();
   }
 
   if (isApiRoute) {
+    // Rate limit only applies to API token requests (Bearer tpi_*)
+    const isProgrammatic = hasApiToken(request);
+
+    // Check rate limit for programmatic API requests
+    let rateLimit: RateLimitResult | null = null;
+    if (isProgrammatic) {
+      rateLimit = await checkApiRateLimit();
+
+      if (!rateLimit.allowed) {
+        const retryAfter = Math.max(
+          0,
+          rateLimit.resetAt - Math.floor(Date.now() / 1000)
+        );
+        return new NextResponse(
+          JSON.stringify({
+            error: "Rate limit exceeded",
+            message: `API rate limit of ${rateLimit.limit} requests per hour exceeded. Try again in ${retryAfter} seconds.`,
+          }),
+          {
+            status: 429,
+            headers: {
+              "Content-Type": "application/json",
+              "X-RateLimit-Limit": String(rateLimit.limit),
+              "X-RateLimit-Remaining": "0",
+              "X-RateLimit-Reset": String(rateLimit.resetAt),
+              "Retry-After": String(retryAfter),
+            },
+          }
+        );
+      }
+    }
+
+    // Helper to attach rate limit headers to a response
+    const withRateLimitHeaders = (response: NextResponse): NextResponse => {
+      if (rateLimit) {
+        response.headers.set("X-RateLimit-Limit", String(rateLimit.limit));
+        response.headers.set(
+          "X-RateLimit-Remaining",
+          String(rateLimit.remaining)
+        );
+        response.headers.set("X-RateLimit-Reset", String(rateLimit.resetAt));
+      }
+      return response;
+    };
+
     // If request has an API token (Bearer tpi_*), let the API route handle authentication
     // API routes will use authenticateApiToken() to validate the token
     if (hasApiToken(request)) {
-      return NextResponse.next();
+      return withRateLimitHeaders(NextResponse.next());
     }
 
     // Get the JWT token for API routes (session-based auth)
@@ -144,12 +190,12 @@ export default async function middlewareWithPreferences(request: NextRequest) {
 
     // If no token, let the API route handler deal with it (return 401)
     if (!token) {
-      return NextResponse.next();
+      return withRateLimitHeaders(NextResponse.next());
     }
 
     // ADMINs always have API access
     if (token.access === "ADMIN") {
-      return NextResponse.next();
+      return withRateLimitHeaders(NextResponse.next());
     }
 
     // Check if this is an external API request
@@ -164,7 +210,7 @@ export default async function middlewareWithPreferences(request: NextRequest) {
     }
 
     // Allow the request
-    return NextResponse.next();
+    return withRateLimitHeaders(NextResponse.next());
   }
 
   // Check trial expiration status

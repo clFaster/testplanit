@@ -1,9 +1,11 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import Heading from '@theme/Heading';
+import useEmblaCarousel from 'embla-carousel-react';
+import Autoplay from 'embla-carousel-autoplay';
 import {
   Wand2,
   Link as LinkIcon,
@@ -55,6 +57,10 @@ function HomepageHeader() {
             TestPlanIt Documentation
           </Heading>
 
+          <p className={styles.heroSubtitle}>
+            Open Source Modern Test Management for Agile Teams
+          </p>
+
           <div className={styles.buttons}>
             <Link className={styles.primaryButton} to="/docs/">
               Get Started
@@ -72,6 +78,87 @@ function HomepageHeader() {
         </div>
       </div>
     </header>
+  );
+}
+
+const screenshots = [
+  {
+    src: '/img/test-cases.png',
+    alt: 'TestPlanIt test case management interface showing test repository, folders, and test cases',
+    label: 'Test Cases',
+  },
+  {
+    src: '/img/test-runs.png',
+    alt: 'TestPlanIt test runs and results dashboard with execution summary and trend charts',
+    label: 'Test Runs',
+  },
+  {
+    src: '/img/sessions.png',
+    alt: 'TestPlanIt exploratory testing sessions with results summary',
+    label: 'Sessions',
+  },
+  {
+    src: '/img/reports.png',
+    alt: 'TestPlanIt reporting interface with custom report builder and visualizations',
+    label: 'Reports',
+  },
+];
+
+function HomepageScreenshot() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
+    Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true }),
+  ]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const scrollTo = useCallback(
+    (index: number) => emblaApi?.scrollTo(index),
+    [emblaApi]
+  );
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+    emblaApi.on('select', onSelect);
+    onSelect();
+    return () => {
+      emblaApi.off('select', onSelect);
+    };
+  }, [emblaApi]);
+
+  return (
+    <section className={styles.screenshotSection}>
+      <div className="container">
+        <div className={styles.screenshotViewport} ref={emblaRef}>
+          <div className={styles.screenshotContainer}>
+            {screenshots.map((shot, index) => (
+              <div key={shot.src} className={styles.screenshotSlide}>
+                <img
+                  src={shot.src}
+                  alt={shot.alt}
+                  className={styles.screenshotImage}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className={styles.screenshotDots}>
+          {screenshots.map((shot, index) => (
+            <button
+              key={shot.src}
+              type="button"
+              className={clsx(
+                styles.screenshotDot,
+                index === selectedIndex && styles.screenshotDotActive
+              )}
+              onClick={() => scrollTo(index)}
+            >
+              {shot.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -198,10 +285,27 @@ export default function Home(): ReactNode {
       title={`${siteConfig.title} - ${siteConfig.tagline}`}
       description="Open-source tool for creating, managing, and executing test plans, supporting manual and automated testing."
     >
-      <HomepageHeader />
-      <main>
-        <HomepageFeaturesSection />
-      </main>
+      <div className={styles.heroBackground}>
+        <HomepageHeader />
+        <main>
+          <div className={styles.logoWrapper}>
+            <Link
+              className={styles.logoLink}
+              href="https://testplanit.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="/img/logo-with-text.svg"
+                alt="TestPlanIt"
+                className={styles.logoLinkImage}
+              />
+            </Link>
+          </div>
+          <HomepageScreenshot />
+        </main>
+      </div>
+      <HomepageFeaturesSection />
     </Layout>
   );
 }

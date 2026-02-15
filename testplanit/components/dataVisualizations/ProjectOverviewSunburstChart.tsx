@@ -223,7 +223,7 @@ const ProjectOverviewSunburstChart: React.FC<
       .append("text")
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central") // Use central for easier tspan alignment
-      .style("fill", "#333")
+      .style("fill", "currentColor")
       .style("opacity", 0); // Start invisible
 
     centerText
