@@ -1,0 +1,115 @@
+# Docs Release Workflow
+#
+# Builds and pushes the docs Docker image to GHCR.
+# Manual trigger only via GitHub Actions UI.
+#
+# Docker Image: ghcr.io/testplanit/testplanit:docs
+#
+name: Docs Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag (e.g., docs-latest, v0.12.1-docs)'
+        required: false
+        default: 'docs'
+        type: string
+
+jobs:
+  build-amd64:
+    runs-on: [self-hosted, linux, x64]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set lowercase repo name
+      run: echo "REPO_LC=$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push AMD64 docs image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: ./docs/Dockerfile
+        platforms: linux/amd64
+        push: true
+        tags: ghcr.io/${{ env.REPO_LC }}:${{ github.event.inputs.tag }}-amd64
+
+  build-arm64:
+    runs-on: [self-hosted, macOS, arm64]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set lowercase repo name
+      run: echo "REPO_LC=$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+    - name: Start Colima
+      run: |
+        if ! colima status 2>/dev/null; then
+          colima start --cpu 6 --memory 24
+        fi
+        docker context use colima
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push ARM64 docs image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: ./docs/Dockerfile
+        platforms: linux/arm64
+        push: true
+        tags: ghcr.io/${{ env.REPO_LC }}:${{ github.event.inputs.tag }}-arm64
+
+  merge-manifests:
+    needs: [build-amd64, build-arm64]
+    runs-on: [self-hosted]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Set lowercase repo name
+      run: echo "REPO_LC=$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create multi-arch manifest
+      run: |
+        TAG="${{ github.event.inputs.tag }}"
+
+        docker buildx imagetools create -t ghcr.io/${REPO_LC}:${TAG} \
+          ghcr.io/${REPO_LC}:${TAG}-amd64 \
+          ghcr.io/${REPO_LC}:${TAG}-arm64
