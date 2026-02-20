@@ -1,6 +1,6 @@
 {
   "name": "testplanit",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "private": true,
   "scripts": {
     "generate": "NODE_OPTIONS='--max-old-space-size=10140' zenstack generate && prisma db push",
