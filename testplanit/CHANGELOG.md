@@ -1,3 +1,10 @@
+# [0.12.0](https://github.com/TestPlanIt/testplanit/compare/v0.11.23...v0.12.0) (2026-02-20)
+
+
+### Features
+
+* add Microsoft SSO integration and demo project with guided tour ([#70](https://github.com/TestPlanIt/testplanit/issues/70)) ([2ab8f62](https://github.com/TestPlanIt/testplanit/commit/2ab8f62d896716ac0617cedd5eb58ed7f200331f))
+
 ## [0.11.23](https://github.com/TestPlanIt/testplanit/compare/v0.11.22...v0.11.23) (2026-02-15)
 
 ## [0.11.22](https://github.com/TestPlanIt/testplanit/compare/v0.11.21...v0.11.22) (2026-02-13)
