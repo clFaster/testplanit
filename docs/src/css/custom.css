@@ -231,6 +231,112 @@ figure figcaption {
   text-align: center;
 }
 
+/* ========================================
+   ALGOLIA DOCSEARCH THEME OVERRIDES
+   ======================================== */
+
+/* Light mode */
+:root {
+  --docsearch-primary-color: var(--brand-600);
+  --docsearch-text-color: var(--brand-950);
+  --docsearch-muted-color: var(--brand-700);
+  --docsearch-container-background: rgba(45, 29, 94, 0.7);
+  --docsearch-modal-background: var(--brand-50);
+  --docsearch-modal-shadow: 0 4px 30px rgba(133, 89, 233, 0.2);
+  --docsearch-searchbox-background: var(--brand-100);
+  --docsearch-searchbox-focus-background: #fff;
+  --docsearch-searchbox-shadow: inset 0 0 0 2px var(--brand-500);
+  --docsearch-hit-background: #fff;
+  --docsearch-hit-shadow: 0 1px 3px rgba(133, 89, 233, 0.1);
+  --docsearch-hit-color: var(--brand-900);
+  --docsearch-hit-active-color: #fff;
+  --docsearch-highlight-color: var(--brand-600);
+  --docsearch-footer-background: var(--brand-50);
+  --docsearch-footer-shadow: 0 -1px 0 0 var(--brand-200);
+  --docsearch-key-gradient: linear-gradient(-225deg, var(--brand-100), var(--brand-200));
+  --docsearch-key-shadow: inset 0 -2px 0 0 var(--brand-300),
+    inset 0 0 1px 1px #fff, 0 1px 2px 1px rgba(133, 89, 233, 0.15);
+}
+
+/* Dark mode */
+[data-theme='dark'] {
+  --docsearch-primary-color: var(--brand-400);
+  --docsearch-text-color: var(--brand-100);
+  --docsearch-muted-color: var(--brand-300);
+  --docsearch-container-background: rgba(15, 10, 30, 0.8);
+  --docsearch-modal-background: var(--brand-950);
+  --docsearch-modal-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  --docsearch-searchbox-background: rgba(133, 89, 233, 0.15);
+  --docsearch-searchbox-focus-background: rgba(133, 89, 233, 0.25);
+  --docsearch-searchbox-shadow: inset 0 0 0 2px var(--brand-600);
+  --docsearch-hit-background: rgba(133, 89, 233, 0.1);
+  --docsearch-hit-shadow: none;
+  --docsearch-hit-color: var(--brand-100);
+  --docsearch-hit-active-color: #fff;
+  --docsearch-highlight-color: var(--brand-400);
+  --docsearch-footer-background: rgba(45, 29, 94, 0.8);
+  --docsearch-footer-shadow: 0 -1px 0 0 rgba(133, 89, 233, 0.3);
+  --docsearch-key-gradient: linear-gradient(-225deg, var(--brand-900), var(--brand-800));
+  --docsearch-key-shadow: inset 0 -2px 0 0 var(--brand-700),
+    inset 0 0 1px 1px rgba(133, 89, 233, 0.3), 0 1px 2px 1px rgba(0, 0, 0, 0.3);
+}
+
+/* Navbar search button */
+.DocSearch-Button {
+  border-radius: 8px !important;
+}
+
+.DocSearch-Button:hover {
+  box-shadow: 0 0 0 2px var(--brand-400) !important;
+}
+
+/* Active hit uses brand gradient with white text for all children */
+.DocSearch-Hit[aria-selected='true'] a {
+  background: linear-gradient(135deg, var(--brand-600), var(--brand-700)) !important;
+}
+
+.DocSearch-Hit[aria-selected='true'] .DocSearch-Hit-title,
+.DocSearch-Hit[aria-selected='true'] .DocSearch-Hit-path,
+.DocSearch-Hit[aria-selected='true'] .DocSearch-Hit-icon,
+.DocSearch-Hit[aria-selected='true'] .DocSearch-Hit-action {
+  color: #fff !important;
+}
+
+/* Search box icon and reset button */
+.DocSearch-Search-Icon {
+  color: var(--brand-500) !important;
+}
+
+.DocSearch-Reset,
+.DocSearch-Clear {
+  color: var(--brand-500) !important;
+}
+
+.DocSearch-Reset:hover,
+.DocSearch-Clear:hover {
+  color: var(--brand-700) !important;
+}
+
+[data-theme='dark'] .DocSearch-Reset:hover,
+[data-theme='dark'] .DocSearch-Clear:hover {
+  color: var(--brand-300) !important;
+}
+
+/* Make highlight marks use brand purple */
+.DocSearch-Hit mark {
+  color: var(--brand-600) !important;
+}
+
+[data-theme='dark'] .DocSearch-Hit mark {
+  color: var(--brand-300) !important;
+}
+
+/* Make highlight marks readable on active hit */
+.DocSearch-Hit[aria-selected='true'] mark {
+  color: #fff !important;
+  text-decoration: underline;
+}
+
 /* Screen reader only utility */
 .sr-only {
   position: absolute;
