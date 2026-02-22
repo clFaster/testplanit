@@ -5354,6 +5354,25 @@
       "exists": "Exists",
       "not_exists": "Does not exist"
     },
+    "help": {
+      "exactPhrases": "Exact Phrases",
+      "exactPhrasesDesc": "Wrap terms in quotes to match exact phrases:",
+      "proximity": "Proximity Search",
+      "proximityDesc": "words within N positions of each other",
+      "booleanOperators": "Boolean Operators",
+      "andDesc": "both terms must match",
+      "orDesc": "either term can match",
+      "notDesc": "exclude results with term",
+      "prefixDesc": "require or exclude a term",
+      "groupingDesc": "group terms for complex queries",
+      "wildcards": "Wildcards",
+      "wildcardMultiDesc": "matches any characters",
+      "wildcardSingleDesc": "matches a single character",
+      "fuzzyMatching": "Fuzzy Matching",
+      "fuzzyDesc": "finds similar terms to help with typos",
+      "defaultBehavior": "Multiple words use OR by default. Results matching the name are ranked highest.",
+      "fullSyntaxLink": "Full Lucene query syntax reference"
+    },
     "filters": {
       "title": "Advanced Filters",
       "active": "filters active",

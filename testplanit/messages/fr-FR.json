@@ -5354,6 +5354,25 @@
       "exists": "Existe",
       "not_exists": "N'existe pas"
     },
+    "help": {
+      "exactPhrases": "Phrases exactes",
+      "exactPhrasesDesc": "Encadrez les termes de guillemets pour correspondre exactement aux expressions :",
+      "proximity": "Recherche de proximité",
+      "proximityDesc": "des mots situés à N positions les uns des autres",
+      "booleanOperators": "Opérateurs booléens",
+      "andDesc": "Les deux termes doivent correspondre",
+      "orDesc": "L'un ou l'autre terme peut correspondre",
+      "notDesc": "exclure les résultats avec terme",
+      "prefixDesc": "exiger ou exclure un terme",
+      "groupingDesc": "termes de regroupement pour les requêtes complexes",
+      "wildcards": "jokers",
+      "wildcardMultiDesc": "correspond à n'importe quel caractère",
+      "wildcardSingleDesc": "correspond à un seul caractère",
+      "fuzzyMatching": "Appariement flou",
+      "fuzzyDesc": "trouve des termes similaires pour aider à corriger les fautes de frappe",
+      "defaultBehavior": "La combinaison de mots multiples utilise par défaut l'opérateur OU. Les résultats correspondant au nom sont classés en premier.",
+      "fullSyntaxLink": "Référence complète de la syntaxe des requêtes Lucene"
+    },
     "filters": {
       "title": "Filtres avancés",
       "active": "filtres actifs",
