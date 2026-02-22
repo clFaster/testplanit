@@ -29,7 +29,7 @@ import {
   useFindManyWorkflows,
 } from "~/lib/hooks";
 import { ManageTags } from "./ManageTags";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import {
   ConfigurationSelect,
@@ -83,7 +83,7 @@ export default function TestResultsImportDialog({
   const t = useTranslations("common.actions.junit.import");
   const tFormat = useTranslations("common.actions.testResults.import.format");
   const tCommon = useTranslations("common");
-  const { toast } = useToast();
+
   const [open, setOpen] = useState(false);
   const [format, setFormat] = useState<TestResultFormat>(defaultFormat);
   const [stateId, setStateId] = useState<string>("");
@@ -291,8 +291,7 @@ export default function TestResultsImportDialog({
         }
       }
 
-      toast({
-        title: t("success.title"),
+      toast.success(t("success.title"), {
         description: t("success.description"),
       });
 
@@ -308,11 +307,9 @@ export default function TestResultsImportDialog({
       onSuccess?.();
     } catch (error) {
       console.error("Error importing test results:", error);
-      toast({
-        title: t("error.title"),
+      toast.error(t("error.title"), {
         description:
           error instanceof Error ? error.message : t("error.importFailed"),
-        variant: "destructive",
       });
     } finally {
       setIsImporting(false);

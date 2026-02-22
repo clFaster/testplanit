@@ -24,7 +24,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Download } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import UploadAttachments from "@/components/UploadAttachments";
 import Papa from "papaparse";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -75,7 +75,7 @@ export function ImportSharedStepsWizard({
   const t = useTranslations("sharedSteps");
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
-  const { toast } = useToast();
+
   const params = useParams();
   const projectId = parseInt(params.projectId as string);
 
@@ -294,10 +294,8 @@ export function ImportSharedStepsWizard({
             setFieldMappings(mappings);
           },
           error: (error: any) => {
-            toast({
-              title: t("importWizard.errors.parseFailed"),
+            toast.error(t("importWizard.errors.parseFailed"), {
               description: error.message,
-              variant: "destructive",
             });
           },
         });
@@ -311,7 +309,6 @@ export function ImportSharedStepsWizard({
     hasHeaders,
     encoding,
     t,
-    toast,
     sharedStepFields,
   ]);
 
@@ -421,8 +418,7 @@ export function ImportSharedStepsWizard({
       const result = await response.json();
 
       if (response.ok) {
-        toast({
-          title: tCommon("fields.success"),
+        toast.success(tCommon("fields.success"), {
           description: t("importWizard.success.description", {
             count: result.importedCount,
           }),
@@ -432,12 +428,10 @@ export function ImportSharedStepsWizard({
         onImportComplete?.();
       } else {
         if (result.errors && result.errors.length > 0) {
-          toast({
-            title: t("importWizard.errors.validationFailed"),
+          toast.error(t("importWizard.errors.validationFailed"), {
             description: t("importWizard.errors.validationDescription", {
               count: result.errors.length,
             }),
-            variant: "destructive",
           });
         } else {
           throw new Error(
@@ -446,11 +440,9 @@ export function ImportSharedStepsWizard({
         }
       }
     } catch (error) {
-      toast({
-        title: t("importWizard.errors.importFailed"),
+      toast.error(t("importWizard.errors.importFailed"), {
         description:
           error instanceof Error ? error.message : tCommon("errors.unknown"),
-        variant: "destructive",
       });
     } finally {
       setIsImporting(false);

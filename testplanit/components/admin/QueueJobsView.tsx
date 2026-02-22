@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import {
   RefreshCw,
   Loader2,
@@ -79,7 +79,7 @@ export function QueueJobsView({
   const t = useTranslations("admin.queues.jobs");
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common.actions");
-  const { toast } = useToast();
+
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,15 +106,13 @@ export function QueueJobsView({
       setJobs(data.jobs);
     } catch (error: any) {
       console.error("Error loading jobs:", error);
-      toast({
-        title: t("error.loadFailed"),
+      toast.error(t("error.loadFailed"), {
         description: error.message,
-        variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
-  }, [queueName, state, toast, t]);
+  }, [queueName, state, t]);
 
   useEffect(() => {
     loadJobs();
@@ -167,14 +165,11 @@ export function QueueJobsView({
 
       // Show appropriate message for partial success vs full success
       if (result.partialSuccess) {
-        toast({
-          title: "Partial Success",
+        toast("Partial Success", {
           description: result.message,
-          variant: "default", // Could use a warning variant if available
         });
       } else {
-        toast({
-          title: t("success.actionCompleted"),
+        toast.success(t("success.actionCompleted"), {
           description: result.message,
         });
       }
@@ -184,10 +179,8 @@ export function QueueJobsView({
       onRefresh();
     } catch (error: any) {
       console.error("Error performing action:", error);
-      toast({
-        title: t("error.actionFailed"),
+      toast.error(t("error.actionFailed"), {
         description: error.message,
-        variant: "destructive",
       });
     } finally {
       setActionInProgress(null);

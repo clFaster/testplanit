@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import {
   RefreshCw,
   Loader2,
@@ -70,7 +70,7 @@ interface QueueInfo {
 export function QueueManagement() {
   const t = useTranslations("admin.queues");
   const tGlobal = useTranslations();
-  const { toast } = useToast();
+
 
   const [queues, setQueues] = useState<QueueInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,15 +95,13 @@ export function QueueManagement() {
       setQueues(data.queues);
     } catch (error: any) {
       console.error("Error loading queues:", error);
-      toast({
-        title: t("error.loadFailed"),
+      toast.error(t("error.loadFailed"), {
         description: error.message,
-        variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
-  }, [toast, t]);
+  }, [t]);
 
   useEffect(() => {
     loadQueues();
@@ -154,8 +152,7 @@ export function QueueManagement() {
       }
 
       const result = await response.json();
-      toast({
-        title: t("success.actionCompleted"),
+      toast.success(t("success.actionCompleted"), {
         description: result.message,
       });
 
@@ -163,10 +160,8 @@ export function QueueManagement() {
       await loadQueues();
     } catch (error: any) {
       console.error("Error performing action:", error);
-      toast({
-        title: t("error.actionFailed"),
+      toast.error(t("error.actionFailed"), {
         description: error.message,
-        variant: "destructive",
       });
     } finally {
       setActionInProgress(null);

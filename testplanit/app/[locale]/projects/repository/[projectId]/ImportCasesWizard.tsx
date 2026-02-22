@@ -24,7 +24,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Download } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import {
   useFindManyTemplates,
   useFindManyRepositoryFolders,
@@ -108,7 +108,7 @@ export function ImportCasesWizard({
   const t = useTranslations("repository.cases");
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
-  const { toast } = useToast();
+
   const params = useParams();
   const projectId = parseInt(params.projectId as string);
 
@@ -467,10 +467,8 @@ export function ImportCasesWizard({
           setFieldMappings(mappings);
         },
         error: (error: any) => {
-          toast({
-            title: tGlobal("sharedSteps.importWizard.errors.parseFailed"),
+          toast.error(tGlobal("sharedSteps.importWizard.errors.parseFailed"), {
             description: error.message,
-            variant: "destructive",
           });
         },
       });
@@ -616,17 +614,15 @@ export function ImportCasesWizard({
               if (data.error) {
                 // Handle error
                 if (data.errors && data.errors.length > 0) {
-                  toast({
-                    title: tGlobal(
+                  toast.error(tGlobal(
                       "sharedSteps.importWizard.errors.validationFailed"
-                    ),
+                    ), {
                     description: tGlobal(
                       "sharedSteps.importWizard.errors.validationDescription",
                       {
                         count: data.errors.length,
                       }
                     ),
-                    variant: "destructive",
                   });
                 } else {
                   throw new Error(
@@ -639,8 +635,7 @@ export function ImportCasesWizard({
 
               if (data.complete) {
                 // Import completed
-                toast({
-                  title: tCommon("fields.title"),
+                toast.success(tCommon("fields.title"), {
                   description: tCommon("fields.description", {
                     count: data.importedCount,
                   }),
@@ -664,11 +659,9 @@ export function ImportCasesWizard({
         }
       }
     } catch (error) {
-      toast({
-        title: tGlobal("sharedSteps.importWizard.errors.importFailed"),
+      toast.error(tGlobal("sharedSteps.importWizard.errors.importFailed"), {
         description:
           error instanceof Error ? error.message : tCommon("errors.unknown"),
-        variant: "destructive",
       });
     } finally {
       setIsImporting(false);

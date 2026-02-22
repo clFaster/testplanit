@@ -41,7 +41,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Ban, Loader2, AlertTriangle } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 type PageSizeOption = number | "All";
 
@@ -59,7 +59,6 @@ function ApiTokensList() {
   const tCommon = useTranslations("common");
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { toast } = useToast();
   const {
     currentPage,
     setCurrentPage,
@@ -266,21 +265,16 @@ function ApiTokensList() {
         where: { id: tokenToRevoke.id },
         data: { isActive: false },
       });
-      toast({
-        title: t("revokeSuccess"),
-      });
+      toast.success(t("revokeSuccess"));
       refetchTokens();
       setRevokeDialogOpen(false);
       setTokenToRevoke(null);
     } catch (error) {
-      toast({
-        title: t("revokeError"),
-        variant: "destructive",
-      });
+      toast.error(t("revokeError"));
     } finally {
       setIsRevoking(false);
     }
-  }, [tokenToRevoke, toast, t, refetchTokens]);
+  }, [tokenToRevoke, t, refetchTokens]);
 
   const handleRevokeAll = useCallback(async () => {
     if (revokeAllConfirmText !== "REVOKE ALL") return;
@@ -303,24 +297,18 @@ function ApiTokensList() {
         )
       );
 
-      toast({
-        title: t("revokeAllSuccess"),
-      });
+      toast.success(t("revokeAllSuccess"));
       refetchTokens();
       setRevokeAllDialogOpen(false);
       setRevokeAllConfirmText("");
     } catch (error) {
-      toast({
-        title: t("revokeAllError"),
-        variant: "destructive",
-      });
+      toast.error(t("revokeAllError"));
     } finally {
       setIsRevokingAll(false);
     }
   }, [
     revokeAllConfirmText,
     totalFilteredTokens,
-    toast,
     t,
     refetchTokens,
   ]);

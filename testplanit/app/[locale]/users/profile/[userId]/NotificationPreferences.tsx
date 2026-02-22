@@ -14,7 +14,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { NotificationMode } from "@prisma/client";
 
 interface NotificationPreferencesProps {
@@ -31,7 +31,7 @@ export function NotificationPreferences({
   const tCommon = useTranslations("common");
   const tNotificationModes = useTranslations("admin.notifications.defaultMode");
   const { data: session } = useSession();
-  const { toast } = useToast();
+
   const [notificationMode, setNotificationMode] =
     useState<NotificationMode>("USE_GLOBAL");
   const [isEmailServerConfigured, setIsEmailServerConfigured] = useState(true);
@@ -90,16 +90,13 @@ export function NotificationPreferences({
       },
       {
         onSuccess: () => {
-          toast({
-            title: t("success.title"),
+          toast.success(t("success.title"), {
             description: t("success.description"),
           });
         },
         onError: () => {
-          toast({
-            title: tCommon("messages.createError"),
+          toast.error(tCommon("messages.createError"), {
             description: t("error.description"),
-            variant: "destructive",
           });
         },
       }
