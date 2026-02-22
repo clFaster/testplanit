@@ -1952,9 +1952,9 @@ export default function TestCaseDetails() {
               (p) => p.projectId === Number(projectId)
             ) ? (
               <div className="px-6 pb-4">
-                <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
-                  <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-                  <AlertDescription className="text-sm text-amber-800 dark:text-amber-400">
+                <Alert className="border-warning/50 bg-warning/10">
+                  <AlertCircle className="h-4 w-4 text-warning" />
+                  <AlertDescription className="text-sm text-warning-foreground">
                     {t("repository.templateNotAssignedWarning", {
                       templateName: testcase.template?.templateName || "",
                       projectName: testcase.project?.name || "",
@@ -2071,9 +2071,9 @@ export default function TestCaseDetails() {
                       (f) => f.caseField.type.type === "Steps"
                     ) && (
                       <div className="mb-4 mr-6">
-                        <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/20 mb-2">
-                          <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-                          <AlertDescription className="text-sm text-amber-800 dark:text-amber-400">
+                        <Alert className="border-warning/50 bg-warning/10 mb-2">
+                          <AlertCircle className="h-4 w-4 text-warning" />
+                          <AlertDescription className="text-sm text-warning-foreground">
                             {t("repository.orphanedStepsWarning", {
                               templateName: testcase.template?.templateName || "",
                             })}
@@ -2104,9 +2104,9 @@ export default function TestCaseDetails() {
 
                     return (
                       <div className="mb-4 mr-6">
-                        <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/20 mb-2">
-                          <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-                          <AlertDescription className="text-sm text-amber-800 dark:text-amber-400">
+                        <Alert className="border-warning/50 bg-warning/10 mb-2">
+                          <AlertCircle className="h-4 w-4 text-warning" />
+                          <AlertDescription className="text-sm text-warning-foreground">
                             {t("repository.orphanedFieldsWarning", {
                               count: orphanedFieldValues.length,
                               templateName: testcase.template?.templateName || "",

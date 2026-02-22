@@ -62,10 +62,10 @@ test.describe("Admin SSO - Email Server Configuration", () => {
     const isWarningVisible = await warningText.isVisible().catch(() => false);
 
     if (isWarningVisible) {
-      // Verify warning has appropriate styling (amber/yellow text)
+      // Verify warning has appropriate styling (warning theme color or amber/yellow)
       const warningElement = warningText.locator("..");
       const classList = await warningElement.getAttribute("class");
-      expect(classList).toMatch(/text-amber|text-yellow/);
+      expect(classList).toMatch(/text-warning|text-amber|text-yellow/);
     }
   });
 
