@@ -16,6 +16,7 @@ import { syncSharedStepToElasticsearch } from "~/services/sharedStepSearch";
 import { syncIssueToElasticsearch } from "~/services/issueSearch";
 import { syncMilestoneToElasticsearch } from "~/services/milestoneSearch";
 import { syncProjectToElasticsearch } from "~/services/projectSearch";
+import { getCurrentTenantId } from "~/lib/multiTenantPrisma";
 
 // Use AsyncLocalStorage for request-scoped API token auth (thread-safe)
 type ApiAuthContext = { userId: string; email?: string; name?: string } | null;
@@ -357,6 +358,9 @@ async function handler(
       headers: response.headers,
     });
 
+    // Get tenant ID for Elasticsearch index routing in multi-tenant deployments
+    const tenantId = getCurrentTenantId();
+
     // Manually trigger Elasticsearch sync for repositoryCases mutations
     // ZenStack's enhance() doesn't preserve Prisma client extensions
     if (
@@ -370,7 +374,7 @@ async function handler(
         const data = result?.data;
 
         if (data?.id) {
-          syncRepositoryCaseToElasticsearch(data.id).catch((error: any) => {
+          syncRepositoryCaseToElasticsearch(data.id, tenantId).catch((error: any) => {
             console.error(
               `Failed to sync repository case ${data.id} to Elasticsearch:`,
               error
@@ -397,7 +401,7 @@ async function handler(
         const data = result?.data;
 
         if (data?.id) {
-          syncTestRunToElasticsearch(data.id).catch((error: any) => {
+          syncTestRunToElasticsearch(data.id, tenantId).catch((error: any) => {
             console.error(
               `Failed to sync test run ${data.id} to Elasticsearch:`,
               error
@@ -424,7 +428,7 @@ async function handler(
         const data = result?.data;
 
         if (data?.id) {
-          syncSessionToElasticsearch(data.id).catch((error: any) => {
+          syncSessionToElasticsearch(data.id, tenantId).catch((error: any) => {
             console.error(
               `Failed to sync session ${data.id} to Elasticsearch:`,
               error
@@ -451,7 +455,7 @@ async function handler(
         const data = result?.data;
 
         if (data?.id) {
-          syncSharedStepToElasticsearch(data.id).catch((error: any) => {
+          syncSharedStepToElasticsearch(data.id, tenantId).catch((error: any) => {
             console.error(
               `Failed to sync shared step ${data.id} to Elasticsearch:`,
               error
@@ -478,7 +482,7 @@ async function handler(
         const data = result?.data;
 
         if (data?.id) {
-          syncIssueToElasticsearch(data.id).catch((error: any) => {
+          syncIssueToElasticsearch(data.id, undefined, tenantId).catch((error: any) => {
             console.error(
               `Failed to sync issue ${data.id} to Elasticsearch:`,
               error
@@ -505,7 +509,7 @@ async function handler(
         const data = result?.data;
 
         if (data?.id) {
-          syncMilestoneToElasticsearch(data.id).catch((error: any) => {
+          syncMilestoneToElasticsearch(data.id, tenantId).catch((error: any) => {
             console.error(
               `Failed to sync milestone ${data.id} to Elasticsearch:`,
               error
@@ -532,7 +536,7 @@ async function handler(
         const data = result?.data;
 
         if (data?.id) {
-          syncProjectToElasticsearch(data.id).catch((error: any) => {
+          syncProjectToElasticsearch(data.id, tenantId).catch((error: any) => {
             console.error(
               `Failed to sync project ${data.id} to Elasticsearch:`,
               error
@@ -560,7 +564,7 @@ async function handler(
         const data = result?.data;
 
         if (data?.repositoryCaseId) {
-          syncRepositoryCaseToElasticsearch(data.repositoryCaseId).catch((error: any) => {
+          syncRepositoryCaseToElasticsearch(data.repositoryCaseId, tenantId).catch((error: any) => {
             console.error(
               `Failed to sync repository case ${data.repositoryCaseId} after step update to Elasticsearch:`,
               error
@@ -588,7 +592,7 @@ async function handler(
         const data = result?.data;
 
         if (data?.repositoryCaseId) {
-          syncRepositoryCaseToElasticsearch(data.repositoryCaseId).catch((error: any) => {
+          syncRepositoryCaseToElasticsearch(data.repositoryCaseId, tenantId).catch((error: any) => {
             console.error(
               `Failed to sync repository case ${data.repositoryCaseId} after custom field update to Elasticsearch:`,
               error

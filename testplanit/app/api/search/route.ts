@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "~/server/auth";
 import { getElasticsearchClient } from "~/services/elasticsearchService";
 import { getIndicesForEntityTypes } from "~/services/unifiedElasticsearchService";
+import { getCurrentTenantId } from "~/lib/multiTenantPrisma";
 import {
   SearchOptions,
   UnifiedSearchResult,
@@ -39,8 +40,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get indices to search based on entity types
-    const indices = getIndicesForEntityTypes(filters.entityTypes);
+    // Get indices to search based on entity types (tenant-aware for multi-tenant deployments)
+    const tenantId = getCurrentTenantId();
+    const indices = getIndicesForEntityTypes(filters.entityTypes, tenantId);
 
     // Build the Elasticsearch query
     const esQuery = await buildElasticsearchQuery(filters, session.user);
@@ -828,17 +830,25 @@ function processFacets(aggregations: any, requestedFacets?: string[]): any {
  * Get entity type from index name
  */
 function getEntityTypeFromIndex(indexName: string): SearchableEntityType {
-  const indexToType: Record<string, SearchableEntityType> = {
-    "testplanit-repository-cases": SearchableEntityType.REPOSITORY_CASE,
-    "testplanit-shared-steps": SearchableEntityType.SHARED_STEP,
-    "testplanit-test-runs": SearchableEntityType.TEST_RUN,
-    "testplanit-sessions": SearchableEntityType.SESSION,
-    "testplanit-projects": SearchableEntityType.PROJECT,
-    "testplanit-issues": SearchableEntityType.ISSUE,
-    "testplanit-milestones": SearchableEntityType.MILESTONE,
+  // Handle both single-tenant (testplanit-{entity}) and multi-tenant (testplanit-{tenantId}-{entity}) index names
+  // Extract the entity suffix by matching against known suffixes
+  const suffixToType: Record<string, SearchableEntityType> = {
+    "repository-cases": SearchableEntityType.REPOSITORY_CASE,
+    "shared-steps": SearchableEntityType.SHARED_STEP,
+    "test-runs": SearchableEntityType.TEST_RUN,
+    "sessions": SearchableEntityType.SESSION,
+    "projects": SearchableEntityType.PROJECT,
+    "issues": SearchableEntityType.ISSUE,
+    "milestones": SearchableEntityType.MILESTONE,
   };
 
-  return indexToType[indexName] || SearchableEntityType.REPOSITORY_CASE;
+  for (const [suffix, type] of Object.entries(suffixToType)) {
+    if (indexName.endsWith(suffix)) {
+      return type;
+    }
+  }
+
+  return SearchableEntityType.REPOSITORY_CASE;
 }
 
 /**
