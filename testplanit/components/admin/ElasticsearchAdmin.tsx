@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import {
   RefreshCw,
   Database,
@@ -70,7 +70,7 @@ export function ElasticsearchAdmin({
 }: ElasticsearchAdminProps) {
   const t = useTranslations("admin.elasticsearch");
   const tGlobal = useTranslations();
-  const { toast } = useToast();
+
 
   const [status, setStatus] = useState<ElasticsearchStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -131,8 +131,7 @@ export function ElasticsearchAdmin({
       });
 
       if (response.ok) {
-        toast({
-          title: tGlobal("admin.notifications.success.title"),
+        toast.success(tGlobal("admin.notifications.success.title"), {
           description: t("settings.savedDescription"),
         });
 
@@ -147,8 +146,7 @@ export function ElasticsearchAdmin({
         );
 
         if (updateResponse.ok) {
-          toast({
-            title: t("settings.updated"),
+          toast.success(t("settings.updated"), {
             description: t("settings.updatedDescription"),
           });
           // Refresh status after updating
@@ -159,10 +157,8 @@ export function ElasticsearchAdmin({
       }
     } catch (error) {
       console.error("Failed to save replica settings:", error);
-      toast({
-        title: t("settings.error"),
+      toast.error(t("settings.error"), {
         description: t("settings.errorDescription"),
-        variant: "destructive",
       });
     } finally {
       setSavingReplicas(false);
@@ -210,8 +206,7 @@ export function ElasticsearchAdmin({
             details: jobStatus.result?.results,
           });
 
-          toast({
-            title: t("reindex.success.title"),
+          toast.success(t("reindex.success.title"), {
             description: t("reindex.success.description", {
               count: jobStatus.result?.totalDocuments || 0,
             }),
@@ -229,11 +224,9 @@ export function ElasticsearchAdmin({
           setReindexing(false);
           setCurrentJobId(null);
 
-          toast({
-            title: t("reindex.error.title"),
+          toast.error(t("reindex.error.title"), {
             description:
               jobStatus.failedReason || t("reindex.error.description"),
-            variant: "destructive",
           });
 
           setProgress(null);
@@ -245,7 +238,7 @@ export function ElasticsearchAdmin({
     }, 2000); // Poll every 2 seconds
 
     return () => clearInterval(pollInterval);
-  }, [currentJobId, t, toast, checkElasticsearchStatus]);
+  }, [currentJobId, t, checkElasticsearchStatus]);
 
   const startReindex = async () => {
     try {
@@ -273,10 +266,8 @@ export function ElasticsearchAdmin({
       });
     } catch (error: any) {
       console.error("Reindex error:", error);
-      toast({
-        title: t("reindex.error.title"),
+      toast.error(t("reindex.error.title"), {
         description: error.message || t("reindex.error.description"),
-        variant: "destructive",
       });
       setProgress(null);
       setReindexing(false);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
 import { useTranslations } from "next-intl";
@@ -41,7 +41,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Ban, Loader2, AlertTriangle } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 type PageSizeOption = number | "All";
 
@@ -59,7 +59,6 @@ function ApiTokensList() {
   const tCommon = useTranslations("common");
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { toast } = useToast();
   const {
     currentPage,
     setCurrentPage,
@@ -94,19 +93,30 @@ function ApiTokensList() {
   const [revokeAllConfirmText, setRevokeAllConfirmText] = useState("");
   const [isRevokingAll, setIsRevokingAll] = useState(false);
 
+  // Map column IDs to actual database field names for orderBy
+  const columnToFieldMap: Record<string, string> = {
+    user: "userId",
+    status: "isActive",
+  };
+
   // Calculate skip and take based on pageSize
   const effectivePageSize =
     typeof pageSize === "number" ? pageSize : totalItems;
   const skip = (currentPage - 1) * effectivePageSize;
+  const sortField = sortConfig
+    ? columnToFieldMap[sortConfig.column] || sortConfig.column
+    : "createdAt";
 
   const { mutateAsync: updateApiToken } = useUpdateApiToken();
+
+  // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
+  const updateApiTokenRef = useRef(updateApiToken);
+  updateApiTokenRef.current = updateApiToken;
 
   const { data: totalFilteredTokens, isLoading: isTotalLoading } =
     useFindManyApiToken(
       {
-        orderBy: sortConfig
-          ? { [sortConfig.column]: sortConfig.direction }
-          : { createdAt: "desc" },
+        orderBy: { [sortField]: sortConfig?.direction || "desc" },
         include: {
           user: {
             select: {
@@ -168,9 +178,7 @@ function ApiTokensList() {
     refetch: refetchTokens,
   } = useFindManyApiToken(
     {
-      orderBy: sortConfig
-        ? { [sortConfig.column]: sortConfig.direction }
-        : { createdAt: "desc" },
+      orderBy: { [sortField]: sortConfig?.direction || "desc" },
       include: {
         user: {
           select: {
@@ -258,25 +266,20 @@ function ApiTokensList() {
 
     setIsRevoking(true);
     try {
-      await updateApiToken({
+      await updateApiTokenRef.current({
         where: { id: tokenToRevoke.id },
         data: { isActive: false },
       });
-      toast({
-        title: t("revokeSuccess"),
-      });
+      toast.success(t("revokeSuccess"));
       refetchTokens();
       setRevokeDialogOpen(false);
       setTokenToRevoke(null);
     } catch (error) {
-      toast({
-        title: t("revokeError"),
-        variant: "destructive",
-      });
+      toast.error(t("revokeError"));
     } finally {
       setIsRevoking(false);
     }
-  }, [tokenToRevoke, updateApiToken, toast, t, refetchTokens]);
+  }, [tokenToRevoke, t, refetchTokens]);
 
   const handleRevokeAll = useCallback(async () => {
     if (revokeAllConfirmText !== "REVOKE ALL") return;
@@ -292,39 +295,40 @@ function ApiTokensList() {
       // Revoke each token
       await Promise.all(
         activeTokenIds.map((id) =>
-          updateApiToken({
+          updateApiTokenRef.current({
             where: { id },
             data: { isActive: false },
           })
         )
       );
 
-      toast({
-        title: t("revokeAllSuccess"),
-      });
+      toast.success(t("revokeAllSuccess"));
       refetchTokens();
       setRevokeAllDialogOpen(false);
       setRevokeAllConfirmText("");
     } catch (error) {
-      toast({
-        title: t("revokeAllError"),
-        variant: "destructive",
-      });
+      toast.error(t("revokeAllError"));
     } finally {
       setIsRevokingAll(false);
     }
   }, [
     revokeAllConfirmText,
     totalFilteredTokens,
-    updateApiToken,
-    toast,
     t,
     refetchTokens,
   ]);
 
+  // Extract stable primitives from session to avoid column remounts when session object changes
+  const dateFormat = session?.user?.preferences?.dateFormat;
+  const timezone = session?.user?.preferences?.timezone;
+  const userPreferences = useMemo(
+    () => ({ user: { preferences: { dateFormat, timezone } } }),
+    [dateFormat, timezone]
+  );
+
   const columns = useMemo(
-    () => getColumns(session, handleRevoke, t, tCommon),
-    [session, handleRevoke, t, tCommon]
+    () => getColumns(userPreferences, handleRevoke, t, tCommon),
+    [userPreferences, handleRevoke, t, tCommon]
   );
 
   const [columnVisibility, setColumnVisibility] = useState<

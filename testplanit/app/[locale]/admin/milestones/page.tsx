@@ -249,8 +249,8 @@ function MilestoneTypes() {
   };
 
   const columns: CustomColumnDef<ExtendedMilestoneTypes>[] = useMemo(
-    () => getColumns(session, handleToggleDefault, tCommon),
-    [session, handleToggleDefault, tCommon]
+    () => getColumns(handleToggleDefault, tCommon),
+    [handleToggleDefault, tCommon]
   );
 
   const [columnVisibility, setColumnVisibility] = useState<

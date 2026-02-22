@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "~/types/dndTypes";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import type { RepositoryFolders } from "@prisma/client";
 
 interface ArboristNode {
@@ -826,8 +826,7 @@ const TreeView: React.FC<{
               );
               await Promise.all(updatePromises);
 
-              toast({
-                title: t("common.fields.success"),
+              toast.success(t("common.fields.success"), {
                 description: t("common.messages.updateSuccess", {
                   count: itemsToUpdate.length,
                 }),
@@ -837,10 +836,8 @@ const TreeView: React.FC<{
               onRefetchStats?.();
             } catch (error) {
               console.error("Failed to move test case(s):", error);
-              toast({
-                title: t("common.errors.error"),
+              toast.error(t("common.errors.error"), {
                 description: t("common.messages.updateError"),
-                variant: "destructive",
               });
             }
           };

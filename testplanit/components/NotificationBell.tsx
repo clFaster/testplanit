@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DateFormatter } from "@/components/DateFormatter";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { cn } from "~/utils";
 import { NotificationContent } from "@/components/NotificationContent";
@@ -159,7 +159,7 @@ export function NotificationBell() {
   const t = useTranslations("components.notifications");
   const tCommon = useTranslations("common");
   const { data: session } = useSession();
-  const { toast } = useToast();
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -224,10 +224,7 @@ export function NotificationBell() {
     if (result.success) {
       refetch();
     } else {
-      toast({
-        title: t("error.markRead"),
-        variant: "destructive",
-      });
+      toast.error(t("error.markRead"));
     }
   };
 
@@ -236,10 +233,7 @@ export function NotificationBell() {
     if (result.success) {
       refetch();
     } else {
-      toast({
-        title: t("error.markUnread"),
-        variant: "destructive",
-      });
+      toast.error(t("error.markUnread"));
     }
   };
 
@@ -247,14 +241,9 @@ export function NotificationBell() {
     const result = await deleteNotification(id);
     if (result.success) {
       refetch();
-      toast({
-        title: t("success.deleted"),
-      });
+      toast.success(t("success.deleted"));
     } else {
-      toast({
-        title: t("error.delete"),
-        variant: "destructive",
-      });
+      toast.error(t("error.delete"));
     }
   };
 
@@ -262,14 +251,9 @@ export function NotificationBell() {
     const result = await markAllNotificationsAsRead();
     if (result.success) {
       refetch();
-      toast({
-        title: t("success.markedAllRead"),
-      });
+      toast.success(t("success.markedAllRead"));
     } else {
-      toast({
-        title: t("error.markAllRead"),
-        variant: "destructive",
-      });
+      toast.error(t("error.markAllRead"));
     }
   };
 

@@ -10,7 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { ExtendedIssue } from "./columns";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "~/lib/navigation";
@@ -22,7 +22,7 @@ interface SyncIssueProps {
 export function SyncIssue({ issue }: SyncIssueProps) {
   const t = useTranslations("admin.issues");
   const tCommon = useTranslations("common");
-  const { toast } = useToast();
+
   const queryClient = useQueryClient();
   const router = useRouter();
   const [isSyncing, setIsSyncing] = useState(false);
@@ -55,16 +55,13 @@ export function SyncIssue({ issue }: SyncIssueProps) {
       await new Promise(resolve => setTimeout(resolve, 100));
 
       // Show success message after data is refreshed
-      toast({
-        title: t("syncSuccess"),
+      toast.success(t("syncSuccess"), {
         description: t("syncSuccessDescription", { name: issue.name }),
       });
     } catch (error: any) {
       console.error("Error syncing issue:", error);
-      toast({
-        title: t("syncError"),
+      toast.error(t("syncError"), {
         description: error.message || t("syncErrorDescription"),
-        variant: "destructive",
       });
     } finally {
       setIsSyncing(false);

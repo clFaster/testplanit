@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Copy, ExternalLink, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
 interface ShareLinkCreatedProps {
@@ -22,7 +22,7 @@ export function ShareLinkCreated({
   onCreateAnother,
 }: ShareLinkCreatedProps) {
   const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
+
   const t = useTranslations("reports.shareDialog.created");
   const tToast = useTranslations("reports.shareDialog.shareList.toast");
 
@@ -30,16 +30,13 @@ export function ShareLinkCreated({
     try {
       await navigator.clipboard.writeText(shareData.shareUrl);
       setCopied(true);
-      toast({
-        title: tToast("linkCopied"),
+      toast.success(tToast("linkCopied"), {
         description: tToast("linkCopiedDescription"),
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      toast({
-        title: tToast("copyFailed"),
+      toast.error(tToast("copyFailed"), {
         description: tToast("copyFailedDescription"),
-        variant: "destructive",
       });
     }
   };

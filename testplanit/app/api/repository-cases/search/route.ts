@@ -8,6 +8,7 @@ import {
   type SearchOptions,
 } from "~/services/repositoryCaseSearch";
 import { z } from "zod/v4";
+import { getCurrentTenantId } from "~/lib/multiTenantPrisma";
 
 // Search request schema
 const searchSchema = z.object({
@@ -89,9 +90,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = searchSchema.parse(body);
 
-    // Perform search
+    // Perform search (tenant-aware for multi-tenant deployments)
+    const tenantId = getCurrentTenantId();
     const searchResult = await searchRepositoryCases(
-      validatedData as SearchOptions
+      validatedData as SearchOptions,
+      tenantId
     );
 
     if (!searchResult) {
@@ -150,11 +153,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ suggestions: [] });
     }
 
-    // Get suggestions
+    // Get suggestions (tenant-aware for multi-tenant deployments)
+    const tenantId = getCurrentTenantId();
     const suggestions = await getSearchSuggestions(
       prefix,
       field || "name",
-      size
+      size,
+      tenantId
     );
 
     return NextResponse.json({ suggestions });

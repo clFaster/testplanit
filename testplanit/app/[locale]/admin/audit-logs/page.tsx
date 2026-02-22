@@ -347,9 +347,17 @@ function AuditLogsContent({ session }: { session: Session }) {
     entityTypeFilter,
   ]);
 
+  // Extract stable primitives from session to avoid column remounts when session object changes
+  const dateFormat = session?.user?.preferences?.dateFormat;
+  const timezone = session?.user?.preferences?.timezone;
+  const userPreferences = useMemo(
+    () => ({ user: { preferences: { dateFormat, timezone } } }),
+    [dateFormat, timezone]
+  );
+
   const columns = useMemo(
-    () => getColumns(session, handleViewDetails, t, tCommon, tUserMenu),
-    [session, handleViewDetails, t, tCommon, tUserMenu]
+    () => getColumns(userPreferences, handleViewDetails, t, tCommon, tUserMenu),
+    [userPreferences, handleViewDetails, t, tCommon, tUserMenu]
   );
 
   const [columnVisibility, setColumnVisibility] = useState<

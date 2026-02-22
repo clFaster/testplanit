@@ -37,7 +37,7 @@ export default async function RootLayout(props: any) {
               <Header />
             </div>
             {props.children}
-            <Toaster richColors toastOptions={{ className: "!z-[9999]" }} />
+            <Toaster richColors className="!z-[9999]" />
           </div>
         </NextStepOnboarding>
       </NextIntlClientProvider>

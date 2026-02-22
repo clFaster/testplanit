@@ -12,7 +12,7 @@ export interface ExtendedApiToken extends ApiToken {
 }
 
 export const getColumns = (
-  session: any,
+  userPreferences: any,
   onRevoke: (token: ExtendedApiToken) => void,
   t: ReturnType<typeof useTranslations<"admin.apiTokens">>,
   tCommon: ReturnType<typeof useTranslations<"common">>
@@ -62,9 +62,9 @@ export const getColumns = (
         <DateFormatter
           date={getValue() as Date | string}
           formatString={
-            session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+            userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
           }
-          timezone={session.user.preferences?.timezone || "Etc/UTC"}
+          timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
         />
       </div>
     ),
@@ -82,9 +82,9 @@ export const getColumns = (
           <DateFormatter
             date={row.original.lastUsedAt}
             formatString={
-              session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+              userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
             }
-            timezone={session.user.preferences?.timezone || "Etc/UTC"}
+            timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
           />
         ) : (
           <span className="text-muted-foreground/50">{t("lastUsedNever")}</span>
@@ -110,9 +110,9 @@ export const getColumns = (
           <DateFormatter
             date={expiresAt}
             formatString={
-              session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+              userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
             }
-            timezone={session.user.preferences?.timezone || "Etc/UTC"}
+            timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
           />
         </Badge>
       );

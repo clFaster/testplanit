@@ -204,12 +204,12 @@ export function IntegrationConfigForm({
   return (
     <div className="space-y-4">
       {showApiKeyWarning && (
-        <Alert className="border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950">
-          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-          <AlertTitle className="text-amber-900 dark:text-amber-100">
+        <Alert className="border-warning/50 bg-warning/10">
+          <AlertTriangle className="h-4 w-4 text-warning" />
+          <AlertTitle className="text-warning-foreground">
             {t("config.apiKeyWarningTitle")}
           </AlertTitle>
-          <AlertDescription className="text-amber-800 dark:text-amber-200">
+          <AlertDescription className="text-warning-foreground">
             <div className="mt-2 space-y-2">
               <p>{t("config.apiKeyWarningDescription")}</p>
               <ul className="list-disc list-inside space-y-1 text-sm">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
 import { useTranslations } from "next-intl";
@@ -29,6 +29,11 @@ function Status() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { mutateAsync: updateStatus } = useUpdateStatus();
+
+  // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
+  const updateStatusRef = useRef(updateStatus);
+  // eslint-disable-next-line react-hooks/refs
+  updateStatusRef.current = updateStatus;
 
   const { data } = useFindManyStatus(
     {
@@ -61,7 +66,7 @@ function Status() {
   const handleToggleEnabled = useCallback(
     async (id: number, isEnabled: boolean) => {
       try {
-        await updateStatus({
+        await updateStatusRef.current({
           where: { id },
           data: { isEnabled },
         });
@@ -69,13 +74,13 @@ function Status() {
         console.error("Failed to update status:", error);
       }
     },
-    [updateStatus]
+    []
   );
 
   const handleToggleSuccess = useCallback(
     async (id: number, isSuccess: boolean) => {
       try {
-        await updateStatus({
+        await updateStatusRef.current({
           where: { id },
           data: { isSuccess, isFailure: isSuccess ? false : undefined },
         });
@@ -83,13 +88,13 @@ function Status() {
         console.error("Failed to update status:", error);
       }
     },
-    [updateStatus]
+    []
   );
 
   const handleToggleFailure = useCallback(
     async (id: number, isFailure: boolean) => {
       try {
-        await updateStatus({
+        await updateStatusRef.current({
           where: { id },
           data: { isFailure, isSuccess: isFailure ? false : undefined },
         });
@@ -97,13 +102,13 @@ function Status() {
         console.error("Failed to update status:", error);
       }
     },
-    [updateStatus]
+    []
   );
 
   const handleToggleCompleted = useCallback(
     async (id: number, isCompleted: boolean) => {
       try {
-        await updateStatus({
+        await updateStatusRef.current({
           where: { id },
           data: { isCompleted },
         });
@@ -111,9 +116,10 @@ function Status() {
         console.error("Failed to update status:", error);
       }
     },
-    [updateStatus]
+    []
   );
 
+  /* eslint-disable react-hooks/refs */
   const columns = useMemo(
     () =>
       getColumns(
@@ -131,6 +137,7 @@ function Status() {
       tCommon,
     ]
   );
+  /* eslint-enable react-hooks/refs */
 
   const [columnVisibility, setColumnVisibility] = useState<
     Record<string, boolean>

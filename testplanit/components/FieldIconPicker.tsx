@@ -95,7 +95,7 @@ export const FieldIconPicker: React.FC<FieldIconPickerProps> = ({
 
   const selectedIcon = allIcons.find((icon) => icon.id === selectedIconId);
   const selectedColorHex =
-    colors.find((color) => color.id === selectedColorId)?.value || "#000000";
+    colors.find((color) => color.id === selectedColorId)?.value ?? undefined;
 
   return (
     <div className="flex flex-row space-x-1 items-center">

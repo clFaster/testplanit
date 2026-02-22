@@ -57,7 +57,7 @@ import { HelpPopover } from "@/components/ui/help-popover";
 import { useTranslations, useLocale } from "next-intl";
 import ProjectRepository from "../../repository/[projectId]/ProjectRepository";
 import { useRouter } from "~/lib/navigation";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { PlusCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { SelectedTestCasesDrawer } from "@/components/SelectedTestCasesDrawer";
@@ -841,7 +841,7 @@ export default function AddTestRunModal({
     total: 0,
   });
   const router = useRouter();
-  const { toast } = useToast();
+
   const [linkedIssueIds, setLinkedIssueIds] = useState<number[]>([]);
 
   const { mutateAsync: createTestRuns } = useCreateTestRuns();
@@ -1230,9 +1230,7 @@ export default function AddTestRunModal({
 
   async function onSubmit(data: z.infer<typeof BaseFormSchema>) {
     if (!session?.user?.id) {
-      toast({
-        variant: "destructive",
-        title: tCommon("errors.notAuthenticated.title"),
+      toast.error(tCommon("errors.notAuthenticated.title"), {
         description: tCommon("errors.notAuthenticated.message"),
       });
       return;
@@ -1261,9 +1259,7 @@ export default function AddTestRunModal({
               response.error,
               response.issues
             );
-            toast({
-              variant: "destructive",
-              title: tCommon("errors.failedToFetchAssignments.title"),
+            toast.error(tCommon("errors.failedToFetchAssignments.title"), {
               description:
                 response.error ||
                 tCommon("errors.failedToFetchAssignments.message"),
@@ -1345,8 +1341,7 @@ export default function AddTestRunModal({
       }
 
       const runsCreated = createdRuns.length;
-      toast({
-        title: t("success.title"),
+      toast.success(t("success.title"), {
         description:
           runsCreated > 1
             ? t("success.descriptionMultiple", {
@@ -1359,9 +1354,7 @@ export default function AddTestRunModal({
       router.refresh();
     } catch (error: any) {
       console.error("Failed to create test run:", error);
-      toast({
-        variant: "destructive",
-        title: tCommon("errors.failedToFetchAssignments.title"),
+      toast.error(tCommon("errors.failedToFetchAssignments.title"), {
         description:
           error.message || tCommon("errors.failedToFetchAssignments.message"),
       });

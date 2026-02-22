@@ -18,6 +18,8 @@
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 20%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
@@ -52,6 +54,8 @@
     --accent-foreground: 222.2 47.4% 11.2%; /* Adjusted for dark mode */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 82%;
+    --warning: 38 80% 40%;
+    --warning-foreground: 38 90% 80%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 70%;
@@ -222,6 +226,8 @@ svg[class*="plot-"] .gantt-task-label text {
   --accent-foreground: 24 9.8% 10%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 9.1% 97.8%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 38 92% 20%;
   --border: 20 5.9% 90%;
   --input: 20 5.9% 90%;
   --ring: 24.6 95% 53.1%;
@@ -244,6 +250,8 @@ svg[class*="plot-"] .gantt-task-label text {
   --accent-foreground: 240 5.9% 10%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 38 92% 20%;
   --border: 240 5.9% 90%;
   --input: 240 5.9% 90%;
   --ring: 142.1 76.2% 36.3%;
@@ -266,6 +274,8 @@ svg[class*="plot-"] .gantt-task-label text {
   --accent-foreground: 220.9 39.3% 11%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 20% 98%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 38 92% 20%;
   --border: 220 13% 91%;
   --input: 220 13% 91%;
   --ring: 262.1 83.3% 57.8%;
@@ -290,10 +300,18 @@ svg[class*="plot-"] .gantt-task-label text {
     color: hsl(var(--foreground));
   }
 
-  /* Search result highlighting */
-  mark {
-    @apply bg-yellow-200 dark:bg-yellow-800 px-1 rounded-sm text-inherit;
-  }
+}
+
+/* Search result highlighting - outside @layer to override browser defaults */
+mark {
+  background-color: hsl(var(--warning) / 0.3);
+  color: inherit;
+  padding-inline: 0.25rem;
+  border-radius: 0.125rem;
+}
+
+.dark mark {
+  background-color: hsl(var(--warning) / 0.45);
 }
 
 /* Tooltip specific styles using CSS variables */

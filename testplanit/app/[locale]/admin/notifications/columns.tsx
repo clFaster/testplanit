@@ -31,7 +31,7 @@ export interface NotificationHistoryItem {
 }
 
 export const getColumns = (
-  session: any,
+  userPreferences: { user: { preferences: { dateFormat?: string; timezone?: string; timeFormat?: string } } },
   t: ReturnType<typeof useTranslations<"admin.notifications">>,
   tCommon: ReturnType<typeof useTranslations<"common">>
 ): ColumnDef<NotificationHistoryItem>[] => [
@@ -100,20 +100,24 @@ export const getColumns = (
       const renderContent = (isPreview: boolean) => {
         if (isTipTapJson) {
           return (
-            <TextFromJson
-              jsonString={JSON.stringify(richContent)}
-              format="html"
-              room={`notification-history-${isPreview ? "preview" : "full"}-${notification.id}`}
-              expand={!isPreview}
-              expandable={false}
-            />
+            <div className="text-sm text-muted-foreground">
+              <TextFromJson
+                jsonString={JSON.stringify(richContent)}
+                format="html"
+                room={`notification-history-${isPreview ? "preview" : "full"}-${notification.id}`}
+                expand={!isPreview}
+                expandable={false}
+              />
+            </div>
           );
         }
         if (htmlSource) {
           return (
             <div
               className={
-                isPreview ? "line-clamp-2" : "prose prose-sm max-w-none"
+                isPreview
+                  ? "text-sm text-muted-foreground line-clamp-2"
+                  : "text-sm text-muted-foreground prose prose-sm dark:prose-invert max-w-none prose-headings:text-foreground prose-strong:text-foreground prose-strong:font-semibold prose-a:text-primary prose-a:underline"
               }
               dangerouslySetInnerHTML={{ __html: htmlSource }}
             />
@@ -173,10 +177,10 @@ export const getColumns = (
     size: 180,
     cell: ({ getValue }) => {
       const date = getValue() as Date | string;
-      const timezone = session?.user?.preferences?.timezone || "Etc/UTC";
+      const timezone = userPreferences?.user?.preferences?.timezone || "Etc/UTC";
       const dateFormat =
-        session?.user?.preferences?.dateFormat || "MM_DD_YYYY_DASH";
-      const timeFormat = session?.user?.preferences?.timeFormat || "HH_MM_24";
+        userPreferences?.user?.preferences?.dateFormat || "MM_DD_YYYY_DASH";
+      const timeFormat = userPreferences?.user?.preferences?.timeFormat || "HH_MM_24";
       return (
         <div className="whitespace-nowrap text-sm cursor-default">
           <DateFormatter

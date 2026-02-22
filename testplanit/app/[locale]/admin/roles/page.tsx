@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
 import { useTranslations } from "next-intl";
@@ -179,15 +179,23 @@ function RoleList() {
   const { mutateAsync: updateRole } = useUpdateRoles();
   const { mutateAsync: updateManyRoles } = useUpdateManyRoles();
 
+  // Stabilize mutation refs — ZenStack's mutateAsync changes identity every render
+  const updateRoleRef = useRef(updateRole);
+  const updateManyRolesRef = useRef(updateManyRoles);
+  // eslint-disable-next-line react-hooks/refs
+  updateRoleRef.current = updateRole;
+  // eslint-disable-next-line react-hooks/refs
+  updateManyRolesRef.current = updateManyRoles;
+
   const handleToggleDefault = useCallback(
     async (id: number, isDefault: boolean) => {
       try {
         if (isDefault) {
-          await updateManyRoles({
+          await updateManyRolesRef.current({
             where: { isDefault: true },
             data: { isDefault: false },
           });
-          await updateRole({
+          await updateRoleRef.current({
             where: { id },
             data: { isDefault: true },
           });
@@ -196,12 +204,13 @@ function RoleList() {
         console.error("Failed to update role:", error);
       }
     },
-    [updateRole, updateManyRoles]
+    []
   );
 
   const columns = useMemo(
-    () => getColumns(session, handleToggleDefault, tCommon),
-    [session, handleToggleDefault, tCommon]
+    // eslint-disable-next-line react-hooks/refs
+    () => getColumns(handleToggleDefault, tCommon),
+    [handleToggleDefault, tCommon]
   );
 
   const [columnVisibility, setColumnVisibility] = useState<

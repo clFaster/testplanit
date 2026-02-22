@@ -120,7 +120,7 @@ export async function deleteSessionFromIndex(sessionId: number, tenantId?: strin
 /**
  * Sync a single session to Elasticsearch
  */
-export async function syncSessionToElasticsearch(sessionId: number): Promise<boolean> {
+export async function syncSessionToElasticsearch(sessionId: number, tenantId?: string): Promise<boolean> {
   const client = getElasticsearchClient();
   if (!client) {
     console.warn("Elasticsearch client not available");
@@ -150,7 +150,7 @@ export async function syncSessionToElasticsearch(sessionId: number): Promise<boo
     // Index session including deleted ones (filtering happens at search time based on admin permissions)
 
     // Index the session
-    await indexSession(session as SessionForIndexing);
+    await indexSession(session as SessionForIndexing, tenantId);
     return true;
   } catch (error) {
     console.error(`Failed to sync session ${sessionId}:`, error);

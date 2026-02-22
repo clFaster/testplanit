@@ -216,23 +216,24 @@ async function buildFolderPath(
  * Sync a repository case to Elasticsearch after create/update
  */
 export async function syncRepositoryCaseToElasticsearch(
-  caseId: number
+  caseId: number,
+  tenantId?: string
 ): Promise<boolean> {
   const doc = await buildRepositoryCaseDocument(caseId);
   if (!doc) {
     // Case no longer exists (hard deleted) - remove from Elasticsearch
-    await deleteRepositoryCase(caseId);
+    await deleteRepositoryCase(caseId, tenantId);
     return true;
   }
 
   // Index all cases including deleted ones (they'll be filtered in search based on admin permissions)
   // Only exclude archived cases as they're typically not meant to be searchable
   if (doc.isArchived) {
-    await deleteRepositoryCase(caseId);
+    await deleteRepositoryCase(caseId, tenantId);
     return true;
   }
 
-  return await indexRepositoryCase(doc);
+  return await indexRepositoryCase(doc, tenantId);
 }
 
 /**

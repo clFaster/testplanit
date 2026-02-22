@@ -18,7 +18,6 @@ export interface ExtendedMilestoneTypes extends MilestoneTypes {
 }
 
 export const getColumns = (
-  session: any,
   handleToggleDefault: (id: number, isDefault: boolean) => void,
   tCommon: ReturnType<typeof useTranslations<"common">>
 ): ColumnDef<ExtendedMilestoneTypes>[] => [

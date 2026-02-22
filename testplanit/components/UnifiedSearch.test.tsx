@@ -448,11 +448,11 @@ describe("UnifiedSearch Component", () => {
       // First check if we have results
       expect(screen.getByText("Test Case 1")).toBeInTheDocument();
 
-      // Check pagination text - it's a single text node with all parts
-      const paginationText = screen.getByText((content, element) => {
+      // Check pagination text (rendered at top and bottom)
+      const paginationTexts = screen.getAllByText((content, element) => {
         return element?.textContent === "common.pagination.showing 1-50 common.of 100 common.results";
       });
-      expect(paginationText).toBeInTheDocument();
+      expect(paginationTexts.length).toBeGreaterThanOrEqual(1);
     });
 
     // Mock the second page response

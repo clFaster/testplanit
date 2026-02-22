@@ -27,7 +27,6 @@ export interface ExtendedTemplates extends Templates {
 
 export const getColumns = (
   tCommon: ReturnType<typeof useTranslations<"common">>,
-  session: any,
   handleToggleEnabled: (id: number, isEnabled: boolean) => void,
   handleToggleDefault: (id: number, isDefault: boolean) => void
 ): ColumnDef<ExtendedTemplates>[] => {

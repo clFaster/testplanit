@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
 import {
@@ -58,6 +58,12 @@ export default function TemplateComponent() {
   const { mutateAsync: deleteManyTemplateProjectAssignment } =
     useDeleteManyTemplateProjectAssignment();
 
+  // Stabilize mutation refs — ZenStack's mutateAsync changes identity every render,
+  // which would cause useCallback/useMemo to recompute and remount table cells.
+  const updateTemplateRef = useRef(updateTemplate);
+  // eslint-disable-next-line react-hooks/refs
+  updateTemplateRef.current = updateTemplate;
+
   const { data: projects } = useFindManyProjects({
     where: { isDeleted: false },
   });
@@ -84,7 +90,7 @@ export default function TemplateComponent() {
   const handleToggleEnabled = useCallback(
     async (id: number, isEnabled: boolean) => {
       try {
-        await updateTemplate({
+        await updateTemplateRef.current({
           where: { id },
           data: { isEnabled },
         });
@@ -92,7 +98,7 @@ export default function TemplateComponent() {
         console.error("Failed to update template:", error);
       }
     },
-    [updateTemplate]
+    []
   );
 
   const handleToggleDefault = useCallback((id: number, isDefault: boolean) => {
@@ -133,8 +139,9 @@ export default function TemplateComponent() {
 
   const columns: any[] = useMemo(
     () =>
-      getColumns(tCommon, session, handleToggleEnabled, handleToggleDefault),
-    [session, handleToggleEnabled, handleToggleDefault, tCommon]
+      // eslint-disable-next-line react-hooks/refs
+      getColumns(tCommon, handleToggleEnabled, handleToggleDefault),
+    [handleToggleEnabled, handleToggleDefault, tCommon]
   );
 
   const [columnVisibility, setColumnVisibility] = useState<

@@ -60,7 +60,7 @@ function formatAction(action: AuditAction): string {
 }
 
 export const getColumns = (
-  session: any,
+  userPreferences: { user: { preferences: { timezone?: string } } },
   onViewDetails: (log: ExtendedAuditLog) => void,
   t: ReturnType<typeof useTranslations<"admin.auditLogs">>,
   tCommon: ReturnType<typeof useTranslations<"common">>,
@@ -77,7 +77,7 @@ export const getColumns = (
         <DateFormatter
           date={getValue() as Date | string}
           formatString="MM-dd-yyyy HH:mm:ss"
-          timezone={session?.user?.preferences?.timezone || "Etc/UTC"}
+          timezone={userPreferences?.user?.preferences?.timezone || "Etc/UTC"}
         />
       </div>
     ),

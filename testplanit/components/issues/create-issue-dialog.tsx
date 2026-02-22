@@ -35,7 +35,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useFindManyProjectIntegration } from "@/lib/hooks/project-integration";
 import { useCreateIssue } from "@/lib/hooks/issue";
 import { useSession } from "next-auth/react";
@@ -506,8 +506,7 @@ export function CreateIssueDialog({
         issue = await response.json();
       }
 
-      toast({
-        title: t("issues.created"),
+      toast.success(t("issues.created"), {
         description:
           useIntegration && activeIntegration
             ? t("issues.createdInExternal", {
@@ -523,10 +522,8 @@ export function CreateIssueDialog({
       form.reset();
       setCustomFieldValues({});
     } catch (error: any) {
-      toast({
-        title: t("common.errors.error"),
+      toast.error(t("common.errors.error"), {
         description: error.message || t("issues.createError"),
-        variant: "destructive",
       });
     } finally {
       setIsCreating(false);

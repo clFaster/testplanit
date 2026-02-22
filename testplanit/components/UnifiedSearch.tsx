@@ -654,6 +654,72 @@ export function UnifiedSearch({
     }
   };
 
+  const paginationControls = (
+    <div className="my-4 flex items-center justify-between">
+      <div className="text-sm text-muted-foreground">
+        {t("common.pagination.showing")} {showingFromForTab}-
+        {showingToForTab} {t("common.of")} {totalForTab}{" "}
+        {t("common.results")}
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => performSearch(1, selectedTab)}
+          disabled={currentPage === 1}
+        >
+          <ChevronsLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => performSearch(currentPage - 1, selectedTab)}
+          disabled={currentPage === 1}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+
+        <div className="flex items-center gap-1">
+          <span className="text-sm">{t("search.results.page")}</span>
+          <Input
+            type="number"
+            min={1}
+            max={totalPagesForTab}
+            value={currentPage}
+            onChange={(e) => {
+              const page = parseInt(e.target.value) || 1;
+              if (page >= 1 && page <= totalPagesForTab) {
+                performSearch(page, selectedTab);
+              }
+            }}
+            className="w-16 h-9 text-center"
+          />
+          <span className="text-sm">
+            {t("common.of")} {totalPagesForTab}
+          </span>
+        </div>
+
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => performSearch(currentPage + 1, selectedTab)}
+          disabled={currentPage === totalPagesForTab}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => performSearch(totalPagesForTab, selectedTab)}
+          disabled={currentPage === totalPagesForTab}
+        >
+          <ChevronsRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <div className={cn("space-y-4", compactMode && "space-y-2")}>
       {/* Search input with filters */}
@@ -818,76 +884,13 @@ export function UnifiedSearch({
 
         {!loading && !error && results && (
           <>
+            {totalPagesForTab > 1 && paginationControls}
+
             {renderResults
               ? renderResults(results)
               : defaultResultRenderer(results)}
 
-            {/* Pagination controls */}
-            {totalPagesForTab > 1 && (
-              <div className="mt-6 flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                  {t("common.pagination.showing")} {showingFromForTab}-
-                  {showingToForTab} {t("common.of")} {totalForTab}{" "}
-                  {t("common.results")}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => performSearch(1, selectedTab)}
-                    disabled={currentPage === 1}
-                  >
-                    <ChevronsLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => performSearch(currentPage - 1, selectedTab)}
-                    disabled={currentPage === 1}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm">{t("search.results.page")}</span>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={totalPagesForTab}
-                      value={currentPage}
-                      onChange={(e) => {
-                        const page = parseInt(e.target.value) || 1;
-                        if (page >= 1 && page <= totalPagesForTab) {
-                          performSearch(page, selectedTab);
-                        }
-                      }}
-                      className="w-16 h-9 text-center"
-                    />
-                    <span className="text-sm">
-                      {t("common.of")} {totalPagesForTab}
-                    </span>
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => performSearch(currentPage + 1, selectedTab)}
-                    disabled={currentPage === totalPagesForTab}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => performSearch(totalPagesForTab, selectedTab)}
-                    disabled={currentPage === totalPagesForTab}
-                  >
-                    <ChevronsRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
+            {totalPagesForTab > 1 && paginationControls}
           </>
         )}
 

@@ -18,7 +18,6 @@ export interface ExtendedRoles extends Roles {
 }
 
 export const getColumns = (
-  session: any,
   handleToggleDefault: (id: number, isDefault: boolean) => void,
   tCommon: ReturnType<typeof useTranslations<"common">>
 ): ColumnDef<ExtendedRoles>[] => [

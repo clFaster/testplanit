@@ -18,7 +18,7 @@ export interface ExtendedLlmIntegration extends LlmIntegration {
 }
 
 export const getColumns = (
-  session: any,
+  userPreferences: any,
   handleToggle: (
     id: number,
     key: string,
@@ -200,9 +200,9 @@ export const getColumns = (
         <DateFormatter
           date={getValue() as Date | string}
           formatString={
-            session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+            userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
           }
-          timezone={session.user.preferences?.timezone || "Etc/UTC"}
+          timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
         />
       </div>
     ),
@@ -221,9 +221,9 @@ export const getColumns = (
         <DateFormatter
           date={getValue() as Date | string}
           formatString={
-            session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+            userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
           }
-          timezone={session.user.preferences?.timezone || "Etc/UTC"}
+          timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
         />
       </div>
     ),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
 import { useFindManyCaseFields, useUpdateCaseFields } from "~/lib/hooks";
@@ -31,6 +31,11 @@ export default function CaseFields() {
 
   const { mutateAsync: updateCaseField } = useUpdateCaseFields();
 
+  // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
+  const updateCaseFieldRef = useRef(updateCaseField);
+  // eslint-disable-next-line react-hooks/refs
+  updateCaseFieldRef.current = updateCaseField;
+
   const handleSortChange = (column: string) => {
     const direction =
       sortConfig &&
@@ -44,7 +49,7 @@ export default function CaseFields() {
   const handleToggle = useCallback(
     async (id: number, key: keyof ExtendedCaseFields, value: boolean) => {
       try {
-        await updateCaseField({
+        await updateCaseFieldRef.current({
           where: { id },
           data: { [key]: value },
         });
@@ -52,7 +57,7 @@ export default function CaseFields() {
         console.error(`Failed to update ${key} for CaseField ${id}`, error);
       }
     },
-    [updateCaseField]
+    []
   );
 
   const { data: casefields, isLoading } = useFindManyCaseFields(
@@ -83,8 +88,9 @@ export default function CaseFields() {
   );
 
   const columns: CustomColumnDef<ExtendedCaseFields>[] = useMemo(
-    () => getColumns(t, tCommon, session, handleToggle),
-    [session, handleToggle, t, tCommon]
+    // eslint-disable-next-line react-hooks/refs
+    () => getColumns(t, tCommon, handleToggle),
+    [handleToggle, t, tCommon]
   );
 
   const [columnVisibility, setColumnVisibility] = useState<

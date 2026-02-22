@@ -5354,6 +5354,25 @@
       "exists": "Existe",
       "not_exists": "No existe"
     },
+    "help": {
+      "exactPhrases": "Frases exactas",
+      "exactPhrasesDesc": "Envuelva los términos entre comillas para que coincidan con frases exactas:",
+      "proximity": "Búsqueda de proximidad",
+      "proximityDesc": "palabras dentro de N posiciones entre sí",
+      "booleanOperators": "Operadores booleanos",
+      "andDesc": "Ambos términos deben coincidir",
+      "orDesc": "Cualquier término puede coincidir",
+      "notDesc": "excluir resultados con término",
+      "prefixDesc": "exigir o excluir un término",
+      "groupingDesc": "términos de grupo para consultas complejas",
+      "wildcards": "Comodines",
+      "wildcardMultiDesc": "coincide con cualquier carácter",
+      "wildcardSingleDesc": "coincide con un solo carácter",
+      "fuzzyMatching": "Coincidencia difusa",
+      "fuzzyDesc": "Encuentra términos similares para ayudar con errores tipográficos.",
+      "defaultBehavior": "Si se usan varias palabras, se usa OR por defecto. Los resultados que coinciden con el nombre se clasifican en primer lugar.",
+      "fullSyntaxLink": "Referencia completa de sintaxis de consulta de Lucene"
+    },
     "filters": {
       "title": "Filtros avanzados",
       "active": "filtros activos",
