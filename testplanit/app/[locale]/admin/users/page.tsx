@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
 import { useTranslations } from "next-intl";
@@ -195,9 +195,18 @@ function UserList() {
     }
   }, [status, session, router]);
 
+  // Extract stable primitives from session to avoid column remounts when session object changes
+  const dateFormat = session?.user?.preferences?.dateFormat;
+  const timezone = session?.user?.preferences?.timezone;
+  const userId = session?.user?.id;
+  const userPreferences = useMemo(
+    () => ({ user: { id: userId, preferences: { dateFormat, timezone } } }),
+    [userId, dateFormat, timezone]
+  );
+
   const columns = useMemo(
-    () => getColumns(session, handleToggle, tCommon),
-    [session, handleToggle, tCommon]
+    () => getColumns(userPreferences, handleToggle, tCommon),
+    [userPreferences, handleToggle, tCommon]
   );
 
   const [columnVisibility, setColumnVisibility] = useState<

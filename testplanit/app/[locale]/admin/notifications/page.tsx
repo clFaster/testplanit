@@ -80,7 +80,16 @@ function NotificationSettingsContent() {
   >({});
   const [isEmailServerConfigured, setIsEmailServerConfigured] = useState(true);
 
-  const columns = useMemo(() => getColumns(session, t, tCommon), [session, t, tCommon]);
+  // Extract stable primitives from session to avoid column remounts when session object changes
+  const dateFormat = session?.user?.preferences?.dateFormat;
+  const timezone = session?.user?.preferences?.timezone;
+  const timeFormat = session?.user?.preferences?.timeFormat;
+  const userPreferences = useMemo(
+    () => ({ user: { preferences: { dateFormat, timezone, timeFormat } } }),
+    [dateFormat, timezone, timeFormat]
+  );
+
+  const columns = useMemo(() => getColumns(userPreferences, t, tCommon), [userPreferences, t, tCommon]);
 
   const tableData: NotificationHistoryItem[] = useMemo(
     () =>

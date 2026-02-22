@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
 import { useFindManyResultFields, useUpdateResultFields } from "~/lib/hooks";
@@ -31,6 +31,10 @@ export default function ResultFields() {
 
   const { mutateAsync: updateResultField } = useUpdateResultFields();
 
+  // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
+  const updateResultFieldRef = useRef(updateResultField);
+  updateResultFieldRef.current = updateResultField;
+
   const handleSortChange = (column: string) => {
     const direction =
       sortConfig &&
@@ -44,7 +48,7 @@ export default function ResultFields() {
   const handleToggle = useCallback(
     async (id: number, key: keyof ExtendedResultFields, value: boolean) => {
       try {
-        await updateResultField({
+        await updateResultFieldRef.current({
           where: { id },
           data: { [key]: value },
         });
@@ -52,7 +56,7 @@ export default function ResultFields() {
         console.error(`Failed to update ${key} for ResultField ${id}`, error);
       }
     },
-    [updateResultField]
+    []
   );
 
   const { data: resultfields, isLoading } = useFindManyResultFields(
@@ -83,8 +87,8 @@ export default function ResultFields() {
   );
 
   const columns: CustomColumnDef<ExtendedResultFields>[] = useMemo(
-    () => getColumns(t, tCommon, session, handleToggle),
-    [session, handleToggle, t, tCommon]
+    () => getColumns(t, tCommon, handleToggle),
+    [handleToggle, t, tCommon]
   );
 
   const [columnVisibility, setColumnVisibility] = useState<

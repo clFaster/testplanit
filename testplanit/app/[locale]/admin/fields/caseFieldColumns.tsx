@@ -30,7 +30,6 @@ export interface ExtendedCaseFields extends CaseFields {
 export const getColumns = (
   t: ReturnType<typeof useTranslations<"admin.templates.caseFields">>,
   tCommon: ReturnType<typeof useTranslations<"common">>,
-  session: any,
   handleToggle: (
     id: number,
     key: keyof ExtendedCaseFields,

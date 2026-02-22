@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
 import { useTranslations } from "next-intl";
@@ -198,6 +198,10 @@ function IntegrationList() {
 
   const { mutate: deleteIntegration } = useDeleteIntegration();
 
+  // Stabilize mutation ref — ZenStack's mutate changes identity every render
+  const deleteIntegrationRef = useRef(deleteIntegration);
+  deleteIntegrationRef.current = deleteIntegration;
+
   const handleAddIntegration = useCallback(() => {
     setSelectedIntegration(null);
     setModalOpen(true);
@@ -216,7 +220,7 @@ function IntegrationList() {
   const handleDeleteConfirm = useCallback(() => {
     if (!integrationToDelete) return;
 
-    deleteIntegration(
+    deleteIntegrationRef.current(
       { where: { id: integrationToDelete.id } },
       {
         onSuccess: () => {
@@ -234,7 +238,7 @@ function IntegrationList() {
     );
     setDeleteDialogOpen(false);
     setIntegrationToDelete(null);
-  }, [integrationToDelete, deleteIntegration, t, refetch]);
+  }, [integrationToDelete, t, refetch]);
 
   const handleTestConnection = useCallback(
     async (integration: Integration) => {
@@ -273,10 +277,18 @@ function IntegrationList() {
     [t, refetch]
   );
 
+  // Extract stable primitives from session to avoid column remounts when session object changes
+  const dateFormat = session?.user?.preferences?.dateFormat;
+  const timezone = session?.user?.preferences?.timezone;
+  const userPreferences = useMemo(
+    () => ({ user: { preferences: { dateFormat, timezone } } }),
+    [dateFormat, timezone]
+  );
+
   const columns = useMemo(
     () =>
       getColumns(
-        session,
+        userPreferences,
         handleEditIntegration,
         handleDeleteClick,
         handleTestConnection,
@@ -285,7 +297,7 @@ function IntegrationList() {
         tApiTokens
       ),
     [
-      session,
+      userPreferences,
       handleEditIntegration,
       handleDeleteClick,
       handleTestConnection,

@@ -31,7 +31,7 @@ export interface NotificationHistoryItem {
 }
 
 export const getColumns = (
-  session: any,
+  userPreferences: { user: { preferences: { dateFormat?: string; timezone?: string; timeFormat?: string } } },
   t: ReturnType<typeof useTranslations<"admin.notifications">>,
   tCommon: ReturnType<typeof useTranslations<"common">>
 ): ColumnDef<NotificationHistoryItem>[] => [
@@ -173,10 +173,10 @@ export const getColumns = (
     size: 180,
     cell: ({ getValue }) => {
       const date = getValue() as Date | string;
-      const timezone = session?.user?.preferences?.timezone || "Etc/UTC";
+      const timezone = userPreferences?.user?.preferences?.timezone || "Etc/UTC";
       const dateFormat =
-        session?.user?.preferences?.dateFormat || "MM_DD_YYYY_DASH";
-      const timeFormat = session?.user?.preferences?.timeFormat || "HH_MM_24";
+        userPreferences?.user?.preferences?.dateFormat || "MM_DD_YYYY_DASH";
+      const timeFormat = userPreferences?.user?.preferences?.timeFormat || "HH_MM_24";
       return (
         <div className="whitespace-nowrap text-sm cursor-default">
           <DateFormatter

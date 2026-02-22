@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRequireAuth } from "~/hooks/useRequireAuth";
 import { useRouter } from "~/lib/navigation";
 import { useTranslations } from "next-intl";
@@ -108,14 +108,18 @@ function Configurations(): React.ReactElement | null {
 
   const { mutate: updateConfiguration } = useUpdateConfigurations();
 
+  // Stabilize mutation ref — ZenStack's mutate changes identity every render
+  const updateConfigurationRef = useRef(updateConfiguration);
+  updateConfigurationRef.current = updateConfiguration;
+
   const handleToggle = useCallback(
     (id: number, isEnabled: boolean) => {
-      updateConfiguration({
+      updateConfigurationRef.current({
         where: { id },
         data: { isEnabled },
       });
     },
-    [updateConfiguration]
+    []
   );
 
   const columns = useMemo(

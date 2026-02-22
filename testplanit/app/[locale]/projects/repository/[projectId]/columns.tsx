@@ -1174,7 +1174,7 @@ const SelectAllCheckbox = React.memo(function SelectAllCheckbox({
 });
 
 export const getColumns = (
-  session: any,
+  userPreferences: { user: { preferences: { dateFormat?: string; timezone?: string; timeFormat?: string } } },
   uniqueCaseFieldList: CaseFields[],
   handleSelect: (attachments: Attachments[], index: number) => void,
   columnTranslations: {
@@ -1418,8 +1418,8 @@ export const getColumns = (
             >
               <DateFormatter
                 date={value as string | Date | null}
-                formatString={session?.user.preferences?.dateFormat}
-                timezone={session?.user.preferences?.timezone}
+                formatString={userPreferences?.user.preferences?.dateFormat}
+                timezone={userPreferences?.user.preferences?.timezone}
               />
             </div>
           );
@@ -1925,11 +1925,11 @@ export const getColumns = (
           <DateFormatter
             date={row.original.createdAt}
             formatString={
-              session?.user.preferences?.dateFormat +
+              userPreferences?.user.preferences?.dateFormat +
               " " +
-              session?.user.preferences?.timeFormat
+              userPreferences?.user.preferences?.timeFormat
             }
-            timezone={session?.user.preferences?.timezone}
+            timezone={userPreferences?.user.preferences?.timezone}
           />
         </div>
       ),

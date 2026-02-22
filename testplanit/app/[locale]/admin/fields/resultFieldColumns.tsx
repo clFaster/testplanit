@@ -30,7 +30,6 @@ export interface ExtendedResultFields extends ResultFields {
 export const getColumns = (
   t: ReturnType<typeof useTranslations<"common">>,
   tCommon: ReturnType<typeof useTranslations<"common">>,
-  session: any,
   handleToggle: (
     id: number,
     key: keyof ExtendedResultFields,

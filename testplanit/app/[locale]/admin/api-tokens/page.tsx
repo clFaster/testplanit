@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
 import { useTranslations } from "next-intl";
@@ -100,6 +100,10 @@ function ApiTokensList() {
   const skip = (currentPage - 1) * effectivePageSize;
 
   const { mutateAsync: updateApiToken } = useUpdateApiToken();
+
+  // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
+  const updateApiTokenRef = useRef(updateApiToken);
+  updateApiTokenRef.current = updateApiToken;
 
   const { data: totalFilteredTokens, isLoading: isTotalLoading } =
     useFindManyApiToken(
@@ -258,7 +262,7 @@ function ApiTokensList() {
 
     setIsRevoking(true);
     try {
-      await updateApiToken({
+      await updateApiTokenRef.current({
         where: { id: tokenToRevoke.id },
         data: { isActive: false },
       });
@@ -276,7 +280,7 @@ function ApiTokensList() {
     } finally {
       setIsRevoking(false);
     }
-  }, [tokenToRevoke, updateApiToken, toast, t, refetchTokens]);
+  }, [tokenToRevoke, toast, t, refetchTokens]);
 
   const handleRevokeAll = useCallback(async () => {
     if (revokeAllConfirmText !== "REVOKE ALL") return;
@@ -292,7 +296,7 @@ function ApiTokensList() {
       // Revoke each token
       await Promise.all(
         activeTokenIds.map((id) =>
-          updateApiToken({
+          updateApiTokenRef.current({
             where: { id },
             data: { isActive: false },
           })
@@ -316,15 +320,22 @@ function ApiTokensList() {
   }, [
     revokeAllConfirmText,
     totalFilteredTokens,
-    updateApiToken,
     toast,
     t,
     refetchTokens,
   ]);
 
+  // Extract stable primitives from session to avoid column remounts when session object changes
+  const dateFormat = session?.user?.preferences?.dateFormat;
+  const timezone = session?.user?.preferences?.timezone;
+  const userPreferences = useMemo(
+    () => ({ user: { preferences: { dateFormat, timezone } } }),
+    [dateFormat, timezone]
+  );
+
   const columns = useMemo(
-    () => getColumns(session, handleRevoke, t, tCommon),
-    [session, handleRevoke, t, tCommon]
+    () => getColumns(userPreferences, handleRevoke, t, tCommon),
+    [userPreferences, handleRevoke, t, tCommon]
   );
 
   const [columnVisibility, setColumnVisibility] = useState<

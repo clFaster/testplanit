@@ -2651,9 +2651,18 @@ export default function Cases({
     ]
   );
 
+  // Extract stable primitives from session to avoid column remounts when session object changes
+  const dateFormat = session?.user?.preferences?.dateFormat;
+  const timezone = session?.user?.preferences?.timezone;
+  const timeFormat = session?.user?.preferences?.timeFormat;
+  const userPreferencesForColumns = useMemo(
+    () => ({ user: { preferences: { dateFormat, timezone, timeFormat } } }),
+    [dateFormat, timezone, timeFormat]
+  );
+
   const columns: CustomColumnDef<any>[] = useMemo(() => {
     return getColumns(
-      session,
+      userPreferencesForColumns,
       uniqueCaseFieldList,
       handleSelect,
       {
@@ -2719,7 +2728,7 @@ export default function Cases({
         ((isRunMode && canAddEditRun) || (!isRunMode && canAddEdit))
     );
   }, [
-    session,
+    userPreferencesForColumns,
     uniqueCaseFieldList,
     handleSelect,
     t,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
 import { useTranslations } from "next-intl";
@@ -122,6 +122,10 @@ function ProjectAdmin() {
 
   const { mutateAsync: updateProjects } = useUpdateProjects();
 
+  // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
+  const updateProjectsRef = useRef(updateProjects);
+  updateProjectsRef.current = updateProjects;
+
   const {
     register,
     handleSubmit,
@@ -146,13 +150,13 @@ function ProjectAdmin() {
       if (isCompleted) {
         setIsAlertDialogOpen(true);
       } else {
-        updateProjects({
+        updateProjectsRef.current({
           where: { id },
           data: { isCompleted, completedAt: null },
         });
       }
     },
-    [updateProjects]
+    []
   );
 
   const handleOpenEditModal = useCallback((project: ExtendedProjects) => {
@@ -345,10 +349,18 @@ function ProjectAdmin() {
     }
   };
 
+  // Extract stable primitives from session to avoid column remounts when session object changes
+  const dateFormat = session?.user?.preferences?.dateFormat;
+  const timezone = session?.user?.preferences?.timezone;
+  const userPreferences = useMemo(
+    () => ({ user: { preferences: { dateFormat, timezone } } }),
+    [dateFormat, timezone]
+  );
+
   const columns: CustomColumnDef<ExtendedProjects>[] = useMemo(
     () =>
-      getColumns(session, handleToggleCompleted, handleOpenEditModal, tCommon),
-    [session, handleToggleCompleted, handleOpenEditModal, tCommon]
+      getColumns(userPreferences, handleToggleCompleted, handleOpenEditModal, tCommon),
+    [userPreferences, handleToggleCompleted, handleOpenEditModal, tCommon]
   );
 
   useEffect(() => {

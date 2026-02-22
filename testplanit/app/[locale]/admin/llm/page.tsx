@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
 import { useTranslations } from "next-intl";
@@ -74,6 +74,12 @@ function LlmIntegrationList() {
   const { mutateAsync: updateLlmIntegration } = useUpdateLlmIntegration();
   const { mutateAsync: updateLlmProviderConfig } = useUpdateLlmProviderConfig();
 
+  // Stabilize mutation refs — ZenStack's mutateAsync changes identity every render
+  const updateLlmIntegrationRef = useRef(updateLlmIntegration);
+  updateLlmIntegrationRef.current = updateLlmIntegration;
+  const updateLlmProviderConfigRef = useRef(updateLlmProviderConfig);
+  updateLlmProviderConfigRef.current = updateLlmProviderConfig;
+
   const handleToggle = useCallback(
     async (
       id: number,
@@ -83,12 +89,12 @@ function LlmIntegrationList() {
     ) => {
       try {
         if (key === "streamingEnabled" && llmProviderConfigId) {
-          await updateLlmProviderConfig({
+          await updateLlmProviderConfigRef.current({
             where: { id: llmProviderConfigId },
             data: { streamingEnabled: value },
           });
         } else {
-          await updateLlmIntegration({
+          await updateLlmIntegrationRef.current({
             where: { id },
             data: { [key]: value },
           });
@@ -97,7 +103,7 @@ function LlmIntegrationList() {
         console.error(`Failed to update ${key} for Integration ${id}`, error);
       }
     },
-    [updateLlmIntegration, updateLlmProviderConfig]
+    []
   );
 
   // Query for total filtered integrations (for pagination)
@@ -212,9 +218,17 @@ function LlmIntegrationList() {
     }
   }, [status, session, router]);
 
+  // Extract stable primitives from session to avoid column remounts when session object changes
+  const dateFormat = session?.user?.preferences?.dateFormat;
+  const timezone = session?.user?.preferences?.timezone;
+  const userPreferences = useMemo(
+    () => ({ user: { preferences: { dateFormat, timezone } } }),
+    [dateFormat, timezone]
+  );
+
   const columns = useMemo(
-    () => getColumns(session, handleToggle, tCommon, t),
-    [session, handleToggle, tCommon, t]
+    () => getColumns(userPreferences, handleToggle, tCommon, t),
+    [userPreferences, handleToggle, tCommon, t]
   );
 
   const [columnVisibility, setColumnVisibility] = useState<
