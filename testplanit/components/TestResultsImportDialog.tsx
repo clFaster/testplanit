@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -69,22 +69,35 @@ const TEST_RESULT_FORMATS = [
 
 type TestResultFormat = (typeof TEST_RESULT_FORMATS)[number]["value"];
 
+const NEW_FOLDER_SENTINEL = "__new__";
+
 interface TestResultsImportDialogProps {
   projectId: number;
   onSuccess?: () => void;
   defaultFormat?: TestResultFormat;
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
+  initialFiles?: File[];
 }
 
 export default function TestResultsImportDialog({
   projectId,
   onSuccess,
   defaultFormat = "auto",
+  externalOpen,
+  onExternalOpenChange,
+  initialFiles,
 }: TestResultsImportDialogProps) {
   const t = useTranslations("common.actions.junit.import");
   const tFormat = useTranslations("common.actions.testResults.import.format");
   const tCommon = useTranslations("common");
 
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined;
+  const open = isControlled ? externalOpen : internalOpen;
+  const setOpen = isControlled
+    ? (v: boolean) => onExternalOpenChange?.(v)
+    : setInternalOpen;
   const [format, setFormat] = useState<TestResultFormat>(defaultFormat);
   const [stateId, setStateId] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
@@ -197,7 +210,7 @@ export default function TestResultsImportDialog({
     resolver: zodResolver(TestResultsImportSchema),
     defaultValues: {
       name: "",
-      selectedFolderId: "",
+      selectedFolderId: NEW_FOLDER_SENTINEL,
       stateId: "",
       templateId: "",
       selectedFiles: [] as File[],
@@ -207,7 +220,19 @@ export default function TestResultsImportDialog({
     },
   });
 
-  const { handleSubmit, control } = form;
+  const { handleSubmit, control, watch } = form;
+  const watchedName = watch("name");
+
+  // Seed form with initialFiles when dialog opens externally
+  useEffect(() => {
+    if (open && initialFiles && initialFiles.length > 0) {
+      form.setValue("selectedFiles", initialFiles);
+      if (!form.getValues("name")) {
+        const fileName = initialFiles[0].name.replace(/\.[^.]+$/, "");
+        form.setValue("name", fileName);
+      }
+    }
+  }, [open, initialFiles, form]);
 
   const handleImport = handleSubmit(async (data) => {
     try {
@@ -225,8 +250,11 @@ export default function TestResultsImportDialog({
       if (data.configurationId)
         formData.append("configId", data.configurationId);
       if (data.milestoneId) formData.append("milestoneId", data.milestoneId);
-      if (data.selectedFolderId)
+      if (data.selectedFolderId === NEW_FOLDER_SENTINEL) {
+        formData.append("newFolderName", data.name);
+      } else if (data.selectedFolderId) {
         formData.append("parentFolderId", data.selectedFolderId);
+      }
       (data.selectedTags ?? []).forEach((id: number) =>
         formData.append("tagIds", id.toString())
       );
@@ -423,7 +451,16 @@ export default function TestResultsImportDialog({
                           onChange={(val) =>
                             field.onChange(val ? String(val) : "")
                           }
-                          folders={transformFolders(folders || [])}
+                          folders={[
+                            {
+                              value: NEW_FOLDER_SENTINEL,
+                              label: watchedName
+                                ? tCommon("actions.junit.import.createNewFolderNamed", { name: watchedName })
+                                : tCommon("actions.junit.import.createNewFolder"),
+                              parentId: null,
+                            },
+                            ...transformFolders(folders || []),
+                          ]}
                           isLoading={isFoldersLoading}
                           placeholder={t("selectFolder")}
                           disabled={isImporting}
@@ -633,6 +670,7 @@ export default function TestResultsImportDialog({
                           compact={true}
                           previews={false}
                           disabled={isImporting}
+                          initialFiles={initialFiles}
                         />
                       </FormControl>
                       <FormMessage />

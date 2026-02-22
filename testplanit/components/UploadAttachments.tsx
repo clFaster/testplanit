@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +19,7 @@ interface UploadAttachmentsProps {
   previews?: boolean;
   accept?: string;
   allowedTypes?: string[];
+  initialFiles?: File[];
 }
 
 function ImagePreview({ file }: { file: File }) {
@@ -58,6 +59,7 @@ export default function UploadAttachments({
   previews = true,
   accept,
   allowedTypes,
+  initialFiles,
 }: UploadAttachmentsProps) {
   const t = useTranslations("common.upload.attachments");
   const tGlobal = useTranslations();
@@ -66,6 +68,19 @@ export default function UploadAttachments({
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Seed selectedFiles from initialFiles prop when it changes from empty to non-empty
+  const initialFilesAppliedRef = useRef(false);
+  useEffect(() => {
+    if (initialFiles && initialFiles.length > 0 && !initialFilesAppliedRef.current) {
+      initialFilesAppliedRef.current = true;
+      setSelectedFiles(initialFiles);
+    }
+    // Reset the ref when initialFiles becomes empty so it can be re-applied
+    if (!initialFiles || initialFiles.length === 0) {
+      initialFilesAppliedRef.current = false;
+    }
+  }, [initialFiles]);
 
   // Generate unique IDs for file inputs to prevent conflicts when multiple instances exist
   const uniqueId = useId();

@@ -26,9 +26,16 @@ Import test cases from CSV files with flexible field mapping.
 
 #### Accessing CSV Import
 
+There are two ways to start a CSV import:
+
+**Using the Import button:**
 1. Navigate to **Repository** in your project
 2. Click the **Import** button in the toolbar
-3. Select **CSV Import** from the dropdown
+
+**Using drag and drop:**
+1. Drag a `.csv` file from your desktop over the Repository page
+2. A full-page drop overlay will appear indicating you can drop to import
+3. Drop the file — the import wizard opens automatically with your file pre-loaded
 
 #### CSV Format Requirements
 
@@ -217,9 +224,18 @@ TestPlanIt supports importing test results from the following formats:
 
 ### Accessing Test Results Import
 
+There are two ways to start a test results import:
+
+**Using the Import button:**
 1. Navigate to **Test Runs** in your project
 2. Click **Import Results** button
 3. The import dialog opens with format options
+
+**Using drag and drop:**
+1. Drag one or more test result files (`.xml`, `.trx`, or `.json`) from your desktop over the Test Runs page
+2. A full-page drop overlay will appear indicating you can drop to import
+3. Drop the files — the import dialog opens automatically with your files pre-loaded
+4. Multiple files can be dropped at once
 
 ### Import Process
 

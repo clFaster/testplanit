@@ -58,6 +58,8 @@ import {
 import { AddFolderModal } from "./AddFolder";
 import { AddCaseModal } from "./AddCase";
 import { ImportCasesWizard } from "./ImportCasesWizard";
+import { usePageFileDrop } from "~/hooks/usePageFileDrop";
+import { PageFileDropOverlay } from "@/components/PageFileDropOverlay";
 import { GenerateTestCasesWizard } from "./GenerateTestCasesWizard";
 import Cases from "./Cases";
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
@@ -1118,6 +1120,24 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
     setCurrentPage,
   ]);
 
+  // Drag/drop from desktop to import CSV (hooks must be before early returns)
+  const canAddEdit = projectPermissions?.canAddEdit ?? false;
+  const [droppedFile, setDroppedFile] = useState<File | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const tFileDropZone = useTranslations("common.fileDropZone");
+
+  const { isDragActive } = usePageFileDrop({
+    acceptedExtensions: [".csv"],
+    enabled: canAddEdit && !isSelectionMode && !isRunMode,
+    onDrop: (files) => {
+      setDroppedFile(files[0]);
+      setImportDialogOpen(true);
+    },
+    unsupportedMessage: tFileDropZone("unsupportedFileType", {
+      expected: ".csv",
+    }),
+  });
+
   if (isComponentLoading) {
     return null;
   }
@@ -1144,13 +1164,17 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
     );
   }
 
-  const canAddEdit = projectPermissions?.canAddEdit ?? false;
   const canAddEditRun = testRunPermissions?.canAddEdit ?? false;
   const canDelete = projectPermissions?.canDelete ?? false;
 
   if (session && session.user.access !== "NONE") {
     return (
       <div>
+        <PageFileDropOverlay
+          isDragActive={isDragActive}
+          message={tFileDropZone("dropToImportTestCases")}
+          subtitle={tFileDropZone("supportedCsvFormats")}
+        />
         <Card className="flex w-full min-w-[400px]">
           <div className="flex-1 w-full">
             {!hideHeader ? (
@@ -1302,6 +1326,12 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
                             <div className="flex gap-2 items-center">
                               <ImportCasesWizard
                                 onImportComplete={refetchFolderStats}
+                                externalOpen={importDialogOpen}
+                                onExternalOpenChange={(v) => {
+                                  setImportDialogOpen(v);
+                                  if (!v) setDroppedFile(null);
+                                }}
+                                initialFile={droppedFile}
                               />
                               <GenerateTestCasesWizard
                                 folderId={selectedFolderId ?? 0}

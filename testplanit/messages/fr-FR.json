@@ -679,6 +679,14 @@
         "count": "{count, plural, =1 {# fichier} other {# fichiers}}"
       }
     },
+    "fileDropZone": {
+      "dropToImportTestCases": "Déposez le fichier CSV pour importer les cas de test",
+      "dropToImportTestResults": "Déposez le fichier pour importer les résultats des tests",
+      "supportedCsvFormats": "Formats pris en charge : .csv",
+      "supportedResultFormats": "Formats pris en charge : .xml, .trx, .json",
+      "unsupportedFileType": "Type de fichier non pris en charge. Attendu : {expected}",
+      "noFilesDetected": "Aucun fichier détecté dans le dossier drop"
+    },
     "editor": {
       "setColor": "Définir la couleur",
       "enterUrl": "Saisissez l'URL, y compris https://",

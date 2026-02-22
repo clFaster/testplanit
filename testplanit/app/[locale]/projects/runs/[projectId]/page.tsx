@@ -51,6 +51,8 @@ import { DateFormatter } from "@/components/DateFormatter";
 import CompletedRunsLineChart from "@/components/dataVisualizations/CompletedRunsLineChart";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import TestResultsImportDialog from "@/components/TestResultsImportDialog";
+import { usePageFileDrop } from "~/hooks/usePageFileDrop";
+import { PageFileDropOverlay } from "@/components/PageFileDropOverlay";
 import { isAutomatedTestRunType } from "~/utils/testResultTypes";
 import DuplicateTestRunDialog, {
   AddTestRunModalInitProps,
@@ -443,6 +445,24 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
 
   const { permissions, isLoading: isLoadingPermissions } =
     useProjectPermissions(numericProjectId ?? -1, ApplicationArea.TestRuns);
+
+  // Drag/drop from desktop to import test results
+  const canAddEdit = permissions?.canAddEdit ?? false;
+  const [droppedFiles, setDroppedFiles] = useState<File[]>([]);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const tFileDropZone = useTranslations("common.fileDropZone");
+
+  const { isDragActive } = usePageFileDrop({
+    acceptedExtensions: [".xml", ".trx", ".json"],
+    enabled: canAddEdit,
+    onDrop: (files) => {
+      setDroppedFiles(files);
+      setImportDialogOpen(true);
+    },
+    unsupportedMessage: tFileDropZone("unsupportedFileType", {
+      expected: ".xml, .trx, .json",
+    }),
+  });
 
   const { data: project, isLoading: isProjectLoading } = useFindFirstProjects(
     {
@@ -982,10 +1002,13 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
   // Each card will show its own loading state
 
   if (session && session.user.access !== "NONE") {
-    const canAddEdit = permissions?.canAddEdit ?? false;
-
     return (
       <SimpleDndProvider>
+        <PageFileDropOverlay
+          isDragActive={isDragActive}
+          message={tFileDropZone("dropToImportTestResults")}
+          subtitle={tFileDropZone("supportedResultFormats")}
+        />
         <Card className="flex w-full min-w-[400px]">
           <div className="flex-1 w-full">
             <CardHeader id="test-runs-page-header">
@@ -1005,6 +1028,16 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
                             router.refresh();
                             refetchIncompleteTestRuns();
                           }}
+                          externalOpen={importDialogOpen}
+                          onExternalOpenChange={(v) => {
+                            setImportDialogOpen(v);
+                            if (!v) setDroppedFiles([]);
+                          }}
+                          initialFiles={
+                            droppedFiles.length > 0
+                              ? droppedFiles
+                              : undefined
+                          }
                         />
                         <AddTestRunModal
                           trigger={

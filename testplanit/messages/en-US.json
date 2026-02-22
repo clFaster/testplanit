@@ -124,6 +124,8 @@
           },
           "import": "Import",
           "selectFolder": "Select a folder",
+          "createNewFolder": "Create new folder",
+          "createNewFolderNamed": "Create new folder: {name}",
           "progress": {
             "initializing": "Initializing import...",
             "validating": "Validating input data...",
@@ -678,6 +680,14 @@
         },
         "count": "{count, plural, =1 {# file} other {# files}}"
       }
+    },
+    "fileDropZone": {
+      "dropToImportTestCases": "Drop CSV file to import test cases",
+      "dropToImportTestResults": "Drop file to import test results",
+      "supportedCsvFormats": "Supported: .csv",
+      "supportedResultFormats": "Supported: .xml, .trx, .json",
+      "unsupportedFileType": "Unsupported file type. Expected: {expected}",
+      "noFilesDetected": "No files detected in drop"
     },
     "editor": {
       "setColor": "Set Color",

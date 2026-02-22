@@ -160,9 +160,10 @@ export async function POST(request: NextRequest) {
         const stateIdFromForm = formData.get("stateId")
           ? parseInt(formData.get("stateId") as string)
           : undefined;
-        const parentFolderId = formData.get("parentFolderId")
+        let parentFolderId = formData.get("parentFolderId")
           ? parseInt(formData.get("parentFolderId") as string)
           : undefined;
+        const newFolderName = formData.get("newFolderName") as string | null;
         const tagIds = formData
           .getAll("tagIds")
           .map((id) => parseInt(id as string))
@@ -409,6 +410,39 @@ export async function POST(request: NextRequest) {
           25,
           progressMessages.countingTests(totalTestCases, files.length)
         );
+
+        // Create a new root-level folder if requested
+        if (newFolderName && !parentFolderId) {
+          let repository = await prisma.repositories.findFirst({
+            where: {
+              projectId: projectId,
+              isActive: true,
+              isDeleted: false,
+              isArchived: false,
+            },
+            orderBy: { id: "asc" },
+          });
+          if (!repository) {
+            repository = await prisma.repositories.create({
+              data: {
+                projectId: projectId,
+                isActive: true,
+                isDeleted: false,
+                isArchived: false,
+              },
+            });
+          }
+          const newFolder = await prisma.repositoryFolders.create({
+            data: {
+              projectId: projectId,
+              repositoryId: repository.id,
+              name: newFolderName,
+              parentId: null,
+              creatorId: userId,
+            },
+          });
+          parentFolderId = newFolder.id;
+        }
 
         // Process each suite
         for (

@@ -133,6 +133,7 @@ TestPlanIt is a comprehensive test management platform designed to help teams pl
 
 ### Import & Export
 
+- **Drag and drop import** - Drag files directly from your desktop onto the Repository or Test Runs page to instantly start an import with the file pre-loaded
 - **Bulk import** - Import test cases from CSV with automatic markdown/HTML detection for rich text fields
 - **Test Results import** - Import automated test results via popular formats like JUnit XML
 - **TestMo migration** - Special import support for migrating from Testmo
