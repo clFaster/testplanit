@@ -300,10 +300,18 @@ svg[class*="plot-"] .gantt-task-label text {
     color: hsl(var(--foreground));
   }
 
-  /* Search result highlighting */
-  mark {
-    @apply bg-yellow-200 dark:bg-yellow-800 px-1 rounded-sm text-inherit;
-  }
+}
+
+/* Search result highlighting - outside @layer to override browser defaults */
+mark {
+  background-color: hsl(var(--warning) / 0.3);
+  color: inherit;
+  padding-inline: 0.25rem;
+  border-radius: 0.125rem;
+}
+
+.dark mark {
+  background-color: hsl(var(--warning) / 0.45);
 }
 
 /* Tooltip specific styles using CSS variables */
