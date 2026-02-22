@@ -33,7 +33,9 @@ export default function ResultFields() {
 
   // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
   const updateResultFieldRef = useRef(updateResultField);
-  updateResultFieldRef.current = updateResultField;
+  useEffect(() => {
+    updateResultFieldRef.current = updateResultField;
+  });
 
   const handleSortChange = (column: string) => {
     const direction =

@@ -200,7 +200,9 @@ function IntegrationList() {
 
   // Stabilize mutation ref — ZenStack's mutate changes identity every render
   const deleteIntegrationRef = useRef(deleteIntegration);
-  deleteIntegrationRef.current = deleteIntegration;
+  useEffect(() => {
+    deleteIntegrationRef.current = deleteIntegration;
+  });
 
   const handleAddIntegration = useCallback(() => {
     setSelectedIntegration(null);

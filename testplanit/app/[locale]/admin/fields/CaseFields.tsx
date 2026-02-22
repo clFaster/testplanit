@@ -33,7 +33,9 @@ export default function CaseFields() {
 
   // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
   const updateCaseFieldRef = useRef(updateCaseField);
-  updateCaseFieldRef.current = updateCaseField;
+  useEffect(() => {
+    updateCaseFieldRef.current = updateCaseField;
+  });
 
   const handleSortChange = (column: string) => {
     const direction =

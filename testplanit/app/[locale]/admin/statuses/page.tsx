@@ -32,7 +32,9 @@ function Status() {
 
   // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
   const updateStatusRef = useRef(updateStatus);
-  updateStatusRef.current = updateStatus;
+  useEffect(() => {
+    updateStatusRef.current = updateStatus;
+  });
 
   const { data } = useFindManyStatus(
     {
