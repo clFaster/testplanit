@@ -69,6 +69,7 @@ export const getColumns = (
       id: "users",
       accessorKey: "users",
       header: tCommon("fields.members"),
+      enableSorting: true,
       enableResizing: true,
       enableHiding: true,
       size: 100,
@@ -84,6 +85,7 @@ export const getColumns = (
       id: "milestoneTypes",
       accessorKey: "milestoneTypes",
       header: tCommon("fields.milestoneTypes"),
+      enableSorting: true,
       enableResizing: true,
       size: 100,
       cell: ({ row }) => (
@@ -98,6 +100,7 @@ export const getColumns = (
       id: "milestones",
       accessorKey: "milestones",
       header: tCommon("fields.milestones"),
+      enableSorting: true,
       enableResizing: true,
       size: 100,
       cell: ({ row }) => (
@@ -110,6 +113,7 @@ export const getColumns = (
       id: "integration",
       accessorKey: "projectIntegrations",
       header: tCommon("fields.issueTracker"),
+      enableSorting: true,
       enableResizing: true,
       size: 150,
       cell: ({ row }) => {

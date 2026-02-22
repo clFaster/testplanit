@@ -175,6 +175,10 @@ function ProjectAdmin() {
     setIsAddModalOpen(false);
   }, []);
 
+  // Columns that require client-side sorting (relation counts, not scalar DB fields)
+  const clientSortColumns = new Set(["users", "milestoneTypes", "milestones", "integration"]);
+  const needsClientSideSorting = clientSortColumns.has(sortConfig.column);
+
   // Calculate skip and take based on pageSize
   const effectivePageSize =
     typeof pageSize === "number" ? pageSize : totalItems;
@@ -214,7 +218,7 @@ function ProjectAdmin() {
   const { data: projectsRaw, isLoading: isLoadingProjects } =
     useFindManyProjects(
       {
-        orderBy: sortConfig
+        orderBy: !needsClientSideSorting && sortConfig
           ? { [sortConfig.column]: sortConfig.direction }
           : { name: "asc" },
         include: {
@@ -292,8 +296,8 @@ function ProjectAdmin() {
             },
           ],
         },
-        take: effectivePageSize,
-        skip: skip,
+        take: needsClientSideSorting ? undefined : effectivePageSize,
+        skip: needsClientSideSorting ? undefined : skip,
       },
       {
         enabled:
@@ -308,6 +312,39 @@ function ProjectAdmin() {
     () => processProjectsWithEffectiveMembers(projectsRaw as any, allUsers), // Pass allUsers for default role calculation
     [projectsRaw, allUsers]
   );
+
+  // Client-side sort by relation count, then paginate
+  const displayedProjects = useMemo(() => {
+    if (!needsClientSideSorting || !projects.length) return projects;
+
+    const sorted = [...projects].sort((a, b) => {
+      let aValue = 0;
+      let bValue = 0;
+      switch (sortConfig.column) {
+        case "users":
+          aValue = a.effectiveUserIds?.length ?? 0;
+          bValue = b.effectiveUserIds?.length ?? 0;
+          break;
+        case "milestoneTypes":
+          aValue = a.milestoneTypes?.length ?? 0;
+          bValue = b.milestoneTypes?.length ?? 0;
+          break;
+        case "milestones":
+          aValue = a.milestones?.length ?? 0;
+          bValue = b.milestones?.length ?? 0;
+          break;
+        case "integration":
+          aValue = a.projectIntegrations?.length ?? 0;
+          bValue = b.projectIntegrations?.length ?? 0;
+          break;
+        default:
+          return 0;
+      }
+      return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
+    });
+
+    return sorted.slice(skip, skip + effectivePageSize);
+  }, [projects, needsClientSideSorting, sortConfig, skip, effectivePageSize]);
 
   // Use only the project loading state now
   const isLoading = isLoadingProjects;
@@ -441,7 +478,7 @@ function ProjectAdmin() {
           <div className="mt-4 flex justify-between">
             <DataTable
               columns={columns}
-              data={projects || []}
+              data={(needsClientSideSorting ? displayedProjects : projects) || []}
               onSortChange={handleSortChange}
               sortConfig={sortConfig}
               columnVisibility={columnVisibility}

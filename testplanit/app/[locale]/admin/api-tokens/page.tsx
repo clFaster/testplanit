@@ -93,10 +93,19 @@ function ApiTokensList() {
   const [revokeAllConfirmText, setRevokeAllConfirmText] = useState("");
   const [isRevokingAll, setIsRevokingAll] = useState(false);
 
+  // Map column IDs to actual database field names for orderBy
+  const columnToFieldMap: Record<string, string> = {
+    user: "userId",
+    status: "isActive",
+  };
+
   // Calculate skip and take based on pageSize
   const effectivePageSize =
     typeof pageSize === "number" ? pageSize : totalItems;
   const skip = (currentPage - 1) * effectivePageSize;
+  const sortField = sortConfig
+    ? columnToFieldMap[sortConfig.column] || sortConfig.column
+    : "createdAt";
 
   const { mutateAsync: updateApiToken } = useUpdateApiToken();
 
@@ -107,9 +116,7 @@ function ApiTokensList() {
   const { data: totalFilteredTokens, isLoading: isTotalLoading } =
     useFindManyApiToken(
       {
-        orderBy: sortConfig
-          ? { [sortConfig.column]: sortConfig.direction }
-          : { createdAt: "desc" },
+        orderBy: { [sortField]: sortConfig?.direction || "desc" },
         include: {
           user: {
             select: {
@@ -171,9 +178,7 @@ function ApiTokensList() {
     refetch: refetchTokens,
   } = useFindManyApiToken(
     {
-      orderBy: sortConfig
-        ? { [sortConfig.column]: sortConfig.direction }
-        : { createdAt: "desc" },
+      orderBy: { [sortField]: sortConfig?.direction || "desc" },
       include: {
         user: {
           select: {
