@@ -100,20 +100,24 @@ export const getColumns = (
       const renderContent = (isPreview: boolean) => {
         if (isTipTapJson) {
           return (
-            <TextFromJson
-              jsonString={JSON.stringify(richContent)}
-              format="html"
-              room={`notification-history-${isPreview ? "preview" : "full"}-${notification.id}`}
-              expand={!isPreview}
-              expandable={false}
-            />
+            <div className="text-sm text-muted-foreground">
+              <TextFromJson
+                jsonString={JSON.stringify(richContent)}
+                format="html"
+                room={`notification-history-${isPreview ? "preview" : "full"}-${notification.id}`}
+                expand={!isPreview}
+                expandable={false}
+              />
+            </div>
           );
         }
         if (htmlSource) {
           return (
             <div
               className={
-                isPreview ? "line-clamp-2" : "prose prose-sm max-w-none"
+                isPreview
+                  ? "text-sm text-muted-foreground line-clamp-2"
+                  : "text-sm text-muted-foreground prose prose-sm dark:prose-invert max-w-none prose-headings:text-foreground prose-strong:text-foreground prose-strong:font-semibold prose-a:text-primary prose-a:underline"
               }
               dangerouslySetInnerHTML={{ __html: htmlSource }}
             />
