@@ -261,6 +261,7 @@ async function buildElasticsearchQuery(filters: any, user: any): Promise<any> {
       searchQueries.push({
         nested: {
           path: "steps",
+          ignore_unmapped: true,
           query: {
             query_string: {
               query: filters.query,
@@ -307,6 +308,7 @@ async function buildElasticsearchQuery(filters: any, user: any): Promise<any> {
       searchQueries.push({
         nested: {
           path: "items",
+          ignore_unmapped: true,
           query: {
             query_string: {
               query: filters.query,
@@ -353,6 +355,7 @@ async function buildElasticsearchQuery(filters: any, user: any): Promise<any> {
       searchQueries.push({
         nested: {
           path: "customFields",
+          ignore_unmapped: true,
           query: {
             query_string: {
               query: filters.query,
@@ -471,6 +474,7 @@ function addRepositoryCaseFilters(filter: any[], rcFilters: any) {
     filter.push({
       nested: {
         path: "tags",
+        ignore_unmapped: true,
         query: {
           terms: { "tags.id": rcFilters.tagIds },
         },
@@ -498,6 +502,7 @@ function addCustomFieldFilters(
       filter.push({
         nested: {
           path: "customFields",
+          ignore_unmapped: true,
           query: {
             bool: {
               must: [
@@ -772,7 +777,7 @@ function buildSearchAggregations(
   facets.forEach((facet) => {
     if (facet === "tags") {
       aggs.tags = {
-        nested: { path: "tags" },
+        nested: { path: "tags", ignore_unmapped: true },
         aggs: {
           tag_ids: {
             terms: {
@@ -852,6 +857,45 @@ function getEntityTypeFromIndex(indexName: string): SearchableEntityType {
 }
 
 /**
+ * Strip nested clauses from a query so it can be used for per-index counts.
+ * Nested queries (steps, items, customFields) are entity-specific and fail
+ * when run against indices that don't have those nested mappings.
+ */
+function stripNestedClauses(query: any): any {
+  if (!query?.bool) return query;
+
+  const stripped = { ...query, bool: { ...query.bool } };
+
+  // Strip nested clauses from must → bool → should
+  if (stripped.bool.must) {
+    stripped.bool.must = stripped.bool.must.map((clause: any) => {
+      if (clause.bool?.should) {
+        const filteredShould = clause.bool.should.filter(
+          (s: any) => !s.nested
+        );
+        if (filteredShould.length === 0) return null;
+        return {
+          bool: {
+            ...clause.bool,
+            should: filteredShould,
+          },
+        };
+      }
+      return clause;
+    }).filter(Boolean);
+  }
+
+  // Strip nested clauses from filter
+  if (stripped.bool.filter) {
+    stripped.bool.filter = stripped.bool.filter.filter(
+      (f: any) => !f.nested
+    );
+  }
+
+  return stripped;
+}
+
+/**
  * Get counts for each entity type
  */
 async function getEntityTypeCounts(
@@ -860,13 +904,14 @@ async function getEntityTypeCounts(
   query: any
 ): Promise<Record<SearchableEntityType, number>> {
   const counts: any = {};
+  const countQuery = stripNestedClauses(query);
 
   // Run a search for each index to get counts
   const countPromises = indices.map(async (index) => {
     try {
       const result = await client.count({
         index,
-        query,
+        query: countQuery,
       });
       const entityType = getEntityTypeFromIndex(index);
       counts[entityType] = result.count;

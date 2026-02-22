@@ -3,7 +3,6 @@ import valkeyConnection from "../lib/valkey";
 import { ELASTICSEARCH_REINDEX_QUEUE_NAME } from "../lib/queueNames";
 import {
   syncProjectCasesToElasticsearch,
-  initializeElasticsearchIndexes,
 } from "~/services/repositoryCaseSync";
 import { syncProjectSharedStepsToElasticsearch } from "~/services/sharedStepSearch";
 import { syncProjectTestRunsToElasticsearch } from "~/services/testRunSearch";
@@ -12,6 +11,8 @@ import { syncProjectIssuesToElasticsearch } from "~/services/issueSearch";
 import { syncProjectMilestonesToElasticsearch } from "~/services/milestoneSearch";
 import { syncAllProjectsToElasticsearch } from "~/services/projectSearch";
 import { getElasticsearchClient } from "~/services/elasticsearchService";
+import { getEntityIndexName, createAllEntityIndices } from "~/services/unifiedElasticsearchService";
+import { SearchableEntityType } from "~/types/search";
 import { pathToFileURL } from "node:url";
 import {
   getPrismaClientForJob,
@@ -48,12 +49,35 @@ const processor = async (job: Job<ReindexJobData>) => {
     await job.updateProgress(0);
     await job.log("Starting reindex operation...");
 
-    // Initialize indexes if needed
-    if (entityType === "all" || entityType === "repositoryCases") {
-      await job.updateProgress(5);
-      await job.log("Initializing Elasticsearch indexes...");
-      await initializeElasticsearchIndexes(prisma, tenantId);
+    // Delete and recreate indices to ensure mappings are up to date
+    const entityTypesToReindex = entityType === "all"
+      ? Object.values(SearchableEntityType)
+      : [entityType === "repositoryCases" ? SearchableEntityType.REPOSITORY_CASE
+        : entityType === "sharedSteps" ? SearchableEntityType.SHARED_STEP
+        : entityType === "testRuns" ? SearchableEntityType.TEST_RUN
+        : entityType === "sessions" ? SearchableEntityType.SESSION
+        : entityType === "issues" ? SearchableEntityType.ISSUE
+        : entityType === "milestones" ? SearchableEntityType.MILESTONE
+        : SearchableEntityType.PROJECT];
+
+    await job.updateProgress(2);
+    await job.log("Deleting old indices to apply latest mappings...");
+    for (const et of entityTypesToReindex) {
+      const indexName = getEntityIndexName(et, tenantId);
+      try {
+        const exists = await esClient.indices.exists({ index: indexName });
+        if (exists) {
+          await esClient.indices.delete({ index: indexName });
+          await job.log(`Deleted index: ${indexName}`);
+        }
+      } catch (err: any) {
+        await job.log(`Warning: failed to delete index ${indexName}: ${err.message}`);
+      }
     }
+
+    await job.updateProgress(5);
+    await job.log("Creating indices with current mappings...");
+    await createAllEntityIndices(prisma, tenantId);
 
     const projects = projectId
       ? await prisma.projects.findMany({

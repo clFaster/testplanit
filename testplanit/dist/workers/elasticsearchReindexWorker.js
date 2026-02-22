@@ -443,6 +443,18 @@ var extractTextFromNode = (node) => {
   return "";
 };
 
+// types/search.ts
+var SearchableEntityType = /* @__PURE__ */ ((SearchableEntityType2) => {
+  SearchableEntityType2["REPOSITORY_CASE"] = "repository_case";
+  SearchableEntityType2["SHARED_STEP"] = "shared_step";
+  SearchableEntityType2["TEST_RUN"] = "test_run";
+  SearchableEntityType2["SESSION"] = "session";
+  SearchableEntityType2["PROJECT"] = "project";
+  SearchableEntityType2["ISSUE"] = "issue";
+  SearchableEntityType2["MILESTONE"] = "milestone";
+  return SearchableEntityType2;
+})(SearchableEntityType || {});
+
 // services/unifiedElasticsearchService.ts
 init_prismaBase();
 var BASE_INDEX_NAMES = {
@@ -841,6 +853,12 @@ async function createEntityIndex(entityType, prismaClient2, tenantId) {
     return false;
   }
 }
+async function createAllEntityIndices(prismaClient2, tenantId) {
+  const entityTypes = Object.values(SearchableEntityType);
+  for (const entityType of entityTypes) {
+    await createEntityIndex(entityType, prismaClient2, tenantId);
+  }
+}
 function transformCustomFieldValue(fieldType, value) {
   const base = {};
   switch (fieldType) {
@@ -1183,16 +1201,6 @@ async function syncProjectCasesToElasticsearch(projectId, batchSize = 100, progr
   } catch (error) {
     console.error("Error syncing project cases to Elasticsearch:", error);
     return false;
-  }
-}
-async function initializeElasticsearchIndexes(prismaClient2, tenantId) {
-  try {
-    const created = await createRepositoryCaseIndex(prismaClient2, tenantId);
-    if (created) {
-      console.log(`Elasticsearch indexes initialized successfully${tenantId ? ` (tenant: ${tenantId})` : ""}`);
-    }
-  } catch (error) {
-    console.error("Failed to initialize Elasticsearch indexes:", error);
   }
 }
 
@@ -2041,11 +2049,24 @@ var processor = async (job) => {
     }
     await job.updateProgress(0);
     await job.log("Starting reindex operation...");
-    if (entityType === "all" || entityType === "repositoryCases") {
-      await job.updateProgress(5);
-      await job.log("Initializing Elasticsearch indexes...");
-      await initializeElasticsearchIndexes(prisma2, tenantId);
+    const entityTypesToReindex = entityType === "all" ? Object.values(SearchableEntityType) : [entityType === "repositoryCases" ? "repository_case" /* REPOSITORY_CASE */ : entityType === "sharedSteps" ? "shared_step" /* SHARED_STEP */ : entityType === "testRuns" ? "test_run" /* TEST_RUN */ : entityType === "sessions" ? "session" /* SESSION */ : entityType === "issues" ? "issue" /* ISSUE */ : entityType === "milestones" ? "milestone" /* MILESTONE */ : "project" /* PROJECT */];
+    await job.updateProgress(2);
+    await job.log("Deleting old indices to apply latest mappings...");
+    for (const et of entityTypesToReindex) {
+      const indexName = getEntityIndexName(et, tenantId);
+      try {
+        const exists = await esClient2.indices.exists({ index: indexName });
+        if (exists) {
+          await esClient2.indices.delete({ index: indexName });
+          await job.log(`Deleted index: ${indexName}`);
+        }
+      } catch (err) {
+        await job.log(`Warning: failed to delete index ${indexName}: ${err.message}`);
+      }
     }
+    await job.updateProgress(5);
+    await job.log("Creating indices with current mappings...");
+    await createAllEntityIndices(prisma2, tenantId);
     const projects = projectId ? await prisma2.projects.findMany({
       where: { id: projectId, isDeleted: false }
     }) : await prisma2.projects.findMany({
