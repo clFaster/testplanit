@@ -759,34 +759,29 @@ function buildSearchAggregations(
 ) {
   const aggs: any = {};
 
-  // Standard facets available for all entities
-  const standardFacets = ["projectId", "createdById", "stateId"];
-
-  // Entity-specific facets
-  const entityFacets: Record<string, string[]> = {
-    [SearchableEntityType.REPOSITORY_CASE]: ["templateId", "automated", "tags"],
-    [SearchableEntityType.TEST_RUN]: ["testRunType", "isCompleted", "configId"],
-    [SearchableEntityType.SESSION]: [
-      "templateId",
-      "assignedToId",
-      "isCompleted",
-    ],
-    // Add more as needed
-  };
+  const hasTagsMapping =
+    !entityTypes ||
+    entityTypes.length === 0 ||
+    entityTypes.includes(SearchableEntityType.REPOSITORY_CASE) ||
+    entityTypes.includes(SearchableEntityType.TEST_RUN) ||
+    entityTypes.includes(SearchableEntityType.SESSION);
 
   facets.forEach((facet) => {
     if (facet === "tags") {
-      aggs.tags = {
-        nested: { path: "tags", ignore_unmapped: true },
-        aggs: {
-          tag_ids: {
-            terms: {
-              field: "tags.id",
-              size: 50,
+      // Tags nested aggregation only works on indices with a "tags" nested mapping (repository cases, test runs, sessions)
+      if (hasTagsMapping) {
+        aggs.tags = {
+          nested: { path: "tags" },
+          aggs: {
+            tag_ids: {
+              terms: {
+                field: "tags.id",
+                size: 50,
+              },
             },
           },
-        },
-      };
+        };
+      }
     } else {
       aggs[facet] = {
         terms: {
