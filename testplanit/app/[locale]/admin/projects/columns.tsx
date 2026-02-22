@@ -37,7 +37,7 @@ export interface ExtendedProjects extends Projects {
 }
 
 export const getColumns = (
-  session: any,
+  userPreferences: any,
   handleToggleCompleted: (id: number, isCompleted: boolean) => void,
   handleOpenEditModal: (project: ExtendedProjects) => void,
   tCommon: ReturnType<typeof useTranslations<"common">>
@@ -141,9 +141,9 @@ export const getColumns = (
           <DateFormatter
             date={getValue() as Date | string}
             formatString={
-              session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+              userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
             }
-            timezone={session.user.preferences?.timezone || "Etc/UTC"}
+            timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
           />
         </div>
       ),
@@ -178,9 +178,9 @@ export const getColumns = (
           <DateFormatter
             date={getValue() as Date | string}
             formatString={
-              session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+              userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
             }
-            timezone={session.user.preferences?.timezone || "Etc/UTC"}
+            timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
           />
         </div>
       ),

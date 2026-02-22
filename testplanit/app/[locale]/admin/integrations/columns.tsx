@@ -35,7 +35,7 @@ export interface ExtendedIntegration extends Integration {
 }
 
 export const getColumns = (
-  session: any,
+  userPreferences: any,
   handleEditIntegration: (integration: Integration) => void,
   handleDeleteClick: (integration: Integration) => void,
   handleTestConnection: (integration: Integration) => void,
@@ -136,9 +136,9 @@ export const getColumns = (
           <DateFormatter
             date={lastSyncAt}
             formatString={
-              session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+              userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
             }
-            timezone={session.user.preferences?.timezone || "Etc/UTC"}
+            timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
           />
         </div>
       );
@@ -158,9 +158,9 @@ export const getColumns = (
         <DateFormatter
           date={getValue() as Date | string}
           formatString={
-            session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+            userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
           }
-          timezone={session.user.preferences?.timezone || "Etc/UTC"}
+          timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
         />
       </div>
     ),
@@ -179,9 +179,9 @@ export const getColumns = (
         <DateFormatter
           date={getValue() as Date | string}
           formatString={
-            session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+            userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
           }
-          timezone={session.user.preferences?.timezone || "Etc/UTC"}
+          timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
         />
       </div>
     ),

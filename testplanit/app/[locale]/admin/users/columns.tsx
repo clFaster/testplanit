@@ -39,7 +39,7 @@ export interface ExtendedUser extends User {
 }
 
 export const getColumns = (
-  session: any,
+  userPreferences: any,
   handleToggle: (id: string, key: keyof ExtendedUser, value: boolean) => void,
   tCommon: ReturnType<typeof useTranslations<"common">>
 ): ColumnDef<ExtendedUser>[] => [
@@ -81,9 +81,9 @@ export const getColumns = (
         <DateFormatter
           date={getValue() as Date | string}
           formatString={
-            session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+            userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
           }
-          timezone={session.user.preferences?.timezone || "Etc/UTC"}
+          timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
         />
       </div>
     ),
@@ -100,7 +100,7 @@ export const getColumns = (
         <Switch
           data-testid={`user-active-toggle-${row.original.id}`}
           checked={row.original.isActive}
-          disabled={row.original.id === session.user.id}
+          disabled={row.original.id === userPreferences.user.id}
           onCheckedChange={(checked) =>
             handleToggle(row.original.id, "isActive", checked)
           }
@@ -194,9 +194,9 @@ export const getColumns = (
         <DateFormatter
           date={getValue() as Date | string}
           formatString={
-            session.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
+            userPreferences.user.preferences?.dateFormat || "MM_DD_YYYY_DASH"
           }
-          timezone={session.user.preferences?.timezone || "Etc/UTC"}
+          timezone={userPreferences.user.preferences?.timezone || "Etc/UTC"}
         />
       </div>
     ),
@@ -227,7 +227,7 @@ export const getColumns = (
     cell: ({ row }) => (
       <div className="bg-primary-foreground whitespace-nowrap flex justify-center gap-1">
         <EditUserModal key={`edit-${row.original.id}`} user={row.original} />
-        {row.original.id !== session.user.id ? (
+        {row.original.id !== userPreferences.user.id ? (
           <DeleteUserModal
             key={`delete-${row.original.id}`}
             user={row.original}
