@@ -3,9 +3,10 @@ name: Semantic Release
 on:
   push:
     branches: [main]
-    # Skip running on release commits (already created)
-    paths-ignore:
-      - 'testplanit/CHANGELOG.md'
+    # Only run when the main application code changes — not for docs, packages, or CLI
+    paths:
+      - 'testplanit/**'
+      - '!testplanit/CHANGELOG.md'
 
 permissions:
   contents: write

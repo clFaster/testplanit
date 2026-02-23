@@ -6,6 +6,112 @@ import * as path from 'path';
 import * as os from 'os';
 
 // src/reporter.ts
+var STALE_THRESHOLD_MS = 4 * 60 * 60 * 1e3;
+function getSharedStateFilePath(projectId) {
+  const fileName = `.testplanit-reporter-${projectId}.json`;
+  return path.join(os.tmpdir(), fileName);
+}
+function acquireLock(lockPath, maxAttempts = 10) {
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      fs.writeFileSync(lockPath, process.pid.toString(), { flag: "wx" });
+      return true;
+    } catch {
+    }
+  }
+  return false;
+}
+function releaseLock(lockPath) {
+  try {
+    fs.unlinkSync(lockPath);
+  } catch {
+  }
+}
+function withLock(projectId, callback) {
+  const filePath = getSharedStateFilePath(projectId);
+  const lockPath = `${filePath}.lock`;
+  if (!acquireLock(lockPath)) {
+    return void 0;
+  }
+  try {
+    return callback(filePath);
+  } finally {
+    releaseLock(lockPath);
+  }
+}
+function readSharedState(projectId) {
+  const filePath = getSharedStateFilePath(projectId);
+  try {
+    if (!fs.existsSync(filePath)) {
+      return null;
+    }
+    const content = fs.readFileSync(filePath, "utf-8");
+    const state = JSON.parse(content);
+    const createdAt = new Date(state.createdAt);
+    const staleThreshold = new Date(Date.now() - STALE_THRESHOLD_MS);
+    if (createdAt < staleThreshold) {
+      deleteSharedState(projectId);
+      return null;
+    }
+    return state;
+  } catch {
+    return null;
+  }
+}
+function writeSharedState(projectId, state) {
+  withLock(projectId, (filePath) => {
+    fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
+  });
+}
+function writeSharedStateIfAbsent(projectId, state) {
+  return withLock(projectId, (filePath) => {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      const existingState = JSON.parse(content);
+      if (!existingState.testSuiteId && state.testSuiteId) {
+        existingState.testSuiteId = state.testSuiteId;
+        fs.writeFileSync(filePath, JSON.stringify(existingState, null, 2));
+      }
+      return existingState;
+    }
+    fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
+    return state;
+  });
+}
+function deleteSharedState(projectId) {
+  const filePath = getSharedStateFilePath(projectId);
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch {
+  }
+}
+function incrementWorkerCount(projectId) {
+  withLock(projectId, (filePath) => {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      const state = JSON.parse(content);
+      state.activeWorkers = (state.activeWorkers || 0) + 1;
+      fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
+    }
+  });
+}
+function decrementWorkerCount(projectId) {
+  const result = withLock(projectId, (filePath) => {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      const state = JSON.parse(content);
+      state.activeWorkers = Math.max(0, (state.activeWorkers || 1) - 1);
+      fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
+      return state.activeWorkers === 0;
+    }
+    return false;
+  });
+  return result ?? false;
+}
+
+// src/reporter.ts
 var TestPlanItReporter = class extends WDIOReporter {
   client;
   reporterOptions;
@@ -18,6 +124,8 @@ var TestPlanItReporter = class extends WDIOReporter {
   currentTestUid = null;
   currentCid = null;
   pendingScreenshots = /* @__PURE__ */ new Map();
+  /** When true, the TestPlanItService manages the test run lifecycle */
+  managedByService = false;
   /**
    * WebdriverIO uses this getter to determine if the reporter has finished async operations.
    * The test runner will wait for this to return true before terminating.
@@ -98,204 +206,6 @@ ${error.stack}` : "";
     console.error(`[TestPlanIt] ERROR: ${message}`, errorMsg, stack);
   }
   /**
-   * Get the path to the shared state file for oneReport mode.
-   * Uses a file in the temp directory with a name based on the project ID.
-   */
-  getSharedStateFilePath() {
-    const fileName = `.testplanit-reporter-${this.reporterOptions.projectId}.json`;
-    return path.join(os.tmpdir(), fileName);
-  }
-  /**
-   * Read shared state from file (for oneReport mode).
-   * Returns null if:
-   * - File doesn't exist
-   * - File is stale (older than 4 hours)
-   * - Previous run completed (activeWorkers === 0)
-   */
-  readSharedState() {
-    const filePath = this.getSharedStateFilePath();
-    try {
-      if (!fs.existsSync(filePath)) {
-        return null;
-      }
-      const content = fs.readFileSync(filePath, "utf-8");
-      const state = JSON.parse(content);
-      const createdAt = new Date(state.createdAt);
-      const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1e3);
-      if (createdAt < fourHoursAgo) {
-        this.log("Shared state file is stale (older than 4 hours), starting fresh");
-        this.deleteSharedState();
-        return null;
-      }
-      if (state.activeWorkers === 0) {
-        this.log("Previous test run completed (activeWorkers=0), starting fresh");
-        this.deleteSharedState();
-        return null;
-      }
-      return state;
-    } catch (error) {
-      this.log("Failed to read shared state file:", error);
-      return null;
-    }
-  }
-  /**
-   * Write shared state to file (for oneReport mode).
-   * Uses a lock file to prevent race conditions.
-   * Only writes the testRunId if the file doesn't exist yet (first writer wins).
-   * Updates testSuiteId if not already set.
-   */
-  writeSharedState(state) {
-    const filePath = this.getSharedStateFilePath();
-    const lockPath = `${filePath}.lock`;
-    try {
-      let lockAcquired = false;
-      for (let i = 0; i < 10; i++) {
-        try {
-          fs.writeFileSync(lockPath, process.pid.toString(), { flag: "wx" });
-          lockAcquired = true;
-          break;
-        } catch {
-          const sleepMs = 50 * Math.pow(2, i) + Math.random() * 50;
-          const start = Date.now();
-          while (Date.now() - start < sleepMs) {
-          }
-        }
-      }
-      if (!lockAcquired) {
-        this.log("Could not acquire lock for shared state file");
-        return;
-      }
-      try {
-        if (fs.existsSync(filePath)) {
-          const existingContent = fs.readFileSync(filePath, "utf-8");
-          const existingState = JSON.parse(existingContent);
-          if (!existingState.testSuiteId && state.testSuiteId) {
-            existingState.testSuiteId = state.testSuiteId;
-            fs.writeFileSync(filePath, JSON.stringify(existingState, null, 2));
-            this.log("Updated shared state file with testSuiteId:", state.testSuiteId);
-          } else {
-            this.log("Shared state file already exists with testSuiteId, not overwriting");
-          }
-          return;
-        }
-        fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
-        this.log("Wrote shared state file:", filePath);
-      } finally {
-        try {
-          fs.unlinkSync(lockPath);
-        } catch {
-        }
-      }
-    } catch (error) {
-      this.log("Failed to write shared state file:", error);
-    }
-  }
-  /**
-   * Delete shared state file (cleanup after run completes).
-   */
-  deleteSharedState() {
-    const filePath = this.getSharedStateFilePath();
-    try {
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-        this.log("Deleted shared state file");
-      }
-    } catch (error) {
-      this.log("Failed to delete shared state file:", error);
-    }
-  }
-  /**
-   * Increment the active worker count in shared state.
-   * Called when a worker starts using the shared test run.
-   */
-  incrementWorkerCount() {
-    const filePath = this.getSharedStateFilePath();
-    const lockPath = `${filePath}.lock`;
-    try {
-      let lockAcquired = false;
-      for (let i = 0; i < 10; i++) {
-        try {
-          fs.writeFileSync(lockPath, process.pid.toString(), { flag: "wx" });
-          lockAcquired = true;
-          break;
-        } catch {
-          const sleepMs = 50 * Math.pow(2, i) + Math.random() * 50;
-          const start = Date.now();
-          while (Date.now() - start < sleepMs) {
-          }
-        }
-      }
-      if (!lockAcquired) {
-        this.log("Could not acquire lock to increment worker count");
-        return;
-      }
-      try {
-        if (fs.existsSync(filePath)) {
-          const content = fs.readFileSync(filePath, "utf-8");
-          const state = JSON.parse(content);
-          state.activeWorkers = (state.activeWorkers || 0) + 1;
-          fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
-          this.log("Incremented worker count to:", state.activeWorkers);
-        }
-      } finally {
-        try {
-          fs.unlinkSync(lockPath);
-        } catch {
-        }
-      }
-    } catch (error) {
-      this.log("Failed to increment worker count:", error);
-    }
-  }
-  /**
-   * Decrement the active worker count in shared state.
-   * Returns true if this was the last worker (count reached 0).
-   */
-  decrementWorkerCount() {
-    const filePath = this.getSharedStateFilePath();
-    const lockPath = `${filePath}.lock`;
-    try {
-      let lockAcquired = false;
-      for (let i = 0; i < 10; i++) {
-        try {
-          fs.writeFileSync(lockPath, process.pid.toString(), { flag: "wx" });
-          lockAcquired = true;
-          break;
-        } catch {
-          const sleepMs = 50 * Math.pow(2, i) + Math.random() * 50;
-          const start = Date.now();
-          while (Date.now() - start < sleepMs) {
-          }
-        }
-      }
-      if (!lockAcquired) {
-        this.log("Could not acquire lock to decrement worker count");
-        return false;
-      }
-      try {
-        if (fs.existsSync(filePath)) {
-          const content = fs.readFileSync(filePath, "utf-8");
-          const state = JSON.parse(content);
-          state.activeWorkers = Math.max(0, (state.activeWorkers || 1) - 1);
-          fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
-          this.log("Decremented worker count to:", state.activeWorkers);
-          if (state.activeWorkers === 0) {
-            this.log("This is the last worker");
-            return true;
-          }
-        }
-      } finally {
-        try {
-          fs.unlinkSync(lockPath);
-        } catch {
-        }
-      }
-    } catch (error) {
-      this.log("Failed to decrement worker count:", error);
-    }
-    return false;
-  }
-  /**
    * Track an async operation to prevent the runner from terminating early.
    * The operation is added to pendingOperations and removed when complete.
    * WebdriverIO checks isSynchronised and waits until all operations finish.
@@ -329,47 +239,59 @@ ${error.stack}` : "";
       this.log("Fetching status mappings...");
       await this.fetchStatusMappings();
       if (this.reporterOptions.oneReport && !this.state.testRunId) {
-        const sharedState = this.readSharedState();
+        const sharedState = readSharedState(this.reporterOptions.projectId);
         if (sharedState) {
-          this.state.testRunId = sharedState.testRunId;
-          this.state.testSuiteId = sharedState.testSuiteId;
-          this.log(`Using shared test run from file: ${sharedState.testRunId}`);
-          try {
-            const testRun = await this.client.getTestRun(this.state.testRunId);
-            if (testRun.isDeleted) {
-              this.log(`Shared test run ${testRun.id} is deleted, starting fresh`);
+          if (sharedState.managedByService) {
+            this.state.testRunId = sharedState.testRunId;
+            this.state.testSuiteId = sharedState.testSuiteId;
+            this.managedByService = true;
+            this.log(`Using service-managed test run: ${sharedState.testRunId}`);
+          } else {
+            this.state.testRunId = sharedState.testRunId;
+            this.state.testSuiteId = sharedState.testSuiteId;
+            this.log(`Using shared test run from file: ${sharedState.testRunId}`);
+            if (sharedState.activeWorkers === 0) {
+              this.log("Previous test run completed (activeWorkers=0), starting fresh");
+              deleteSharedState(this.reporterOptions.projectId);
               this.state.testRunId = void 0;
               this.state.testSuiteId = void 0;
-              this.deleteSharedState();
-            } else if (testRun.isCompleted) {
-              this.log(`Shared test run ${testRun.id} is already completed, starting fresh`);
-              this.state.testRunId = void 0;
-              this.state.testSuiteId = void 0;
-              this.deleteSharedState();
             } else {
-              this.log(`Validated shared test run: ${testRun.name} (ID: ${testRun.id})`);
-              this.incrementWorkerCount();
+              try {
+                const testRun = await this.client.getTestRun(this.state.testRunId);
+                if (testRun.isDeleted) {
+                  this.log(`Shared test run ${testRun.id} is deleted, starting fresh`);
+                  this.state.testRunId = void 0;
+                  this.state.testSuiteId = void 0;
+                  deleteSharedState(this.reporterOptions.projectId);
+                } else if (testRun.isCompleted) {
+                  this.log(`Shared test run ${testRun.id} is already completed, starting fresh`);
+                  this.state.testRunId = void 0;
+                  this.state.testSuiteId = void 0;
+                  deleteSharedState(this.reporterOptions.projectId);
+                } else {
+                  this.log(`Validated shared test run: ${testRun.name} (ID: ${testRun.id})`);
+                  incrementWorkerCount(this.reporterOptions.projectId);
+                }
+              } catch {
+                this.log("Shared test run no longer exists, will create new one");
+                this.state.testRunId = void 0;
+                this.state.testSuiteId = void 0;
+                deleteSharedState(this.reporterOptions.projectId);
+              }
             }
-          } catch {
-            this.log("Shared test run no longer exists, will create new one");
-            this.state.testRunId = void 0;
-            this.state.testSuiteId = void 0;
-            this.deleteSharedState();
           }
         }
       }
-      if (!this.state.testRunId) {
+      if (!this.state.testRunId && !this.managedByService) {
         if (this.reporterOptions.oneReport) {
           await this.createTestRun();
           this.log(`Created test run with ID: ${this.state.testRunId}`);
-          this.writeSharedState({
+          const finalState = writeSharedStateIfAbsent(this.reporterOptions.projectId, {
             testRunId: this.state.testRunId,
             testSuiteId: this.state.testSuiteId,
             createdAt: (/* @__PURE__ */ new Date()).toISOString(),
             activeWorkers: 1
-            // First worker
           });
-          const finalState = this.readSharedState();
           if (finalState && finalState.testRunId !== this.state.testRunId) {
             this.log(`Another worker created test run first, switching from ${this.state.testRunId} to ${finalState.testRunId}`);
             this.state.testRunId = finalState.testRunId;
@@ -379,7 +301,7 @@ ${error.stack}` : "";
           await this.createTestRun();
           this.log(`Created test run with ID: ${this.state.testRunId}`);
         }
-      } else if (!this.reporterOptions.oneReport) {
+      } else if (this.state.testRunId && !this.reporterOptions.oneReport && !this.managedByService) {
         try {
           const testRun = await this.client.getTestRun(this.state.testRunId);
           this.log(`Using existing test run: ${testRun.name} (ID: ${testRun.id})`);
@@ -516,7 +438,7 @@ ${error.stack}` : "";
       throw new Error("Cannot create JUnit test suite without a test run ID");
     }
     if (this.reporterOptions.oneReport) {
-      const sharedState = this.readSharedState();
+      const sharedState = readSharedState(this.reporterOptions.projectId);
       if (sharedState?.testSuiteId) {
         this.state.testSuiteId = sharedState.testSuiteId;
         this.log("Using shared JUnit test suite from file:", sharedState.testSuiteId);
@@ -538,14 +460,12 @@ ${error.stack}` : "";
     this.state.testSuiteId = testSuite.id;
     this.log("Created JUnit test suite with ID:", testSuite.id);
     if (this.reporterOptions.oneReport) {
-      this.writeSharedState({
+      const finalState = writeSharedStateIfAbsent(this.reporterOptions.projectId, {
         testRunId: this.state.testRunId,
         testSuiteId: this.state.testSuiteId,
         createdAt: (/* @__PURE__ */ new Date()).toISOString(),
         activeWorkers: 1
-        // Will be merged/updated by writeSharedState
       });
-      const finalState = this.readSharedState();
       if (finalState && finalState.testSuiteId !== this.state.testSuiteId) {
         this.log(`Another worker created test suite first, switching from ${this.state.testSuiteId} to ${finalState.testSuiteId}`);
         this.state.testSuiteId = finalState.testSuiteId;
@@ -999,15 +919,17 @@ ${error.stack}` : "";
       await Promise.allSettled(uploadPromises);
       this.pendingScreenshots.clear();
     }
-    if (this.reporterOptions.completeRunOnFinish) {
+    if (this.managedByService) {
+      this.log("Skipping test run completion (managed by TestPlanItService)");
+    } else if (this.reporterOptions.completeRunOnFinish) {
       if (this.reporterOptions.oneReport) {
-        const isLastWorker = this.decrementWorkerCount();
+        const isLastWorker = decrementWorkerCount(this.reporterOptions.projectId);
         if (isLastWorker) {
           const completeRunOp = (async () => {
             try {
               await this.client.completeTestRun(this.state.testRunId, this.reporterOptions.projectId);
               this.log("Test run completed (last worker):", this.state.testRunId);
-              this.deleteSharedState();
+              deleteSharedState(this.reporterOptions.projectId);
             } catch (error) {
               this.logError("Failed to complete test run:", error);
             }
@@ -1030,7 +952,7 @@ ${error.stack}` : "";
         await completeRunOp;
       }
     } else if (this.reporterOptions.oneReport) {
-      this.decrementWorkerCount();
+      decrementWorkerCount(this.reporterOptions.projectId);
     }
     const stats = this.state.stats;
     const duration = ((Date.now() - stats.startTime.getTime()) / 1e3).toFixed(1);
@@ -1079,7 +1001,194 @@ ${error.stack}` : "";
     return this.state;
   }
 };
+var TestPlanItService = class {
+  options;
+  client;
+  verbose;
+  testRunId;
+  testSuiteId;
+  constructor(serviceOptions) {
+    if (!serviceOptions.domain) {
+      throw new Error("TestPlanIt service: domain is required");
+    }
+    if (!serviceOptions.apiToken) {
+      throw new Error("TestPlanIt service: apiToken is required");
+    }
+    if (!serviceOptions.projectId) {
+      throw new Error("TestPlanIt service: projectId is required");
+    }
+    this.options = {
+      completeRunOnFinish: true,
+      runName: "Automated Tests - {date} {time}",
+      testRunType: "MOCHA",
+      timeout: 3e4,
+      maxRetries: 3,
+      verbose: false,
+      ...serviceOptions
+    };
+    this.verbose = this.options.verbose ?? false;
+    this.client = new TestPlanItClient({
+      baseUrl: this.options.domain,
+      apiToken: this.options.apiToken,
+      timeout: this.options.timeout,
+      maxRetries: this.options.maxRetries
+    });
+  }
+  /**
+   * Log a message if verbose mode is enabled
+   */
+  log(message, ...args) {
+    if (this.verbose) {
+      console.log(`[TestPlanIt Service] ${message}`, ...args);
+    }
+  }
+  /**
+   * Log an error (always logs, not just in verbose mode)
+   */
+  logError(message, error) {
+    const errorMsg = error instanceof Error ? error.message : String(error ?? "");
+    console.error(`[TestPlanIt Service] ERROR: ${message}`, errorMsg);
+  }
+  /**
+   * Format run name with available placeholders.
+   * Note: {browser}, {spec}, and {suite} are NOT available in the service context
+   * since it runs before any workers start.
+   */
+  formatRunName(template) {
+    const now = /* @__PURE__ */ new Date();
+    const date = now.toISOString().split("T")[0];
+    const time = now.toTimeString().split(" ")[0];
+    const platform = process.platform;
+    return template.replace("{date}", date).replace("{time}", time).replace("{platform}", platform).replace("{browser}", "unknown").replace("{spec}", "unknown").replace("{suite}", "Tests");
+  }
+  /**
+   * Resolve string option IDs to numeric IDs using the API client.
+   */
+  async resolveIds() {
+    const projectId = this.options.projectId;
+    const resolved = {};
+    if (typeof this.options.configId === "string") {
+      const config = await this.client.findConfigurationByName(projectId, this.options.configId);
+      if (!config) {
+        throw new Error(`Configuration not found: "${this.options.configId}"`);
+      }
+      resolved.configId = config.id;
+      this.log(`Resolved configuration "${this.options.configId}" -> ${config.id}`);
+    } else if (typeof this.options.configId === "number") {
+      resolved.configId = this.options.configId;
+    }
+    if (typeof this.options.milestoneId === "string") {
+      const milestone = await this.client.findMilestoneByName(projectId, this.options.milestoneId);
+      if (!milestone) {
+        throw new Error(`Milestone not found: "${this.options.milestoneId}"`);
+      }
+      resolved.milestoneId = milestone.id;
+      this.log(`Resolved milestone "${this.options.milestoneId}" -> ${milestone.id}`);
+    } else if (typeof this.options.milestoneId === "number") {
+      resolved.milestoneId = this.options.milestoneId;
+    }
+    if (typeof this.options.stateId === "string") {
+      const state = await this.client.findWorkflowStateByName(projectId, this.options.stateId);
+      if (!state) {
+        throw new Error(`Workflow state not found: "${this.options.stateId}"`);
+      }
+      resolved.stateId = state.id;
+      this.log(`Resolved workflow state "${this.options.stateId}" -> ${state.id}`);
+    } else if (typeof this.options.stateId === "number") {
+      resolved.stateId = this.options.stateId;
+    }
+    if (this.options.tagIds && this.options.tagIds.length > 0) {
+      resolved.tagIds = await this.client.resolveTagIds(projectId, this.options.tagIds);
+      this.log(`Resolved tags: ${resolved.tagIds.join(", ")}`);
+    }
+    return resolved;
+  }
+  /**
+   * onPrepare - Runs once in the main process before any workers start.
+   *
+   * Creates the test run and JUnit test suite, then writes shared state
+   * so all worker reporters can find and use the pre-created run.
+   */
+  async onPrepare() {
+    this.log("Preparing test run...");
+    this.log(`  Domain: ${this.options.domain}`);
+    this.log(`  Project ID: ${this.options.projectId}`);
+    try {
+      deleteSharedState(this.options.projectId);
+      const resolved = await this.resolveIds();
+      const runName = this.formatRunName(this.options.runName ?? "Automated Tests - {date} {time}");
+      this.log(`Creating test run: "${runName}" (type: ${this.options.testRunType})`);
+      const testRun = await this.client.createTestRun({
+        projectId: this.options.projectId,
+        name: runName,
+        testRunType: this.options.testRunType,
+        configId: resolved.configId,
+        milestoneId: resolved.milestoneId,
+        stateId: resolved.stateId,
+        tagIds: resolved.tagIds
+      });
+      this.testRunId = testRun.id;
+      this.log(`Created test run with ID: ${this.testRunId}`);
+      this.log("Creating JUnit test suite...");
+      const testSuite = await this.client.createJUnitTestSuite({
+        testRunId: this.testRunId,
+        name: runName,
+        time: 0,
+        tests: 0,
+        failures: 0,
+        errors: 0,
+        skipped: 0
+      });
+      this.testSuiteId = testSuite.id;
+      this.log(`Created JUnit test suite with ID: ${this.testSuiteId}`);
+      const sharedState = {
+        testRunId: this.testRunId,
+        testSuiteId: this.testSuiteId,
+        createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+        activeWorkers: 0,
+        // Not used in service-managed mode
+        managedByService: true
+      };
+      writeSharedState(this.options.projectId, sharedState);
+      this.log("Wrote shared state file for workers");
+      console.log(`[TestPlanIt Service] Test run created: "${runName}" (ID: ${this.testRunId})`);
+    } catch (error) {
+      this.logError("Failed to prepare test run:", error);
+      deleteSharedState(this.options.projectId);
+      throw error;
+    }
+  }
+  /**
+   * onComplete - Runs once in the main process after all workers finish.
+   *
+   * Completes the test run and cleans up the shared state file.
+   */
+  async onComplete(exitCode) {
+    this.log(`All workers finished (exit code: ${exitCode})`);
+    try {
+      if (this.testRunId && this.options.completeRunOnFinish) {
+        this.log(`Completing test run ${this.testRunId}...`);
+        await this.client.completeTestRun(this.testRunId, this.options.projectId);
+        this.log("Test run completed successfully");
+      }
+      if (this.testRunId) {
+        console.log("\n[TestPlanIt Service] \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
+        console.log(`[TestPlanIt Service]   Test Run ID: ${this.testRunId}`);
+        if (this.options.completeRunOnFinish) {
+          console.log("[TestPlanIt Service]   Status: Completed");
+        }
+        console.log(`[TestPlanIt Service]   View: ${this.options.domain}/projects/runs/${this.options.projectId}/${this.testRunId}`);
+        console.log("[TestPlanIt Service] \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n");
+      }
+    } catch (error) {
+      this.logError("Failed to complete test run:", error);
+    } finally {
+      deleteSharedState(this.options.projectId);
+      this.log("Cleaned up shared state file");
+    }
+  }
+};
 
-export { TestPlanItReporter, TestPlanItReporter as default };
+export { TestPlanItReporter, TestPlanItService, TestPlanItReporter as default };
 //# sourceMappingURL=index.mjs.map
 //# sourceMappingURL=index.mjs.map

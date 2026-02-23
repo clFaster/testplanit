@@ -60,7 +60,7 @@ Yes, TestPlanIt supports importing test cases from CSV files. For specific tools
 TestPlanIt doesn't run automated tests directly, but it integrates with your existing automation frameworks. You can push automated test results to TestPlanIt using:
 
 - The [TestPlanIt SDK](/docs/sdk/) for programmatic access
-- The [WebdriverIO reporter](/docs/sdk/webdriverio-reporter) for WebdriverIO integration
+- The [WebdriverIO reporter](/docs/sdk/wdio-overview) for WebdriverIO integration
 - The REST API for custom integrations
 
 ### Can I integrate with Jira/GitHub/Azure DevOps?

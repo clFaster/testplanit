@@ -22,7 +22,8 @@
  */
 
 export { default, default as TestPlanItReporter } from './reporter.js';
-export type { TestPlanItReporterOptions, TrackedTestResult, ReporterState } from './types.js';
+export { default as TestPlanItService } from './service.js';
+export type { TestPlanItReporterOptions, TestPlanItServiceOptions, TrackedTestResult, ReporterState } from './types.js';
 
 // Re-export useful types from the API package
 export { TestPlanItClient, TestPlanItError } from '@testplanit/api';

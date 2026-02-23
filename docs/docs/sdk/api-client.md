@@ -435,6 +435,6 @@ reportTestResults();
 
 ## Related Resources
 
-- [WebdriverIO Reporter](./webdriverio-reporter.md) - Automatic reporting for WebdriverIO tests
+- [WebdriverIO Reporter](./wdio-overview.md) - Automatic reporting for WebdriverIO tests
 - [API Tokens](../api-tokens.md) - Managing API tokens
 - [API Reference](../api-reference.md) - Full REST API documentation

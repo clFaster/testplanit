@@ -145,7 +145,7 @@ runName: `Build #${process.env.GITHUB_RUN_NUMBER} - {browser} - {date}`,
 
 ## Documentation
 
-For complete configuration options, examples, and advanced features like custom case ID patterns, milestone/configuration associations, and retry handling, see the [WebdriverIO Reporter documentation](/docs/sdk/webdriverio-reporter).
+For complete configuration options, examples, and advanced features like custom case ID patterns, milestone/configuration associations, and retry handling, see the [WebdriverIO Reporter documentation](/docs/sdk/wdio-overview).
 
 ## Get Started
 

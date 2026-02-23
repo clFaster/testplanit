@@ -216,7 +216,21 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'sdk/api-client', // @testplanit/api package
-        'sdk/webdriverio-reporter', // @testplanit/wdio-reporter package
+        {
+          type: 'category',
+          label: 'WebdriverIO Reporter',
+          link: {
+            type: 'doc',
+            id: 'sdk/wdio-overview',
+          },
+          items: [
+            'sdk/wdio-configuration', // Configuration options reference
+            'sdk/wdio-test-cases', // Linking & auto-creating test cases
+            'sdk/wdio-launcher-service', // Launcher service for single test run
+            'sdk/wdio-screenshots', // Screenshot uploads
+            'sdk/wdio-ci-cd', // CI/CD, retries, debugging, complete example
+          ],
+        },
       ],
     },
     // Add other categories or items here if needed in the future

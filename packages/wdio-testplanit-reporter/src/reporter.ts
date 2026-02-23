@@ -2,21 +2,13 @@ import WDIOReporter, { type RunnerStats, type SuiteStats, type TestStats, type A
 import { TestPlanItClient } from '@testplanit/api';
 import type { NormalizedStatus, JUnitResultType } from '@testplanit/api';
 import type { TestPlanItReporterOptions, TrackedTestResult, ReporterState } from './types.js';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
-
-/**
- * Shared state file for oneReport mode.
- * Contains the test run ID shared across all worker instances.
- */
-interface SharedState {
-  testRunId: number;
-  testSuiteId?: number;
-  createdAt: string;
-  /** Number of active workers using this test run */
-  activeWorkers: number;
-}
+import {
+  readSharedState,
+  writeSharedStateIfAbsent,
+  deleteSharedState,
+  incrementWorkerCount,
+  decrementWorkerCount,
+} from './shared.js';
 
 /**
  * WebdriverIO Reporter for TestPlanIt
@@ -50,6 +42,8 @@ export default class TestPlanItReporter extends WDIOReporter {
   private currentTestUid: string | null = null;
   private currentCid: string | null = null;
   private pendingScreenshots: Map<string, Buffer[]> = new Map();
+  /** When true, the TestPlanItService manages the test run lifecycle */
+  private managedByService = false;
 
   /**
    * WebdriverIO uses this getter to determine if the reporter has finished async operations.
@@ -141,242 +135,6 @@ export default class TestPlanItReporter extends WDIOReporter {
   }
 
   /**
-   * Get the path to the shared state file for oneReport mode.
-   * Uses a file in the temp directory with a name based on the project ID.
-   */
-  private getSharedStateFilePath(): string {
-    const fileName = `.testplanit-reporter-${this.reporterOptions.projectId}.json`;
-    return path.join(os.tmpdir(), fileName);
-  }
-
-  /**
-   * Read shared state from file (for oneReport mode).
-   * Returns null if:
-   * - File doesn't exist
-   * - File is stale (older than 4 hours)
-   * - Previous run completed (activeWorkers === 0)
-   */
-  private readSharedState(): SharedState | null {
-    const filePath = this.getSharedStateFilePath();
-    try {
-      if (!fs.existsSync(filePath)) {
-        return null;
-      }
-      const content = fs.readFileSync(filePath, 'utf-8');
-      const state: SharedState = JSON.parse(content);
-
-      // Check if state is stale (older than 4 hours)
-      const createdAt = new Date(state.createdAt);
-      const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
-      if (createdAt < fourHoursAgo) {
-        this.log('Shared state file is stale (older than 4 hours), starting fresh');
-        this.deleteSharedState();
-        return null;
-      }
-
-      // Check if previous run completed (no active workers)
-      // This ensures each new test execution creates a new test run
-      if (state.activeWorkers === 0) {
-        this.log('Previous test run completed (activeWorkers=0), starting fresh');
-        this.deleteSharedState();
-        return null;
-      }
-
-      return state;
-    } catch (error) {
-      this.log('Failed to read shared state file:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Write shared state to file (for oneReport mode).
-   * Uses a lock file to prevent race conditions.
-   * Only writes the testRunId if the file doesn't exist yet (first writer wins).
-   * Updates testSuiteId if not already set.
-   */
-  private writeSharedState(state: SharedState): void {
-    const filePath = this.getSharedStateFilePath();
-    const lockPath = `${filePath}.lock`;
-
-    try {
-      // Simple lock mechanism - try to create lock file exclusively
-      let lockAcquired = false;
-      for (let i = 0; i < 10; i++) {
-        try {
-          fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'wx' });
-          lockAcquired = true;
-          break;
-        } catch {
-          // Lock exists, wait and retry with exponential backoff
-          const sleepMs = 50 * Math.pow(2, i) + Math.random() * 50;
-          // Use setTimeout-based sleep since Atomics.wait requires SharedArrayBuffer
-          const start = Date.now();
-          while (Date.now() - start < sleepMs) {
-            // Busy wait (not ideal but works synchronously)
-          }
-        }
-      }
-
-      if (!lockAcquired) {
-        this.log('Could not acquire lock for shared state file');
-        return;
-      }
-
-      try {
-        // Check if file already exists
-        if (fs.existsSync(filePath)) {
-          // Read existing state and merge - only update testSuiteId if not set
-          const existingContent = fs.readFileSync(filePath, 'utf-8');
-          const existingState: SharedState = JSON.parse(existingContent);
-
-          // Only update if the testSuiteId is missing and we have one to add
-          if (!existingState.testSuiteId && state.testSuiteId) {
-            existingState.testSuiteId = state.testSuiteId;
-            fs.writeFileSync(filePath, JSON.stringify(existingState, null, 2));
-            this.log('Updated shared state file with testSuiteId:', state.testSuiteId);
-          } else {
-            this.log('Shared state file already exists with testSuiteId, not overwriting');
-          }
-          return;
-        }
-        fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
-        this.log('Wrote shared state file:', filePath);
-      } finally {
-        // Release lock
-        try {
-          fs.unlinkSync(lockPath);
-        } catch {
-          // Ignore lock removal errors
-        }
-      }
-    } catch (error) {
-      this.log('Failed to write shared state file:', error);
-    }
-  }
-
-  /**
-   * Delete shared state file (cleanup after run completes).
-   */
-  private deleteSharedState(): void {
-    const filePath = this.getSharedStateFilePath();
-    try {
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-        this.log('Deleted shared state file');
-      }
-    } catch (error) {
-      this.log('Failed to delete shared state file:', error);
-    }
-  }
-
-  /**
-   * Increment the active worker count in shared state.
-   * Called when a worker starts using the shared test run.
-   */
-  private incrementWorkerCount(): void {
-    const filePath = this.getSharedStateFilePath();
-    const lockPath = `${filePath}.lock`;
-
-    try {
-      // Acquire lock
-      let lockAcquired = false;
-      for (let i = 0; i < 10; i++) {
-        try {
-          fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'wx' });
-          lockAcquired = true;
-          break;
-        } catch {
-          const sleepMs = 50 * Math.pow(2, i) + Math.random() * 50;
-          const start = Date.now();
-          while (Date.now() - start < sleepMs) {
-            // Busy wait
-          }
-        }
-      }
-
-      if (!lockAcquired) {
-        this.log('Could not acquire lock to increment worker count');
-        return;
-      }
-
-      try {
-        if (fs.existsSync(filePath)) {
-          const content = fs.readFileSync(filePath, 'utf-8');
-          const state: SharedState = JSON.parse(content);
-          state.activeWorkers = (state.activeWorkers || 0) + 1;
-          fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
-          this.log('Incremented worker count to:', state.activeWorkers);
-        }
-      } finally {
-        try {
-          fs.unlinkSync(lockPath);
-        } catch {
-          // Ignore
-        }
-      }
-    } catch (error) {
-      this.log('Failed to increment worker count:', error);
-    }
-  }
-
-  /**
-   * Decrement the active worker count in shared state.
-   * Returns true if this was the last worker (count reached 0).
-   */
-  private decrementWorkerCount(): boolean {
-    const filePath = this.getSharedStateFilePath();
-    const lockPath = `${filePath}.lock`;
-
-    try {
-      // Acquire lock
-      let lockAcquired = false;
-      for (let i = 0; i < 10; i++) {
-        try {
-          fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'wx' });
-          lockAcquired = true;
-          break;
-        } catch {
-          const sleepMs = 50 * Math.pow(2, i) + Math.random() * 50;
-          const start = Date.now();
-          while (Date.now() - start < sleepMs) {
-            // Busy wait
-          }
-        }
-      }
-
-      if (!lockAcquired) {
-        this.log('Could not acquire lock to decrement worker count');
-        return false;
-      }
-
-      try {
-        if (fs.existsSync(filePath)) {
-          const content = fs.readFileSync(filePath, 'utf-8');
-          const state: SharedState = JSON.parse(content);
-          state.activeWorkers = Math.max(0, (state.activeWorkers || 1) - 1);
-          fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
-          this.log('Decremented worker count to:', state.activeWorkers);
-
-          if (state.activeWorkers === 0) {
-            this.log('This is the last worker');
-            return true;
-          }
-        }
-      } finally {
-        try {
-          fs.unlinkSync(lockPath);
-        } catch {
-          // Ignore
-        }
-      }
-    } catch (error) {
-      this.log('Failed to decrement worker count:', error);
-    }
-    return false;
-  }
-
-  /**
    * Track an async operation to prevent the runner from terminating early.
    * The operation is added to pendingOperations and removed when complete.
    * WebdriverIO checks isSynchronised and waits until all operations finish.
@@ -425,61 +183,73 @@ export default class TestPlanItReporter extends WDIOReporter {
 
       // Handle oneReport mode - check for existing shared state
       if (this.reporterOptions.oneReport && !this.state.testRunId) {
-        const sharedState = this.readSharedState();
+        const sharedState = readSharedState(this.reporterOptions.projectId);
         if (sharedState) {
-          this.state.testRunId = sharedState.testRunId;
-          this.state.testSuiteId = sharedState.testSuiteId;
-          this.log(`Using shared test run from file: ${sharedState.testRunId}`);
-          // Validate the shared test run still exists, is not completed, and is not deleted
-          try {
-            const testRun = await this.client.getTestRun(this.state.testRunId);
-            if (testRun.isDeleted) {
-              // Test run was soft-deleted
-              this.log(`Shared test run ${testRun.id} is deleted, starting fresh`);
+          if (sharedState.managedByService) {
+            // Service manages the run — just use the IDs, skip all lifecycle management
+            this.state.testRunId = sharedState.testRunId;
+            this.state.testSuiteId = sharedState.testSuiteId;
+            this.managedByService = true;
+            this.log(`Using service-managed test run: ${sharedState.testRunId}`);
+          } else {
+            // Legacy oneReport mode — validate and join the existing run
+            this.state.testRunId = sharedState.testRunId;
+            this.state.testSuiteId = sharedState.testSuiteId;
+            this.log(`Using shared test run from file: ${sharedState.testRunId}`);
+
+            // In legacy mode, skip runs where all workers have finished
+            if (sharedState.activeWorkers === 0) {
+              this.log('Previous test run completed (activeWorkers=0), starting fresh');
+              deleteSharedState(this.reporterOptions.projectId);
               this.state.testRunId = undefined;
               this.state.testSuiteId = undefined;
-              this.deleteSharedState();
-            } else if (testRun.isCompleted) {
-              // Test run was already completed (from a previous execution)
-              this.log(`Shared test run ${testRun.id} is already completed, starting fresh`);
-              this.state.testRunId = undefined;
-              this.state.testSuiteId = undefined;
-              this.deleteSharedState();
             } else {
-              this.log(`Validated shared test run: ${testRun.name} (ID: ${testRun.id})`);
-              // Increment worker count since we're joining an existing run
-              this.incrementWorkerCount();
+              // Validate the shared test run still exists, is not completed, and is not deleted
+              try {
+                const testRun = await this.client.getTestRun(this.state.testRunId);
+                if (testRun.isDeleted) {
+                  this.log(`Shared test run ${testRun.id} is deleted, starting fresh`);
+                  this.state.testRunId = undefined;
+                  this.state.testSuiteId = undefined;
+                  deleteSharedState(this.reporterOptions.projectId);
+                } else if (testRun.isCompleted) {
+                  this.log(`Shared test run ${testRun.id} is already completed, starting fresh`);
+                  this.state.testRunId = undefined;
+                  this.state.testSuiteId = undefined;
+                  deleteSharedState(this.reporterOptions.projectId);
+                } else {
+                  this.log(`Validated shared test run: ${testRun.name} (ID: ${testRun.id})`);
+                  incrementWorkerCount(this.reporterOptions.projectId);
+                }
+              } catch {
+                this.log('Shared test run no longer exists, will create new one');
+                this.state.testRunId = undefined;
+                this.state.testSuiteId = undefined;
+                deleteSharedState(this.reporterOptions.projectId);
+              }
             }
-          } catch {
-            // Shared test run no longer exists, clear state and create new one
-            this.log('Shared test run no longer exists, will create new one');
-            this.state.testRunId = undefined;
-            this.state.testSuiteId = undefined;
-            this.deleteSharedState();
           }
         }
       }
 
-      // Create or validate test run
-      if (!this.state.testRunId) {
+      // Create or validate test run (skip if service-managed)
+      if (!this.state.testRunId && !this.managedByService) {
         // In oneReport mode, use atomic write to prevent race conditions
         if (this.reporterOptions.oneReport) {
           // Create the test run first
           await this.createTestRun();
           this.log(`Created test run with ID: ${this.state.testRunId}`);
 
-          // Try to write shared state - this will fail if another worker already wrote
-          this.writeSharedState({
+          // Try to write shared state - first writer wins
+          const finalState = writeSharedStateIfAbsent(this.reporterOptions.projectId, {
             testRunId: this.state.testRunId!,
             testSuiteId: this.state.testSuiteId,
             createdAt: new Date().toISOString(),
-            activeWorkers: 1, // First worker
+            activeWorkers: 1,
           });
 
-          // Re-check shared state to see if we won the race
-          const finalState = this.readSharedState();
+          // Check if another worker wrote first
           if (finalState && finalState.testRunId !== this.state.testRunId) {
-            // Another worker created a test run first - use theirs instead
             this.log(`Another worker created test run first, switching from ${this.state.testRunId} to ${finalState.testRunId}`);
             this.state.testRunId = finalState.testRunId;
             this.state.testSuiteId = finalState.testSuiteId;
@@ -488,9 +258,8 @@ export default class TestPlanItReporter extends WDIOReporter {
           await this.createTestRun();
           this.log(`Created test run with ID: ${this.state.testRunId}`);
         }
-      } else if (!this.reporterOptions.oneReport) {
-        // Only validate if not using oneReport (already validated above)
-        // Validate existing test run
+      } else if (this.state.testRunId && !this.reporterOptions.oneReport && !this.managedByService) {
+        // Validate existing test run (only when not using oneReport or service)
         try {
           const testRun = await this.client.getTestRun(this.state.testRunId);
           this.log(`Using existing test run: ${testRun.name} (ID: ${testRun.id})`);
@@ -652,7 +421,7 @@ export default class TestPlanItReporter extends WDIOReporter {
 
     // In oneReport mode, check if another worker has already created a suite
     if (this.reporterOptions.oneReport) {
-      const sharedState = this.readSharedState();
+      const sharedState = readSharedState(this.reporterOptions.projectId);
       if (sharedState?.testSuiteId) {
         this.state.testSuiteId = sharedState.testSuiteId;
         this.log('Using shared JUnit test suite from file:', sharedState.testSuiteId);
@@ -679,15 +448,14 @@ export default class TestPlanItReporter extends WDIOReporter {
 
     // Update shared state with suite ID if in oneReport mode
     if (this.reporterOptions.oneReport) {
-      this.writeSharedState({
+      const finalState = writeSharedStateIfAbsent(this.reporterOptions.projectId, {
         testRunId: this.state.testRunId,
         testSuiteId: this.state.testSuiteId,
         createdAt: new Date().toISOString(),
-        activeWorkers: 1, // Will be merged/updated by writeSharedState
+        activeWorkers: 1,
       });
 
-      // Re-check to handle race condition - if another worker wrote first, use their suite
-      const finalState = this.readSharedState();
+      // Check if another worker wrote first — use their suite
       if (finalState && finalState.testSuiteId !== this.state.testSuiteId) {
         this.log(`Another worker created test suite first, switching from ${this.state.testSuiteId} to ${finalState.testSuiteId}`);
         this.state.testSuiteId = finalState.testSuiteId;
@@ -1323,19 +1091,20 @@ export default class TestPlanItReporter extends WDIOReporter {
     // This ensures correct totals when multiple workers/spec files report to the same test run.
 
     // Complete the test run if configured
-    // In oneReport mode, decrement worker count and only complete when last worker finishes
-    // Track this operation to prevent WebdriverIO from terminating early
-    if (this.reporterOptions.completeRunOnFinish) {
+    // When managedByService is true, the service handles completion in onComplete — skip entirely
+    // In legacy oneReport mode, decrement worker count and only complete when last worker finishes
+    if (this.managedByService) {
+      this.log('Skipping test run completion (managed by TestPlanItService)');
+    } else if (this.reporterOptions.completeRunOnFinish) {
       if (this.reporterOptions.oneReport) {
         // Decrement worker count and check if we're the last worker
-        const isLastWorker = this.decrementWorkerCount();
+        const isLastWorker = decrementWorkerCount(this.reporterOptions.projectId);
         if (isLastWorker) {
           const completeRunOp = (async () => {
             try {
               await this.client.completeTestRun(this.state.testRunId!, this.reporterOptions.projectId);
               this.log('Test run completed (last worker):', this.state.testRunId);
-              // Clean up shared state file
-              this.deleteSharedState();
+              deleteSharedState(this.reporterOptions.projectId);
             } catch (error) {
               this.logError('Failed to complete test run:', error);
             }
@@ -1358,8 +1127,8 @@ export default class TestPlanItReporter extends WDIOReporter {
         await completeRunOp;
       }
     } else if (this.reporterOptions.oneReport) {
-      // Even if not completing, decrement worker count
-      this.decrementWorkerCount();
+      // Even if not completing, decrement worker count in legacy mode
+      decrementWorkerCount(this.reporterOptions.projectId);
     }
 
     // Print summary

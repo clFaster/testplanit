@@ -126,16 +126,23 @@ vi.mock("@testplanit/api", () => {
   };
 });
 
-// Mock fs module
-vi.mock("fs", () => ({
-  existsSync: vi.fn().mockReturnValue(false), // No shared state file exists by default
-  readFileSync: vi.fn().mockReturnValue(Buffer.from("fake-image-data")),
-  writeFileSync: vi.fn(),
-  unlinkSync: vi.fn(),
+// Mock shared state utilities
+vi.mock("./shared.js", () => ({
+  readSharedState: vi.fn().mockReturnValue(null),
+  writeSharedState: vi.fn(),
+  writeSharedStateIfAbsent: vi.fn(),
+  deleteSharedState: vi.fn(),
+  incrementWorkerCount: vi.fn(),
+  decrementWorkerCount: vi.fn().mockReturnValue(false),
 }));
 
 // Import after mocks are set up
 import TestPlanItReporter from "./reporter.js";
+import {
+  readSharedState,
+  incrementWorkerCount,
+  decrementWorkerCount,
+} from "./shared.js";
 
 describe("TestPlanItReporter", () => {
   let reporter: TestPlanItReporter;
@@ -472,5 +479,160 @@ describe("caseIdPattern edge cases", () => {
     const result = (reporter as any).parseCaseIds("#1234 should work");
     expect(result.caseIds).toEqual([1234]);
     expect(result.cleanTitle).toBe("should work");
+  });
+});
+
+describe("service-managed mode", () => {
+  const defaultOptions = {
+    domain: "https://testplanit.example.com",
+    apiToken: "tpi_test_token",
+    projectId: 1,
+  };
+
+  const mockedReadSharedState = vi.mocked(readSharedState);
+  const mockedIncrementWorkerCount = vi.mocked(incrementWorkerCount);
+  const mockedDecrementWorkerCount = vi.mocked(decrementWorkerCount);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("should not be managed by service before initialization", () => {
+    mockedReadSharedState.mockReturnValue({
+      testRunId: 500,
+      testSuiteId: 600,
+      createdAt: new Date().toISOString(),
+      activeWorkers: 0,
+      managedByService: true,
+    });
+
+    const reporter = new TestPlanItReporter(defaultOptions);
+    // Before initialization, the flag should be false
+    expect((reporter as any).managedByService).toBe(false);
+  });
+
+  it("should adopt service-managed testRunId and testSuiteId after initialization", async () => {
+    mockedReadSharedState.mockReturnValue({
+      testRunId: 500,
+      testSuiteId: 600,
+      createdAt: new Date().toISOString(),
+      activeWorkers: 0,
+      managedByService: true,
+    });
+
+    const reporter = new TestPlanItReporter(defaultOptions);
+    // Trigger initialization via the private method
+    await (reporter as any).initialize();
+
+    expect((reporter as any).managedByService).toBe(true);
+    const state = reporter.getState();
+    expect(state.testRunId).toBe(500);
+    expect(state.testSuiteId).toBe(600);
+    expect(state.initialized).toBe(true);
+  });
+
+  it("should not create a test run when service-managed", async () => {
+    mockedReadSharedState.mockReturnValue({
+      testRunId: 500,
+      testSuiteId: 600,
+      createdAt: new Date().toISOString(),
+      activeWorkers: 0,
+      managedByService: true,
+    });
+
+    const reporter = new TestPlanItReporter(defaultOptions);
+    const client = (reporter as any).client;
+    const createTestRunSpy = vi.spyOn(client, "createTestRun");
+
+    await (reporter as any).initialize();
+
+    expect(createTestRunSpy).not.toHaveBeenCalled();
+  });
+
+  it("should not increment worker count when service-managed", async () => {
+    mockedReadSharedState.mockReturnValue({
+      testRunId: 500,
+      testSuiteId: 600,
+      createdAt: new Date().toISOString(),
+      activeWorkers: 0,
+      managedByService: true,
+    });
+
+    const reporter = new TestPlanItReporter(defaultOptions);
+    await (reporter as any).initialize();
+
+    expect(mockedIncrementWorkerCount).not.toHaveBeenCalled();
+  });
+
+  it("should skip test run completion on runner end when service-managed", async () => {
+    mockedReadSharedState.mockReturnValue({
+      testRunId: 500,
+      testSuiteId: 600,
+      createdAt: new Date().toISOString(),
+      activeWorkers: 0,
+      managedByService: true,
+    });
+
+    const reporter = new TestPlanItReporter({
+      ...defaultOptions,
+      completeRunOnFinish: true,
+    });
+    await (reporter as any).initialize();
+
+    const client = (reporter as any).client;
+    const completeTestRunSpy = vi.spyOn(client, "completeTestRun");
+
+    // Simulate runner end
+    const runnerStats = {
+      cid: "0-0",
+      capabilities: { browserName: "chrome" },
+      specs: ["/test/specs/login.spec.js"],
+    } as unknown as import("@wdio/reporter").RunnerStats;
+    reporter.onRunnerStart(runnerStats);
+    await (reporter as any).onRunnerEnd(runnerStats);
+
+    // completeTestRun should NOT have been called
+    expect(completeTestRunSpy).not.toHaveBeenCalled();
+    // decrementWorkerCount should NOT have been called
+    expect(mockedDecrementWorkerCount).not.toHaveBeenCalled();
+  });
+
+  it("should still report results when service-managed", async () => {
+    mockedReadSharedState.mockReturnValue({
+      testRunId: 500,
+      testSuiteId: 600,
+      createdAt: new Date().toISOString(),
+      activeWorkers: 0,
+      managedByService: true,
+    });
+
+    const reporter = new TestPlanItReporter({
+      ...defaultOptions,
+      autoCreateTestCases: true,
+      parentFolderId: 1,
+      templateId: 1,
+    });
+
+    // Track a test result
+    const testStats = {
+      type: "test",
+      title: "should work",
+      fullTitle: "Suite > should work",
+      uid: "test-uid-svc",
+      cid: "0-0",
+      state: "passed",
+      duration: 100,
+      start: new Date(),
+      end: new Date(),
+      retries: 0,
+    } as import("@wdio/reporter").TestStats;
+
+    reporter.onTestPass(testStats);
+    const state = reporter.getState();
+    expect(state.results.size).toBe(1);
   });
 });

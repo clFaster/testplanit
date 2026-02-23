@@ -189,6 +189,141 @@ export interface TestPlanItReporterOptions extends Reporters.Options {
 }
 
 /**
+ * Configuration options for the TestPlanIt WDIO launcher service.
+ *
+ * The service runs in the main WDIO process and manages the test run lifecycle:
+ * - Creates the test run before any workers start (onPrepare)
+ * - Completes the test run after all workers finish (onComplete)
+ *
+ * This ensures all spec files across all worker batches report to a single test run,
+ * regardless of `maxInstances` or execution order.
+ *
+ * @example
+ * ```javascript
+ * // wdio.conf.js
+ * import { TestPlanItService } from '@testplanit/wdio-reporter';
+ *
+ * export const config = {
+ *   services: [
+ *     [TestPlanItService, {
+ *       domain: 'https://testplanit.example.com',
+ *       apiToken: process.env.TESTPLANIT_API_TOKEN,
+ *       projectId: 1,
+ *       runName: 'Automated Tests - {date}',
+ *     }]
+ *   ],
+ *   reporters: [
+ *     ['@testplanit/wdio-reporter', {
+ *       domain: 'https://testplanit.example.com',
+ *       apiToken: process.env.TESTPLANIT_API_TOKEN,
+ *       projectId: 1,
+ *       autoCreateTestCases: true,
+ *       parentFolderId: 10,
+ *       templateId: 1,
+ *     }]
+ *   ]
+ * }
+ * ```
+ */
+export interface TestPlanItServiceOptions {
+  /**
+   * The base URL of your TestPlanIt instance
+   * @example 'https://testplanit.example.com'
+   */
+  domain: string;
+
+  /**
+   * API token for authentication
+   * Generate this from TestPlanIt: Settings > API Tokens
+   * Should start with 'tpi_'
+   */
+  apiToken: string;
+
+  /**
+   * The project ID in TestPlanIt where results will be reported
+   */
+  projectId: number;
+
+  /**
+   * Name for the test run.
+   * Supports placeholders:
+   * - {date} - Current date (YYYY-MM-DD)
+   * - {time} - Current time (HH:MM:SS)
+   * - {platform} - Platform/OS name
+   *
+   * Note: {browser}, {spec}, and {suite} are NOT available since the service
+   * runs before any workers start. They will be replaced with fallback values.
+   *
+   * @default 'Automated Tests - {date} {time}'
+   */
+  runName?: string;
+
+  /**
+   * Test run type to indicate the test framework being used.
+   * @default 'MOCHA'
+   */
+  testRunType?: 'REGULAR' | 'JUNIT' | 'TESTNG' | 'XUNIT' | 'NUNIT' | 'MSTEST' | 'MOCHA' | 'CUCUMBER';
+
+  /**
+   * Configuration to associate with the test run (ID or name).
+   * If a string is provided, the system will look up the configuration by exact name match.
+   */
+  configId?: number | string;
+
+  /**
+   * Milestone to associate with the test run (ID or name).
+   * If a string is provided, the system will look up the milestone by exact name match.
+   */
+  milestoneId?: number | string;
+
+  /**
+   * Workflow state for the test run (ID or name).
+   * If a string is provided, the system will look up the state by exact name match.
+   */
+  stateId?: number | string;
+
+  /**
+   * Tags to apply to the test run (IDs or names).
+   * If strings are provided, the system will look up each tag by exact name match.
+   * Tags that don't exist will be created automatically.
+   */
+  tagIds?: (number | string)[];
+
+  /**
+   * Whether to mark the test run as completed when all workers finish
+   * @default true
+   */
+  completeRunOnFinish?: boolean;
+
+  /**
+   * Automatically capture a screenshot when a test fails.
+   * The screenshot is taken via the WDIO `afterTest` hook and is
+   * automatically uploaded by the reporter when `uploadScreenshots`
+   * is enabled (the default).
+   * @default false
+   */
+  captureScreenshots?: boolean;
+
+  /**
+   * Request timeout in milliseconds
+   * @default 30000
+   */
+  timeout?: number;
+
+  /**
+   * Number of retries for failed API requests
+   * @default 3
+   */
+  maxRetries?: number;
+
+  /**
+   * Enable verbose logging for debugging
+   * @default false
+   */
+  verbose?: boolean;
+}
+
+/**
  * Internal test result tracked by the reporter
  */
 export interface TrackedTestResult {

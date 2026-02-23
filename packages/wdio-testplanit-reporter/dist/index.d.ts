@@ -169,6 +169,119 @@ interface TestPlanItReporterOptions extends Reporters.Options {
     oneReport?: boolean;
 }
 /**
+ * Configuration options for the TestPlanIt WDIO launcher service.
+ *
+ * The service runs in the main WDIO process and manages the test run lifecycle:
+ * - Creates the test run before any workers start (onPrepare)
+ * - Completes the test run after all workers finish (onComplete)
+ *
+ * This ensures all spec files across all worker batches report to a single test run,
+ * regardless of `maxInstances` or execution order.
+ *
+ * @example
+ * ```javascript
+ * // wdio.conf.js
+ * import { TestPlanItService } from '@testplanit/wdio-reporter';
+ *
+ * export const config = {
+ *   services: [
+ *     [TestPlanItService, {
+ *       domain: 'https://testplanit.example.com',
+ *       apiToken: process.env.TESTPLANIT_API_TOKEN,
+ *       projectId: 1,
+ *       runName: 'Automated Tests - {date}',
+ *     }]
+ *   ],
+ *   reporters: [
+ *     ['@testplanit/wdio-reporter', {
+ *       domain: 'https://testplanit.example.com',
+ *       apiToken: process.env.TESTPLANIT_API_TOKEN,
+ *       projectId: 1,
+ *       autoCreateTestCases: true,
+ *       parentFolderId: 10,
+ *       templateId: 1,
+ *     }]
+ *   ]
+ * }
+ * ```
+ */
+interface TestPlanItServiceOptions {
+    /**
+     * The base URL of your TestPlanIt instance
+     * @example 'https://testplanit.example.com'
+     */
+    domain: string;
+    /**
+     * API token for authentication
+     * Generate this from TestPlanIt: Settings > API Tokens
+     * Should start with 'tpi_'
+     */
+    apiToken: string;
+    /**
+     * The project ID in TestPlanIt where results will be reported
+     */
+    projectId: number;
+    /**
+     * Name for the test run.
+     * Supports placeholders:
+     * - {date} - Current date (YYYY-MM-DD)
+     * - {time} - Current time (HH:MM:SS)
+     * - {platform} - Platform/OS name
+     *
+     * Note: {browser}, {spec}, and {suite} are NOT available since the service
+     * runs before any workers start. They will be replaced with fallback values.
+     *
+     * @default 'Automated Tests - {date} {time}'
+     */
+    runName?: string;
+    /**
+     * Test run type to indicate the test framework being used.
+     * @default 'MOCHA'
+     */
+    testRunType?: 'REGULAR' | 'JUNIT' | 'TESTNG' | 'XUNIT' | 'NUNIT' | 'MSTEST' | 'MOCHA' | 'CUCUMBER';
+    /**
+     * Configuration to associate with the test run (ID or name).
+     * If a string is provided, the system will look up the configuration by exact name match.
+     */
+    configId?: number | string;
+    /**
+     * Milestone to associate with the test run (ID or name).
+     * If a string is provided, the system will look up the milestone by exact name match.
+     */
+    milestoneId?: number | string;
+    /**
+     * Workflow state for the test run (ID or name).
+     * If a string is provided, the system will look up the state by exact name match.
+     */
+    stateId?: number | string;
+    /**
+     * Tags to apply to the test run (IDs or names).
+     * If strings are provided, the system will look up each tag by exact name match.
+     * Tags that don't exist will be created automatically.
+     */
+    tagIds?: (number | string)[];
+    /**
+     * Whether to mark the test run as completed when all workers finish
+     * @default true
+     */
+    completeRunOnFinish?: boolean;
+    /**
+     * Request timeout in milliseconds
+     * @default 30000
+     */
+    timeout?: number;
+    /**
+     * Number of retries for failed API requests
+     * @default 3
+     */
+    maxRetries?: number;
+    /**
+     * Enable verbose logging for debugging
+     * @default false
+     */
+    verbose?: boolean;
+}
+/**
  * Internal test result tracked by the reporter
  */
 interface TrackedTestResult {
@@ -326,6 +439,8 @@ declare class TestPlanItReporter extends WDIOReporter {
     private currentTestUid;
     private currentCid;
     private pendingScreenshots;
+    /** When true, the TestPlanItService manages the test run lifecycle */
+    private managedByService;
     /**
      * WebdriverIO uses this getter to determine if the reporter has finished async operations.
      * The test runner will wait for this to return true before terminating.
@@ -340,40 +455,6 @@ declare class TestPlanItReporter extends WDIOReporter {
      * Log an error (always logs, not just in verbose mode)
      */
     private logError;
-    /**
-     * Get the path to the shared state file for oneReport mode.
-     * Uses a file in the temp directory with a name based on the project ID.
-     */
-    private getSharedStateFilePath;
-    /**
-     * Read shared state from file (for oneReport mode).
-     * Returns null if:
-     * - File doesn't exist
-     * - File is stale (older than 4 hours)
-     * - Previous run completed (activeWorkers === 0)
-     */
-    private readSharedState;
-    /**
-     * Write shared state to file (for oneReport mode).
-     * Uses a lock file to prevent race conditions.
-     * Only writes the testRunId if the file doesn't exist yet (first writer wins).
-     * Updates testSuiteId if not already set.
-     */
-    private writeSharedState;
-    /**
-     * Delete shared state file (cleanup after run completes).
-     */
-    private deleteSharedState;
-    /**
-     * Increment the active worker count in shared state.
-     * Called when a worker starts using the shared test run.
-     */
-    private incrementWorkerCount;
-    /**
-     * Decrement the active worker count in shared state.
-     * Returns true if this was the last worker (count reached 0).
-     */
-    private decrementWorkerCount;
     /**
      * Track an async operation to prevent the runner from terminating early.
      * The operation is added to pendingOperations and removed when complete.
@@ -456,4 +537,91 @@ declare class TestPlanItReporter extends WDIOReporter {
     getState(): ReporterState;
 }
 
-export { type ReporterState, TestPlanItReporter, type TestPlanItReporterOptions, type TrackedTestResult, TestPlanItReporter as default };
+/**
+ * WebdriverIO Launcher Service for TestPlanIt.
+ *
+ * Manages the test run lifecycle in the main WDIO process:
+ * - onPrepare: Creates the test run and JUnit test suite ONCE before any workers start
+ * - onComplete: Completes the test run ONCE after all workers finish
+ *
+ * This ensures all spec files across all worker batches report to a single test run,
+ * regardless of `maxInstances` or execution order.
+ *
+ * @example
+ * ```javascript
+ * // wdio.conf.js
+ * import { TestPlanItService } from '@testplanit/wdio-reporter';
+ *
+ * export const config = {
+ *   services: [
+ *     [TestPlanItService, {
+ *       domain: 'https://testplanit.example.com',
+ *       apiToken: process.env.TESTPLANIT_API_TOKEN,
+ *       projectId: 1,
+ *       runName: 'E2E Tests - {date}',
+ *     }]
+ *   ],
+ *   reporters: [
+ *     ['@testplanit/wdio-reporter', {
+ *       domain: 'https://testplanit.example.com',
+ *       apiToken: process.env.TESTPLANIT_API_TOKEN,
+ *       projectId: 1,
+ *       autoCreateTestCases: true,
+ *       parentFolderId: 10,
+ *       templateId: 1,
+ *     }]
+ *   ]
+ * }
+ * ```
+ *
+ * @packageDocumentation
+ */
+
+/**
+ * WebdriverIO Launcher Service for TestPlanIt.
+ *
+ * Creates a single test run before any workers start and completes it
+ * after all workers finish. Workers read the shared state file to find
+ * the pre-created test run and report results to it.
+ */
+declare class TestPlanItService {
+    private options;
+    private client;
+    private verbose;
+    private testRunId?;
+    private testSuiteId?;
+    constructor(serviceOptions: TestPlanItServiceOptions);
+    /**
+     * Log a message if verbose mode is enabled
+     */
+    private log;
+    /**
+     * Log an error (always logs, not just in verbose mode)
+     */
+    private logError;
+    /**
+     * Format run name with available placeholders.
+     * Note: {browser}, {spec}, and {suite} are NOT available in the service context
+     * since it runs before any workers start.
+     */
+    private formatRunName;
+    /**
+     * Resolve string option IDs to numeric IDs using the API client.
+     */
+    private resolveIds;
+    /**
+     * onPrepare - Runs once in the main process before any workers start.
+     *
+     * Creates the test run and JUnit test suite, then writes shared state
+     * so all worker reporters can find and use the pre-created run.
+     */
+    onPrepare(): Promise<void>;
+    /**
+     * onComplete - Runs once in the main process after all workers finish.
+     *
+     * Completes the test run and cleans up the shared state file.
+     */
+    onComplete(exitCode: number): Promise<void>;
+}
+
+export { type ReporterState, TestPlanItReporter, type TestPlanItReporterOptions, TestPlanItService, type TestPlanItServiceOptions, type TrackedTestResult, TestPlanItReporter as default };
