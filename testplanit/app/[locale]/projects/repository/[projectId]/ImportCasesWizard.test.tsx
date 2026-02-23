@@ -85,48 +85,47 @@ vi.mock("@/components/ui/select", () => ({
 // Mock UploadAttachments component
 vi.mock("@/components/UploadAttachments", () => {
   const { useState } = require("react");
-  return {
-    default: ({ onFileSelect, allowedTypes }: any) => {
-      const [files, setFiles] = useState([] as File[]);
-      return (
-        <div>
-          <input
-            title="file-upload"
-            type="file"
-            data-testid="file-upload"
-            accept=".csv"
-            onChange={(e: any) => {
-              if (e.target.files && e.target.files.length > 0) {
-                const incoming = Array.from(e.target.files) as File[];
-                if (allowedTypes && allowedTypes.length > 0) {
-                  const validFiles = incoming.filter((file: File) =>
-                    allowedTypes.some(
-                      (type: string) =>
-                        file.name.toLowerCase().endsWith(type.toLowerCase()) ||
-                        file.type === type
-                    )
-                  );
-                  setFiles(validFiles);
-                  onFileSelect(validFiles);
-                } else {
-                  setFiles(incoming);
-                  onFileSelect(incoming);
-                }
+  function MockUploadAttachments({ onFileSelect, allowedTypes }: any) {
+    const [files, setFiles] = useState([] as File[]);
+    return (
+      <div>
+        <input
+          title="file-upload"
+          type="file"
+          data-testid="file-upload"
+          accept=".csv"
+          onChange={(e: any) => {
+            if (e.target.files && e.target.files.length > 0) {
+              const incoming = Array.from(e.target.files) as File[];
+              if (allowedTypes && allowedTypes.length > 0) {
+                const validFiles = incoming.filter((file: File) =>
+                  allowedTypes.some(
+                    (type: string) =>
+                      file.name.toLowerCase().endsWith(type.toLowerCase()) ||
+                      file.type === type
+                  )
+                );
+                setFiles(validFiles);
+                onFileSelect(validFiles);
               } else {
-                setFiles([]);
-                onFileSelect([]);
+                setFiles(incoming);
+                onFileSelect(incoming);
               }
-            }}
-          />
-          {files.length > 0 && (
-            <span data-testid="selected-file-info">
-              Selected file: {files[files.length - 1].name}
-            </span>
-          )}
-        </div>
-      );
-    },
-  };
+            } else {
+              setFiles([]);
+              onFileSelect([]);
+            }
+          }}
+        />
+        {files.length > 0 && (
+          <span data-testid="selected-file-info">
+            {`Selected file: ${files[files.length - 1].name}`}
+          </span>
+        )}
+      </div>
+    );
+  }
+  return { default: MockUploadAttachments };
 });
 
 // Mock FolderSelect component
