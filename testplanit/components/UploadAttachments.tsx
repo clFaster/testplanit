@@ -27,6 +27,7 @@ interface UploadAttachmentsProps {
   accept?: string;
   allowedTypes?: string[];
   initialFiles?: File[];
+  multiple?: boolean;
 }
 
 function ImagePreview({ file }: { file: File }) {
@@ -67,6 +68,7 @@ export default function UploadAttachments({
   accept,
   allowedTypes,
   initialFiles,
+  multiple = true,
 }: UploadAttachmentsProps) {
   const t = useTranslations("common.upload.attachments");
   const tGlobal = useTranslations();
@@ -123,6 +125,10 @@ export default function UploadAttachments({
     setErrorMessage(null);
     setUploading(true);
     setSelectedFiles((prevFiles) => {
+      // In single-file mode, replace instead of append
+      if (!multiple) {
+        return [file];
+      }
       // Check if file with same name and size already exists to prevent duplicates
       const isDuplicate = prevFiles.some(
         (f) =>
@@ -200,9 +206,7 @@ export default function UploadAttachments({
 
   const removeFile = (index: number) => {
     setSelectedFiles((prevFiles) => {
-      const updatedFiles = prevFiles.filter((_, i) => i !== index);
-      onFileSelect(updatedFiles);
-      return updatedFiles;
+      return prevFiles.filter((_, i) => i !== index);
     });
   };
 
@@ -287,7 +291,7 @@ export default function UploadAttachments({
           )}
           <input
             type="file"
-            multiple
+            multiple={multiple}
             accept={accept}
             onChange={handleFileChange}
             disabled={uploading || disabled}
@@ -303,7 +307,9 @@ export default function UploadAttachments({
               {uploading
                 ? tGlobal("common.status.uploading")
                 : selectedFiles.length > 0
-                  ? tGlobal("common.upload.attachments.addMoreFiles")
+                  ? multiple
+                    ? tGlobal("common.upload.attachments.addMoreFiles")
+                    : tGlobal("common.upload.attachments.replaceFile")
                   : tGlobal("common.upload.attachments.selectFiles", {
                       count: selectedFiles.length,
                     })}
@@ -380,7 +386,7 @@ export default function UploadAttachments({
         {errorMessage && <div className="text-destructive">{errorMessage}</div>}
         <input
           type="file"
-          multiple
+          multiple={multiple}
           accept={accept}
           onChange={handleFileChange}
           disabled={uploading || disabled}

@@ -735,18 +735,10 @@ export function ImportCasesWizard({
               previews={false}
               accept=".csv"
               allowedTypes={[".csv", "text/csv"]}
+              multiple={false}
               initialFiles={initialFile ? [initialFile] : undefined}
             />
           </div>
-          {selectedFile && (
-            <p
-              className="mt-2 text-sm text-muted-foreground"
-              data-testid="selected-file-info"
-            >
-              {tGlobal("sharedSteps.importWizard.page1.selectedFile")}:{" "}
-              {selectedFile.name}
-            </p>
-          )}
         </div>
       </div>
 

@@ -676,6 +676,7 @@
         "selectFiles": "{count, plural, =0 {Selecciona Archivos} one {1 Archivo seleccionado} other {# Archivos Seleccionados}}",
         "filesSelected": "{count, plural, one {1 archivo seleccionado} other {# archivos seleccionados}}",
         "addMoreFiles": "Añadir más archivos...",
+        "replaceFile": "Reemplazar archivo...",
         "invalidFileType": "Tipo de archivo no válido. Sólo se permiten archivos {types}.",
         "altText": {
           "emoji": "emoji"
