@@ -61,7 +61,7 @@ interface ParsedSharedStep {
 const createPage1Schema = (t: any) =>
   z.object({
     selectedFile: z.any().refine((file) => file !== null, {
-      message: t("importWizard.errors.csvFileRequired"),
+      message: t("importWizard.errors.fileRequired"),
     }),
   });
 

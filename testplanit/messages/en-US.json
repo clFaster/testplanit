@@ -675,6 +675,7 @@
         "title": "Upload Attachments",
         "description": "Drag and drop your files or click the button below to select files.",
         "selectFiles": "{count, plural, =0 {Select Files} one {1 Selected File} other {# Selected Files}}",
+        "selectFile": "{count, plural, =0 {Select File} other {1 Selected File}}",
         "filesSelected": "{count, plural, one {1 file selected} other {# files selected}}",
         "addMoreFiles": "Add more files...",
         "replaceFile": "Replace file...",
@@ -1664,7 +1665,7 @@
         "errors": {
           "templateRequired": "Template selection is required",
           "folderRequired": "Folder selection is required for this import location",
-          "markdownFileRequired": "A Markdown file is required",
+          "fileRequired": "A CSV or Markdown file is required",
           "markdownParseFailed": "Failed to parse Markdown file",
           "markdownLlmFailed": "AI parsing unavailable, using standard parser"
         },
@@ -1674,13 +1675,13 @@
             "csv": "CSV",
             "markdown": "Markdown"
           },
-          "markdownDescription": "Upload a Markdown file (.md) containing test cases. Each heading becomes a test case, with steps, expected results, and tags extracted automatically.",
           "parsingMarkdown": "Parsing markdown file...",
+          "useAiParsing": "Use AI to assist with field mapping",
           "importLocation": {
             "label": "Import Location",
             "singleFolder": "Add all cases to a single folder",
-            "rootFolder": "Add all cases and folders to a root folder",
-            "topLevel": "Add all cases and folders to the top level"
+            "rootFolder": "Add all cases and folders to a root folder (mapping required)",
+            "topLevel": "Add all cases and folders to the top level (mapping required)"
           },
           "selectFolder": "Select Folder",
           "selectFolderPlaceholder": "Select a folder...",
@@ -5284,11 +5285,11 @@
         "validationFailed": "Validation failed",
         "validationDescription": "{count} validation errors found",
         "importFailed": "Import failed",
-        "csvFileRequired": "CSV file is required"
+        "fileRequired": "A CSV file is required"
       },
       "page1": {
         "title": "Upload File and Configuration",
-        "uploadFile": "Upload CSV File",
+        "uploadFile": "Upload File",
         "selectedFile": "Selected file",
         "delimiter": "Field Delimiter",
         "delimiters": {

@@ -310,9 +310,12 @@ export default function UploadAttachments({
                   ? multiple
                     ? tGlobal("common.upload.attachments.addMoreFiles")
                     : tGlobal("common.upload.attachments.replaceFile")
-                  : tGlobal("common.upload.attachments.selectFiles", {
-                      count: selectedFiles.length,
-                    })}
+                  : tGlobal(
+                      multiple
+                        ? "common.upload.attachments.selectFiles"
+                        : "common.upload.attachments.selectFile",
+                      { count: selectedFiles.length }
+                    )}
             </span>
             {selectedFiles.length > 1 && (
               <span className="ml-auto flex items-center gap-0.5 text-sm text-muted-foreground">
@@ -407,9 +410,12 @@ export default function UploadAttachments({
               <CloudUpload className="w-5 h-5 text-primary" />
               {uploading
                 ? tGlobal("common.status.uploading")
-                : tGlobal("common.upload.attachments.selectFiles", {
-                    count: selectedFiles.length,
-                  })}
+                : tGlobal(
+                    multiple
+                      ? "common.upload.attachments.selectFiles"
+                      : "common.upload.attachments.selectFile",
+                    { count: selectedFiles.length }
+                  )}
             </span>
           </Button>
         </label>

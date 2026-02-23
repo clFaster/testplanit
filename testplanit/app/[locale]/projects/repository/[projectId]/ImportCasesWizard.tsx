@@ -65,6 +65,12 @@ interface ImportCasesWizardProps {
 }
 
 type FileType = "csv" | "markdown";
+
+const detectFileType = (file: File): FileType => {
+  const ext = file.name.split(".").pop()?.toLowerCase();
+  return ext === "md" || ext === "markdown" ? "markdown" : "csv";
+};
+
 type ImportLocation = "single_folder" | "root_folder" | "top_level";
 type Delimiter = "," | ";" | ":" | "|" | "\t";
 type Encoding = "UTF-8" | "ISO-8859-1" | "ISO-8859-15" | "Windows-1252";
@@ -85,7 +91,7 @@ const createPage1Schema = (t: any, tGlobal: any) =>
   z
     .object({
       selectedFile: z.any().refine((file) => file !== null, {
-        message: tGlobal("sharedSteps.importWizard.errors.csvFileRequired"),
+        message: t("importWizard.errors.fileRequired"),
       }),
       selectedTemplateId: z.string().min(1, {
         message: t("importWizard.errors.templateRequired"),
@@ -148,6 +154,7 @@ export function ImportCasesWizard({
   const [encoding, setEncoding] = useState<Encoding>("UTF-8");
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const [rowMode, setRowMode] = useState<RowMode>("single");
+  const [useAiParsing, setUseAiParsing] = useState(false);
 
   // Page 2 state
   // const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
@@ -169,6 +176,7 @@ export function ImportCasesWizard({
   useEffect(() => {
     if (open && initialFile) {
       setSelectedFile(initialFile);
+      setFileType(detectFileType(initialFile));
     }
   }, [open, initialFile]);
 
@@ -524,8 +532,8 @@ export function ImportCasesWizard({
     try {
       const text = await selectedFile.text();
 
-      // Try LLM-assisted parsing first if available
-      if (hasLlmIntegration) {
+      // Try LLM-assisted parsing if user opted in
+      if (useAiParsing && hasLlmIntegration) {
         try {
           const response = await fetch("/api/llm/parse-markdown-test-cases", {
             method: "POST",
@@ -624,7 +632,9 @@ export function ImportCasesWizard({
 
   const handleFileSelect = (files: File[]) => {
     if (files.length > 0) {
-      setSelectedFile(files[0]);
+      const file = files[0];
+      setSelectedFile(file);
+      setFileType(detectFileType(file));
       // Clear file validation error when file is selected
       if (validationErrors.selectedFile) {
         setValidationErrors((prev) => ({ ...prev, selectedFile: undefined }));
@@ -632,6 +642,7 @@ export function ImportCasesWizard({
     } else {
       // Files array is empty, user removed the file
       setSelectedFile(null);
+      setFileType("csv");
     }
   };
 
@@ -838,34 +849,6 @@ export function ImportCasesWizard({
   const renderPage1 = () => (
     <div className="space-y-6">
       <div>
-        <Label>{t("importWizard.page1.fileType.label")}</Label>
-        <RadioGroup
-          value={fileType}
-          onValueChange={(v) => {
-            setFileType(v as FileType);
-            setSelectedFile(null);
-          }}
-          className="mt-2 flex gap-4"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="csv" id="filetype_csv" />
-            <Label htmlFor="filetype_csv" className="font-normal cursor-pointer">
-              {t("importWizard.page1.fileType.csv")}
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="markdown" id="filetype_markdown" />
-            <Label
-              htmlFor="filetype_markdown"
-              className="font-normal cursor-pointer"
-            >
-              {t("importWizard.page1.fileType.markdown")}
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
-
-      <div>
         <RequiredLabel required error={validationErrors.selectedFile}>
           {tGlobal("sharedSteps.importWizard.page1.uploadFile")}
         </RequiredLabel>
@@ -881,32 +864,21 @@ export function ImportCasesWizard({
               onFileSelect={handleFileSelect}
               compact
               previews={false}
-              accept={
-                fileType === "csv" ? ".csv" : ".md,.markdown,.txt"
-              }
-              allowedTypes={
-                fileType === "csv"
-                  ? [".csv", "text/csv"]
-                  : [".md", ".markdown", ".txt", "text/markdown", "text/plain"]
-              }
+              accept=".csv,.md,.markdown,.txt"
+              allowedTypes={[
+                ".csv",
+                "text/csv",
+                ".md",
+                ".markdown",
+                ".txt",
+                "text/markdown",
+                "text/plain",
+              ]}
               multiple={false}
               initialFiles={initialFile ? [initialFile] : undefined}
             />
           </div>
-          {selectedFile && (
-            <p
-              className="mt-2 text-sm text-muted-foreground"
-              data-testid="selected-file-info"
-            >
-              {tGlobal("sharedSteps.importWizard.page1.selectedFile")}:{" "}
-              {selectedFile.name}
-            </p>
-          )}
-          {fileType === "markdown" && (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("importWizard.page1.markdownDescription")}
-            </p>
-          )}
+
         </div>
       </div>
 
@@ -976,7 +948,7 @@ export function ImportCasesWizard({
         </div>
       )}
 
-      {fileType === "csv" && (
+      {selectedFile && fileType === "csv" && (
         <>
           <div>
             <Label>{tGlobal("sharedSteps.importWizard.page1.delimiter")}</Label>
@@ -1038,6 +1010,19 @@ export function ImportCasesWizard({
         </>
       )}
 
+      {selectedFile && fileType === "markdown" && hasLlmIntegration && (
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="useAiParsing"
+            checked={useAiParsing}
+            onCheckedChange={(c) => setUseAiParsing(!!c)}
+          />
+          <Label htmlFor="useAiParsing" className="font-normal cursor-pointer">
+            {t("importWizard.page1.useAiParsing")}
+          </Label>
+        </div>
+      )}
+
       <div>
         <RequiredLabel required error={validationErrors.selectedTemplateId}>
           {t("importWizard.page1.template")}
@@ -1076,7 +1061,7 @@ export function ImportCasesWizard({
         </Select>
       </div>
 
-      {fileType === "csv" && (
+      {selectedFile && fileType === "csv" && (
         <div>
           <Label>
             {tGlobal("sharedSteps.importWizard.page1.rowMode.label")}

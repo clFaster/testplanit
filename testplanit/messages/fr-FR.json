@@ -675,6 +675,7 @@
         "title": "Télécharger des pièces jointes",
         "description": "Glissez-déposez vos fichiers ou cliquez sur le bouton ci-dessous pour sélectionner des fichiers.",
         "selectFiles": "{count, plural, =0 {Sélectionner des fichiers} one {1 fichier sélectionné} other {# fichiers sélectionnés}}",
+        "selectFile": "{count, plural, =0 {Sélectionner un fichier} other {1 fichier sélectionné}}",
         "filesSelected": "{count, plural, one {1 fichier sélectionné} other {# fichiers sélectionnés}}",
         "addMoreFiles": "Ajouter d'autres fichiers...",
         "replaceFile": "Remplacer le fichier...",
@@ -1664,7 +1665,7 @@
         "errors": {
           "templateRequired": "La sélection du modèle est requise.",
           "folderRequired": "La sélection du dossier est requise pour cet emplacement d'importation",
-          "markdownFileRequired": "Un fichier Markdown est requis.",
+          "fileRequired": "Un fichier CSV ou Markdown est requis.",
           "markdownParseFailed": "Impossible d'analyser le fichier Markdown",
           "markdownLlmFailed": "Analyse par IA indisponible, utilisation de l'analyseur standard"
         },
@@ -1674,13 +1675,12 @@
             "csv": "CSV",
             "markdown": "Réduction"
           },
-          "markdownDescription": "Importez un fichier Markdown (.md) contenant les cas de test. Chaque titre devient un cas de test, avec les étapes, les résultats attendus et les balises extraits automatiquement.",
           "parsingMarkdown": "Analyse du fichier Markdown...",
           "importLocation": {
             "label": "Emplacement d'importation",
             "singleFolder": "Ajouter tous les dossiers à un seul dossier",
-            "rootFolder": "Ajouter tous les dossiers et les fichiers à un dossier racine",
-            "topLevel": "Ajouter tous les dossiers et les cas au niveau supérieur"
+            "rootFolder": "Ajouter tous les dossiers et les fichiers à un dossier racine (association requise)",
+            "topLevel": "Ajouter tous les dossiers et les cas au niveau supérieur (association requise)"
           },
           "selectFolder": "Sélectionner un dossier",
           "selectFolderPlaceholder": "Sélectionnez un dossier...",
@@ -5284,11 +5284,11 @@
         "validationFailed": "La validation a échoué",
         "validationDescription": "{count} Erreurs de validation détectées",
         "importFailed": "L'importation a échoué",
-        "csvFileRequired": "Un fichier CSV est requis."
+        "fileRequired": "Un fichier CSV est requis."
       },
       "page1": {
         "title": "Téléchargement du fichier et configuration",
-        "uploadFile": "Téléverser un fichier CSV",
+        "uploadFile": "Téléverser un fichier",
         "selectedFile": "Fichier sélectionné",
         "delimiter": "Délimiteur de champ",
         "delimiters": {
