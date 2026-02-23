@@ -11,10 +11,10 @@ TestPlanIt integrates with leading AI providers to power features across the pla
 
 AI-powered features in TestPlanIt:
 
-- **[Test Case Generation](./llm-test-generation)** — Generate test cases from requirements, issues, and documents
-- **[Magic Select](./llm-magic-select)** — AI-assisted test case selection when building test runs
-- **[Writing Assistant](./llm-writing-assistant)** — Improve, translate, and enhance content in any rich text field
-- **[Markdown Import](./llm-markdown-import)** — AI-assisted field mapping when importing markdown test cases
+- **[Test Case Generation](../llm-test-generation)** — Generate test cases from requirements, issues, and documents
+- **[Magic Select](../llm-magic-select)** — AI-assisted test case selection when building test runs
+- **[Writing Assistant](../llm-writing-assistant)** — Improve, translate, and enhance content in any rich text field
+- **[Markdown Import](../llm-markdown-import)** — AI-assisted field mapping when importing markdown test cases
 
 ## Supported AI Providers
 
