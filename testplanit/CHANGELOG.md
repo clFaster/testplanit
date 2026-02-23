@@ -1,3 +1,10 @@
+## [0.13.3](https://github.com/TestPlanIt/testplanit/compare/v0.13.2...v0.13.3) (2026-02-23)
+
+
+### Bug Fixes
+
+* resolve issues with file handling in ImportCasesWizard ([db3f98b](https://github.com/TestPlanIt/testplanit/commit/db3f98b0d61a55cf9ef488d88d27818e369cd15e))
+
 ## [0.13.2](https://github.com/TestPlanIt/testplanit/compare/v0.13.1...v0.13.2) (2026-02-23)
 
 
