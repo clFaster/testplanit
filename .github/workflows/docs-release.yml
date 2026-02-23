@@ -1,13 +1,17 @@
 # Docs Release Workflow
 #
 # Builds and pushes the docs Docker image to GHCR.
-# Manual trigger only via GitHub Actions UI.
+# Triggers on pushes to main that change docs/, or manually via GitHub Actions UI.
 #
 # Docker Image: ghcr.io/testplanit/testplanit:docs
 #
 name: Docs Release
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
   workflow_dispatch:
     inputs:
       tag:
@@ -47,7 +51,7 @@ jobs:
         file: ./docs/Dockerfile
         platforms: linux/amd64
         push: true
-        tags: ghcr.io/${{ env.REPO_LC }}:${{ github.event.inputs.tag }}-amd64
+        tags: ghcr.io/${{ env.REPO_LC }}:${{ github.event.inputs.tag || 'docs' }}-amd64
 
   build-arm64:
     runs-on: [self-hosted, macOS, arm64]
@@ -86,7 +90,7 @@ jobs:
         file: ./docs/Dockerfile
         platforms: linux/arm64
         push: true
-        tags: ghcr.io/${{ env.REPO_LC }}:${{ github.event.inputs.tag }}-arm64
+        tags: ghcr.io/${{ env.REPO_LC }}:${{ github.event.inputs.tag || 'docs' }}-arm64
 
   merge-manifests:
     needs: [build-amd64, build-arm64]
@@ -108,7 +112,7 @@ jobs:
 
     - name: Create multi-arch manifest
       run: |
-        TAG="${{ github.event.inputs.tag }}"
+        TAG="${{ github.event.inputs.tag || 'docs' }}"
 
         docker buildx imagetools create -t ghcr.io/${REPO_LC}:${TAG} \
           ghcr.io/${REPO_LC}:${TAG}-amd64 \
