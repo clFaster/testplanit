@@ -1128,7 +1128,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
 
   const { isDragActive } = usePageFileDrop({
     acceptedExtensions: [".csv"],
-    enabled: canAddEdit && !isSelectionMode && !isRunMode,
+    enabled: canAddEdit && !isSelectionMode && !isRunMode && !importDialogOpen,
     onDrop: (files) => {
       setDroppedFile(files[0]);
       setImportDialogOpen(true);

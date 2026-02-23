@@ -306,9 +306,9 @@ export default function TestResultsImportDialog({
                 }
               } catch (e) {
                 if (
-                  e instanceof Error &&
-                  e.message !== "Failed to import test results"
+                  e instanceof SyntaxError
                 ) {
+                  // JSON parse error on SSE data — log and continue
                   console.error("Error parsing SSE data:", e);
                 } else {
                   throw e;
@@ -346,7 +346,7 @@ export default function TestResultsImportDialog({
     }
   });
 
-  // Set default workflow state and template when dialog opens
+  // Set default workflow state, template, and folder when dialog opens
   React.useEffect(() => {
     if (open && defaultWorkflow && !stateId) {
       setStateId(defaultWorkflow.id.toString());
@@ -354,6 +354,9 @@ export default function TestResultsImportDialog({
     }
     if (open && defaultTemplate && !form.getValues("templateId")) {
       form.setValue("templateId", defaultTemplate.id.toString());
+    }
+    if (open && !form.getValues("selectedFolderId")) {
+      form.setValue("selectedFolderId", NEW_FOLDER_SENTINEL);
     }
   }, [open, defaultWorkflow, stateId, defaultTemplate, form]);
 
@@ -455,8 +458,8 @@ export default function TestResultsImportDialog({
                             {
                               value: NEW_FOLDER_SENTINEL,
                               label: watchedName
-                                ? tCommon("actions.junit.import.createNewFolderNamed", { name: watchedName })
-                                : tCommon("actions.junit.import.createNewFolder"),
+                                ? t("createNewFolderNamed", { name: watchedName })
+                                : t("createNewFolder"),
                               parentId: null,
                             },
                             ...transformFolders(folders || []),

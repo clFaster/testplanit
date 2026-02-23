@@ -188,10 +188,19 @@ export function ImportCasesWizard({
     },
   });
 
+  const defaultTemplate = templates?.find((template) => template.isDefault);
+
   const { data: folders } = useFindManyRepositoryFolders({
     where: { projectId, isDeleted: false },
     orderBy: { order: "asc" },
   });
+
+  // Auto-select default template when dialog opens
+  useEffect(() => {
+    if (open && defaultTemplate && !selectedTemplateId) {
+      setSelectedTemplateId(defaultTemplate.id.toString());
+    }
+  }, [open, defaultTemplate, selectedTemplateId]);
 
   // Get template fields for mapping
   const selectedTemplate = templates?.find(
@@ -892,6 +901,11 @@ export function ImportCasesWizard({
             {templates?.map((template) => (
               <SelectItem key={template.id} value={template.id.toString()}>
                 {template.templateName}
+                {template.isDefault && (
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    {tCommon("fields.default")}
+                  </span>
+                )}
               </SelectItem>
             ))}
           </SelectContent>

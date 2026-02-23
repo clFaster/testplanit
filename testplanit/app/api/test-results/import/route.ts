@@ -31,7 +31,7 @@ import {
   normalizeStatus,
   countTotalTestCases,
   extractClassName,
-  detectFormatFromFiles,
+  detectFormat,
   TEST_RESULT_FORMATS,
   parseExtendedTestCaseData,
   getExtendedDataKey,
@@ -177,51 +177,78 @@ export async function POST(request: NextRequest) {
 
         sendProgress(5, progressMessages.validating);
 
+        console.log(`[TestResultsImport] Received ${files.length} file(s): ${files.map(f => `${f.name} (${f.size} bytes)`).join(', ')}`);
+        console.log(`[TestResultsImport] Format: ${format}`);
+
+        // Per-file format detection map (file index -> format)
+        const fileFormatMap = new Map<number, TestResultFormat>();
+
         // Auto-detect format if not specified or set to "auto"
         if (format === "auto" || !format) {
           sendProgress(6, progressMessages.detectingFormat);
 
-          // Read file contents for detection
-          const fileContents = await Promise.all(
-            files.map(async (file) => ({
-              content: await file.text(),
-              name: file.name,
-            }))
-          );
+          // Detect each file's format individually
+          const undetected: string[] = [];
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const content = await file.text();
+            const detected = detectFormat(content, file.name);
+            if (detected) {
+              fileFormatMap.set(i, detected);
+            } else {
+              undetected.push(file.name);
+            }
+          }
 
-          const detectedFormat = detectFormatFromFiles(fileContents);
-
-          if (!detectedFormat) {
+          if (undetected.length > 0) {
             controller.enqueue(
               encoder.encode(
-                `data: ${JSON.stringify({ error: "Unable to auto-detect file format. Please select the format manually." })}\n\n`
+                `data: ${JSON.stringify({ error: `Unable to auto-detect format for: ${undetected.join(", ")}. Please select the format manually.` })}\n\n`
               )
             );
             controller.close();
             return;
           }
 
-          format = detectedFormat;
-          sendProgress(
-            8,
-            progressMessages.formatDetected(
-              TEST_RESULT_FORMATS[detectedFormat].label
-            )
-          );
+          // All files detected — check if single or mixed formats
+          const uniqueFormats = new Set(fileFormatMap.values());
+          if (uniqueFormats.size === 1) {
+            format = [...uniqueFormats][0];
+            sendProgress(
+              8,
+              progressMessages.formatDetected(
+                TEST_RESULT_FORMATS[format as TestResultFormat].label
+              )
+            );
+          } else {
+            const labels = [...uniqueFormats].map(f => TEST_RESULT_FORMATS[f].label).join(", ");
+            sendProgress(8, `Detected mixed formats: ${labels}`);
+          }
         }
 
-        // Validate format
-        if (!isValidFormat(format)) {
-          controller.enqueue(
-            encoder.encode(
-              `data: ${JSON.stringify({ error: `Unsupported format: ${format}` })}\n\n`
-            )
-          );
-          controller.close();
-          return;
+        // For explicit (non-auto) format, validate it
+        if (format !== "auto" && fileFormatMap.size === 0) {
+          if (!isValidFormat(format)) {
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({ error: `Unsupported format: ${format}` })}\n\n`
+              )
+            );
+            controller.close();
+            return;
+          }
+          // Assign the explicit format to all files
+          for (let i = 0; i < files.length; i++) {
+            fileFormatMap.set(i, format as TestResultFormat);
+          }
         }
 
-        const validFormat = format as TestResultFormat;
+        // Determine the primary format (most common, used for test run type)
+        const formatCounts = new Map<TestResultFormat, number>();
+        for (const fmt of fileFormatMap.values()) {
+          formatCounts.set(fmt, (formatCounts.get(fmt) || 0) + 1);
+        }
+        const primaryFormat = [...formatCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
 
         // Get the case workflow state (DONE) for imported test cases
         const caseWorkflow = await prisma.workflows.findFirst({
@@ -271,39 +298,83 @@ export async function POST(request: NextRequest) {
           return;
         }
 
-        sendProgress(10, progressMessages.parsing(validFormat));
+        sendProgress(10, progressMessages.parsing(primaryFormat));
 
-        // Read file contents for extended data parsing (system-out/err, assertions)
-        const fileContentsForExtended = await Promise.all(
-          files.map(async (file) => file.text())
-        );
+        // Group files by detected format for parsing
+        const filesByFormat = new Map<TestResultFormat, File[]>();
+        for (let i = 0; i < files.length; i++) {
+          const fmt = fileFormatMap.get(i)!;
+          const group = filesByFormat.get(fmt) || [];
+          group.push(files[i]);
+          filesByFormat.set(fmt, group);
+        }
 
-        // Parse the files using the main parser
-        let parsedResults;
-        try {
-          parsedResults = await parseTestResults(files, validFormat);
-        } catch (parseError: unknown) {
-          const message =
-            parseError instanceof Error
-              ? parseError.message
-              : "Unknown parse error";
+        // Parse each format group and merge results
+        // Track which format each suite belongs to for per-suite caseSource
+        let result: any = null;
+        const errors: string[] = [];
+        const allFileContentsForExtended: string[] = [];
+        const suiteFormatMap: TestResultFormat[] = [];
+
+        for (const [fmt, fmtFiles] of filesByFormat) {
+          try {
+            const parsed = await parseTestResults(fmtFiles, fmt);
+            if (!result) {
+              result = parsed.result;
+              // Tag initial suites with their format
+              for (let s = 0; s < (parsed.result.suites?.length || 0); s++) {
+                suiteFormatMap.push(fmt);
+              }
+            } else {
+              // Merge suites into the first result
+              result.total += parsed.result.total;
+              result.passed += parsed.result.passed;
+              result.failed += parsed.result.failed;
+              result.errors += parsed.result.errors;
+              result.skipped += parsed.result.skipped;
+              result.duration += parsed.result.duration;
+              for (let s = 0; s < (parsed.result.suites?.length || 0); s++) {
+                suiteFormatMap.push(fmt);
+              }
+              result.suites = result.suites.concat(parsed.result.suites);
+            }
+            errors.push(...parsed.errors);
+          } catch (parseError: unknown) {
+            const message =
+              parseError instanceof Error
+                ? parseError.message
+                : "Unknown parse error";
+            errors.push(message);
+          }
+        }
+
+        if (!result || !result.suites || result.suites.length === 0) {
           controller.enqueue(
             encoder.encode(
-              `data: ${JSON.stringify({ error: progressMessages.errorParsing(message) })}\n\n`
+              `data: ${JSON.stringify({ error: progressMessages.errorParsing(errors.join("; ") || "No test results found") })}\n\n`
             )
           );
           controller.close();
           return;
         }
 
-        const { result, errors } = parsedResults;
+        // Read file contents for extended data parsing (system-out/err, assertions)
+        for (const file of files) {
+          allFileContentsForExtended.push(await file.text());
+        }
+
+        console.log(`[TestResultsImport] Parsed ${files.length} file(s): ${files.map(f => f.name).join(', ')}`);
+        console.log(`[TestResultsImport] Result: ${result.suites?.length ?? 0} suites, ${result.total} total test cases`);
+        if (errors.length > 0) {
+          console.log(`[TestResultsImport] Parse errors: ${errors.join('; ')}`);
+        }
 
         // Parse extended data (system-out, system-err, assertions) that the main parser doesn't expose
         let extendedDataMap: ExtendedTestCaseDataMap = new Map();
         try {
           extendedDataMap = parseExtendedTestCaseData(
-            fileContentsForExtended,
-            validFormat
+            allFileContentsForExtended,
+            primaryFormat
           );
         } catch {
           // Non-fatal - extended data is supplementary
@@ -316,11 +387,8 @@ export async function POST(request: NextRequest) {
 
         sendProgress(15, progressMessages.creatingRun);
 
-        // Map format to run type and source
-        const testRunType = FORMAT_TO_RUN_TYPE[validFormat] as TestRunType;
-        const caseSource = FORMAT_TO_SOURCE[
-          validFormat
-        ] as RepositoryCaseSource;
+        // Map primary format to run type; caseSource is determined per-suite
+        const testRunType = FORMAT_TO_RUN_TYPE[primaryFormat] as TestRunType;
 
         // Create or verify test run
         if (!testRunId) {
@@ -411,8 +479,19 @@ export async function POST(request: NextRequest) {
           progressMessages.countingTests(totalTestCases, files.length)
         );
 
-        // Create a new root-level folder if requested
+        // Create or reuse a root-level folder if requested
         if (newFolderName && !parentFolderId) {
+          const sanitizedFolderName = newFolderName.trim();
+          if (sanitizedFolderName.length === 0) {
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({ error: "Folder name cannot be empty" })}\n\n`
+              )
+            );
+            controller.close();
+            return;
+          }
+
           let repository = await prisma.repositories.findFirst({
             where: {
               projectId: projectId,
@@ -432,16 +511,28 @@ export async function POST(request: NextRequest) {
               },
             });
           }
-          const newFolder = await prisma.repositoryFolders.create({
-            data: {
+          // Reuse existing root folder with the same name, or create new
+          let folder = await prisma.repositoryFolders.findFirst({
+            where: {
               projectId: projectId,
               repositoryId: repository.id,
-              name: newFolderName,
               parentId: null,
-              creatorId: userId,
+              name: sanitizedFolderName,
+              isDeleted: false,
             },
           });
-          parentFolderId = newFolder.id;
+          if (!folder) {
+            folder = await prisma.repositoryFolders.create({
+              data: {
+                projectId: projectId,
+                repositoryId: repository.id,
+                name: sanitizedFolderName,
+                parentId: null,
+                creatorId: userId,
+              },
+            });
+          }
+          parentFolderId = folder.id;
         }
 
         // Process each suite
@@ -451,6 +542,8 @@ export async function POST(request: NextRequest) {
           suiteIndex++
         ) {
           const suite = result.suites[suiteIndex];
+          const suiteFormat = suiteFormatMap[suiteIndex] || primaryFormat;
+          const caseSource = FORMAT_TO_SOURCE[suiteFormat] as RepositoryCaseSource;
           const suiteProgress =
             25 + (suiteIndex / (result.suites?.length || 1)) * 60;
 
@@ -501,71 +594,75 @@ export async function POST(request: NextRequest) {
               });
             }
 
-            // Find or create folder structure
-            // Split suite name by both "/" and "." to create nested folders
-            // This handles:
-            // - Forward slashes (Cucumber features, Mocha describe blocks)
-            // - Dots (NUnit/xUnit/MSTest namespaces like "MyApp.Tests.CalculatorTests")
-            let suiteFolder: { id: number } | undefined = undefined;
-            if (parentFolderId) {
-              const suiteName = suite.name || "Test Suite";
-              const pathParts = suiteName
-                .split(/[./]/)
-                .filter((part: string) => part.length > 0);
+            // Lazily resolve the folder for new test cases in this suite.
+            // Folders are only created when a test case doesn't match an existing record,
+            // avoiding empty folder trees on re-imports.
+            let _suiteFolder: { id: number } | undefined = undefined;
+            const getFolderForNewCase = async () => {
+              if (_suiteFolder) return _suiteFolder;
 
-              let currentParentId = parentFolderId;
+              // Build sub-folder hierarchy from suite name
+              if (parentFolderId) {
+                const suiteName = suite.name || "Test Suite";
+                const pathParts = suiteName
+                  .split(/[./]/)
+                  .filter((part: string) => part.length > 0);
 
-              for (let i = 0; i < pathParts.length; i++) {
-                const folderName = pathParts[i];
+                let currentParentId = parentFolderId;
 
-                const folder = await prisma.repositoryFolders.upsert({
-                  where: {
-                    projectId_repositoryId_parentId_name_isDeleted: {
+                for (let i = 0; i < pathParts.length; i++) {
+                  const folderName = pathParts[i];
+
+                  const f = await prisma.repositoryFolders.upsert({
+                    where: {
+                      projectId_repositoryId_parentId_name_isDeleted: {
+                        projectId: projectId,
+                        repositoryId: repository.id,
+                        parentId: currentParentId,
+                        name: folderName,
+                        isDeleted: false,
+                      },
+                    },
+                    update: {},
+                    create: {
                       projectId: projectId,
                       repositoryId: repository.id,
                       parentId: currentParentId,
                       name: folderName,
-                      isDeleted: false,
+                      creatorId: userId,
                     },
-                  },
-                  update: {},
-                  create: {
+                  });
+
+                  currentParentId = f.id;
+
+                  if (i === pathParts.length - 1) {
+                    _suiteFolder = f;
+                  }
+                }
+              }
+
+              // Fallback: use first existing folder or create a generic one
+              if (!_suiteFolder) {
+                const existing = await prisma.repositoryFolders.findFirst({
+                  where: {
                     projectId: projectId,
                     repositoryId: repository.id,
-                    parentId: currentParentId,
-                    name: folderName,
+                    isDeleted: false,
+                  },
+                  orderBy: { id: "asc" },
+                });
+                _suiteFolder = existing ?? await prisma.repositoryFolders.create({
+                  data: {
+                    projectId: projectId,
+                    repositoryId: repository.id,
+                    name: `${primaryFormat.toUpperCase()} Imports`,
                     creatorId: userId,
                   },
                 });
-
-                currentParentId = folder.id;
-
-                if (i === pathParts.length - 1) {
-                  suiteFolder = folder;
-                }
               }
-            }
 
-            let folder = await prisma.repositoryFolders.findFirst({
-              where: {
-                projectId: projectId,
-                repositoryId: repository.id,
-                isDeleted: false,
-              },
-              orderBy: { id: "asc" },
-            });
-            if (!folder) {
-              folder = await prisma.repositoryFolders.create({
-                data: {
-                  projectId: projectId,
-                  repositoryId: repository.id,
-                  name: `${validFormat.toUpperCase()} Imports`,
-                  creatorId: userId,
-                },
-              });
-            }
-
-            const finalFolder = suiteFolder || folder;
+              return _suiteFolder;
+            };
 
             // Process each test case
             for (
@@ -603,49 +700,57 @@ export async function POST(request: NextRequest) {
               );
               const extendedData = extendedDataMap.get(extendedDataKey);
 
-              // Upsert RepositoryCase
-              // className is used as part of the composite unique key to identify test cases
-              // For JUnit: fully qualified class name, for Cucumber: feature name, etc.
+              // Find or create RepositoryCase
+              // Match by (projectId, name, className) ignoring source so that
+              // re-imports with a different detected format reuse the existing case
+              // instead of creating duplicates.
               // When updating existing cases, we intentionally do NOT update folderId
-              // to preserve the user's folder organization
-              const repositoryCase = await prisma.repositoryCases.upsert({
+              // to preserve the user's folder organization.
+              let repositoryCase = await prisma.repositoryCases.findFirst({
                 where: {
-                  projectId_name_className_source: {
+                  projectId: projectId,
+                  name: testCase.name,
+                  className: className,
+                  isDeleted: false,
+                },
+              });
+
+              if (repositoryCase) {
+                repositoryCase = await prisma.repositoryCases.update({
+                  where: { id: repositoryCase.id },
+                  data: {
+                    automated: true,
+                    isDeleted: false,
+                    isArchived: false,
+                    stateId: defaultCaseStateId,
+                    templateId: template.id,
+                    repositoryId: repository.id,
+                    creatorId: userId,
+                    order: caseOrder,
+                    estimate: Math.max(1, Math.round(testCaseTime)),
+                    forecastManual: Math.max(1, Math.round(testCaseTime)),
+                  },
+                });
+              } else {
+                const folder = await getFolderForNewCase();
+                repositoryCase = await prisma.repositoryCases.create({
+                  data: {
                     projectId: projectId,
+                    repositoryId: repository.id,
+                    folderId: folder.id,
+                    templateId: template.id,
                     name: testCase.name,
                     className: className,
                     source: caseSource,
+                    stateId: defaultCaseStateId,
+                    automated: true,
+                    creatorId: userId,
+                    order: caseOrder,
+                    estimate: Math.max(1, Math.round(testCaseTime)),
+                    forecastManual: Math.max(1, Math.round(testCaseTime)),
                   },
-                },
-                update: {
-                  automated: true,
-                  isDeleted: false,
-                  isArchived: false,
-                  stateId: defaultCaseStateId,
-                  templateId: template.id,
-                  // Note: folderId is intentionally not updated to preserve existing folder structure
-                  repositoryId: repository.id,
-                  creatorId: userId,
-                  order: caseOrder,
-                  estimate: Math.max(1, Math.round(testCaseTime)),
-                  forecastManual: Math.max(1, Math.round(testCaseTime)),
-                },
-                create: {
-                  projectId: projectId,
-                  repositoryId: repository.id,
-                  folderId: finalFolder.id,
-                  templateId: template.id,
-                  name: testCase.name,
-                  className: className,
-                  source: caseSource,
-                  stateId: defaultCaseStateId,
-                  automated: true,
-                  creatorId: userId,
-                  order: caseOrder,
-                  estimate: Math.max(1, Math.round(testCaseTime)),
-                  forecastManual: Math.max(1, Math.round(testCaseTime)),
-                },
-              });
+                });
+              }
 
               // Upsert TestRunCases
               await prisma.testRunCases.upsert({
@@ -728,7 +833,7 @@ export async function POST(request: NextRequest) {
                     testName: testCase.name,
                     className: className,
                     junitTestResultId: junitTestResult.id,
-                    attachments: testCase.attachments.map((att) => ({
+                    attachments: testCase.attachments.map((att: { name: string; path: string }) => ({
                       name: att.name,
                       path: att.path,
                     })),
@@ -812,7 +917,7 @@ export async function POST(request: NextRequest) {
         const importedCount = caseOrder - 1;
         if (importedCount > 0) {
           auditBulkCreate("JUnitTestResult", importedCount, projectId, {
-            source: `${validFormat.toUpperCase()} Import`,
+            source: `${primaryFormat.toUpperCase()} Import`,
             testRunId,
             fileCount: files.length,
           }).catch((error) =>

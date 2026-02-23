@@ -124,6 +124,8 @@
           },
           "import": "Importar",
           "selectFolder": "Seleccione una carpeta",
+          "createNewFolder": "Crear nueva carpeta",
+          "createNewFolderNamed": "Crear nueva carpeta: {name}",
           "progress": {
             "initializing": "Inicializando importación...",
             "validating": "Validando datos de entrada...",
@@ -672,6 +674,8 @@
         "title": "Subir adjuntos",
         "description": "Arrastre y suelte sus archivos o haga clic en el botón de abajo para seleccionar archivos.",
         "selectFiles": "{count, plural, =0 {Selecciona Archivos} one {1 Archivo seleccionado} other {# Archivos Seleccionados}}",
+        "filesSelected": "{count, plural, one {1 archivo seleccionado} other {# archivos seleccionados}}",
+        "addMoreFiles": "Añadir más archivos...",
         "invalidFileType": "Tipo de archivo no válido. Sólo se permiten archivos {types}.",
         "altText": {
           "emoji": "emoji"

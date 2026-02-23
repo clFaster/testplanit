@@ -454,7 +454,7 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
 
   const { isDragActive } = usePageFileDrop({
     acceptedExtensions: [".xml", ".trx", ".json"],
-    enabled: canAddEdit,
+    enabled: canAddEdit && !importDialogOpen,
     onDrop: (files) => {
       setDroppedFiles(files);
       setImportDialogOpen(true);

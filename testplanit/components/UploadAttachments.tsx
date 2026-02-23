@@ -8,7 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CloudUpload, Loader2, Plus, XCircle } from "lucide-react";
+import {
+  CloudUpload,
+  Loader2,
+  XCircle,
+  FileText,
+  FileStack,
+} from "lucide-react";
+import { filesize } from "filesize";
 import Image from "next/image";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -72,7 +79,11 @@ export default function UploadAttachments({
   // Seed selectedFiles from initialFiles prop when it changes from empty to non-empty
   const initialFilesAppliedRef = useRef(false);
   useEffect(() => {
-    if (initialFiles && initialFiles.length > 0 && !initialFilesAppliedRef.current) {
+    if (
+      initialFiles &&
+      initialFiles.length > 0 &&
+      !initialFilesAppliedRef.current
+    ) {
       initialFilesAppliedRef.current = true;
       setSelectedFiles(initialFiles);
     }
@@ -257,44 +268,90 @@ export default function UploadAttachments({
 
   if (compact) {
     return (
-      <div
-        className={`items-center justify-center border-2 ${
-          isDragging && !disabled
-            ? "bg-accent dark:bg-primary"
-            : "border-dashed border-muted"
-        } rounded-lg p-2 ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-        onDragOver={disabled ? undefined : handleDragOver}
-        onDragLeave={disabled ? undefined : handleDragLeave}
-        onDrop={disabled ? undefined : handleDrop}
-      >
-        {uploading && <Loader2 className="h-6 w-6 animate-spin text-primary" />}
-        {errorMessage && (
-          <div className="text-destructive text-xs">{errorMessage}</div>
-        )}
-        <input
-          type="file"
-          multiple
-          accept={accept}
-          onChange={handleFileChange}
-          disabled={uploading || disabled}
-          style={{ display: "none" }}
-          id={fileInputId}
-        />
-        <label
-          htmlFor={fileInputId}
-          className={`flex items-center w-full ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+      <div className="flex flex-col gap-1">
+        <div
+          className={`items-center justify-center border-2 ${
+            isDragging && !disabled
+              ? "bg-accent dark:bg-primary"
+              : "border-dashed border-muted"
+          } rounded-lg p-2 ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+          onDragOver={disabled ? undefined : handleDragOver}
+          onDragLeave={disabled ? undefined : handleDragLeave}
+          onDrop={disabled ? undefined : handleDrop}
         >
-          <CloudUpload className="w-5 h-5 text-primary mr-1" />
-          <span className="text-sm truncate inline-block">
-            {uploading
-              ? tGlobal("common.status.uploading")
-              : selectedFiles.length > 0
-                ? truncateFileName(selectedFiles[selectedFiles.length - 1].name)
-                : tGlobal("common.upload.attachments.selectFiles", {
-                    count: selectedFiles.length,
-                  })}
-          </span>
-        </label>
+          {uploading && (
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          )}
+          {errorMessage && (
+            <div className="text-destructive text-xs">{errorMessage}</div>
+          )}
+          <input
+            type="file"
+            multiple
+            accept={accept}
+            onChange={handleFileChange}
+            disabled={uploading || disabled}
+            style={{ display: "none" }}
+            id={fileInputId}
+          />
+          <label
+            htmlFor={fileInputId}
+            className={`flex items-center w-full ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+          >
+            <CloudUpload className="w-5 h-5 text-primary mr-1" />
+            <span className="text-sm truncate inline-block">
+              {uploading
+                ? tGlobal("common.status.uploading")
+                : selectedFiles.length > 0
+                  ? tGlobal("common.upload.attachments.addMoreFiles")
+                  : tGlobal("common.upload.attachments.selectFiles", {
+                      count: selectedFiles.length,
+                    })}
+            </span>
+            {selectedFiles.length > 1 && (
+              <span className="ml-auto flex items-center gap-0.5 text-sm text-muted-foreground">
+                <FileStack className="w-4 h-4" />
+                {String(
+                  filesize(selectedFiles.reduce((sum, f) => sum + f.size, 0))
+                )}
+              </span>
+            )}
+          </label>
+        </div>
+        {selectedFiles.length > 0 && (
+          <ul className="flex flex-col gap-0.5">
+            {selectedFiles.map((file, index) => (
+              <li
+                key={index}
+                className="flex items-center justify-between gap-1 text-sm px-1 py-0.5 rounded hover:bg-accent"
+              >
+                <span className="flex items-center gap-1">
+                  <span>
+                    <FileText className="w-4 h-4 text-muted-foreground" />
+                  </span>
+                  <span className="truncate text-muted-foreground">
+                    {file.name}
+                  </span>
+                </span>
+                <span className="flex items-center">
+                  <span className="text-xs text-muted-foreground pr-2">
+                    {filesize(file.size)}
+                  </span>
+                  {!disabled && (
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      aria-label={tGlobal("common.actions.remove")}
+                      className="shrink-0"
+                    >
+                      <XCircle className="w-4 h-4 text-muted-foreground hover:text-destructive" />
+                    </button>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     );
   }

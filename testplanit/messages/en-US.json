@@ -674,6 +674,8 @@
         "title": "Upload Attachments",
         "description": "Drag and drop your files or click the button below to select files.",
         "selectFiles": "{count, plural, =0 {Select Files} one {1 Selected File} other {# Selected Files}}",
+        "filesSelected": "{count, plural, one {1 file selected} other {# files selected}}",
+        "addMoreFiles": "Add more files...",
         "invalidFileType": "Invalid file type. Only {types} files are allowed.",
         "altText": {
           "emoji": "emoji"

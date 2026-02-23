@@ -124,6 +124,8 @@
           },
           "import": "Importer",
           "selectFolder": "Sélectionnez un dossier",
+          "createNewFolder": "Créer un nouveau dossier",
+          "createNewFolderNamed": "Créer un nouveau dossier : {name}",
           "progress": {
             "initializing": "Initialisation de l'importation...",
             "validating": "Validation des données d'entrée...",
@@ -672,6 +674,8 @@
         "title": "Télécharger des pièces jointes",
         "description": "Glissez-déposez vos fichiers ou cliquez sur le bouton ci-dessous pour sélectionner des fichiers.",
         "selectFiles": "{count, plural, =0 {Sélectionner des fichiers} one {1 fichier sélectionné} other {# fichiers sélectionnés}}",
+        "filesSelected": "{count, plural, one {1 fichier sélectionné} other {# fichiers sélectionnés}}",
+        "addMoreFiles": "Ajouter d'autres fichiers...",
         "invalidFileType": "Type de fichier invalide. Seuls les fichiers {types} sont autorisés.",
         "altText": {
           "emoji": "emoji"
