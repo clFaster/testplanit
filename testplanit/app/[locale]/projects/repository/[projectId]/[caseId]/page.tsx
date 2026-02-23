@@ -2024,6 +2024,7 @@ export default function TestCaseDetails() {
                               fieldValue={fieldValue}
                               fieldType={field.caseField.type.type}
                               caseId={caseId?.toString() || ""}
+                              projectId={Number(projectIdParam)}
                               stepsForDisplay={
                                 field.caseField.type.type === "Steps"
                                   ? testcase.steps?.map((s: any) => ({
@@ -2051,7 +2052,6 @@ export default function TestCaseDetails() {
                                   : undefined
                               }
                               {...(field.caseField.type.type === "Steps" && {
-                                projectId: Number(projectIdParam),
                                 onSharedStepCreated: refetch,
                               })}
                             />
@@ -2123,6 +2123,7 @@ export default function TestCaseDetails() {
                                 fieldValue={cfv.value}
                                 fieldType={cfv.field?.type?.type || "Text String"}
                                 caseId={caseId?.toString() || ""}
+                                projectId={Number(projectIdParam)}
                                 template={{
                                   caseFields: testcase?.template?.caseFields || [],
                                 }}

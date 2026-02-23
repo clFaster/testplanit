@@ -9,6 +9,7 @@ import { DropdownButton } from "@/components/tiptap/ui/Dropdown";
 import useContentItemActions from "./hooks/useContentItemActions";
 import { useData } from "./hooks/useData";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export type ContentItemMenuProps = {
   editor: Editor;
@@ -16,6 +17,8 @@ export type ContentItemMenuProps = {
 };
 
 export const ContentItemMenu = ({ editor, editable }: ContentItemMenuProps) => {
+  const t = useTranslations("common.editor.contentMenu");
+  const tActions = useTranslations("common.actions");
   const [menuOpen, setMenuOpen] = useState(false);
   const data = useData();
   const actions = useContentItemActions(
@@ -74,35 +77,35 @@ export const ContentItemMenu = ({ editor, editable }: ContentItemMenuProps) => {
                 <Popover.Close>
                   <DropdownButton onClick={actions.handleAdd}>
                     <Icon name="Plus" />
-                    Add paragraph below
+                    {t("addParagraphBelow")}
                   </DropdownButton>
                 </Popover.Close>
                 <Popover.Close>
                   <DropdownButton onClick={actions.resetTextFormatting}>
                     <Icon name="RemoveFormatting" />
-                    Clear formatting
+                    {t("clearFormatting")}
                   </DropdownButton>
                 </Popover.Close>
                 <Popover.Close>
                   <DropdownButton onClick={actions.copyNodeToClipboard}>
                     <Icon name="Clipboard" />
-                    Copy to clipboard
+                    {t("copyToClipboard")}
                   </DropdownButton>
                 </Popover.Close>
                 <Popover.Close>
                   <DropdownButton onClick={actions.duplicateNode}>
                     <Icon name="Copy" />
-                    Duplicate
+                    {tActions("duplicate")}
                   </DropdownButton>
                 </Popover.Close>
                 <Toolbar.Divider horizontal />
                 <Popover.Close>
                   <DropdownButton
                     onClick={actions.deleteNode}
-                    className="text-destructive bg-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    className="text-destructive! hover:bg-destructive! hover:text-destructive-foreground!"
                   >
                     <Icon name="Trash2" />
-                    Delete
+                    {tActions("delete")}
                   </DropdownButton>
                 </Popover.Close>
               </Surface>

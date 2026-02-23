@@ -13,6 +13,14 @@ import { Emoji, EmojiItem, gitHubEmojis } from "@tiptap/extension-emoji";
 import { Video } from "./video";
 import { FileHandler } from "@tiptap/extension-file-handler";
 import { ContentItemMenu } from "./menus/ContentItemMenu";
+import {
+  Table,
+  TableRow,
+  TableCell,
+  TableHeader,
+} from "~/app/extensions/Table";
+import { findTable } from "~/app/extensions/Table/utils";
+import { TableColumnMenu, TableRowMenu } from "~/app/extensions/Table/menus";
 import Focus from "@tiptap/extension-focus";
 // import { Image } from "@tiptap/extension-image";
 // import ImageResize from "tiptap-extension-resize-image";
@@ -57,6 +65,14 @@ import {
   Heading3,
   Wand2,
   Loader2,
+  Table2,
+  Rows3,
+  Columns3,
+  BetweenVerticalStart,
+  BetweenVerticalEnd,
+  BetweenHorizontalStart,
+  BetweenHorizontalEnd,
+  PanelTop,
 } from "lucide-react";
 import LoadingSpinnerAlert from "../LoadingSpinnerAlert";
 import { Separator } from "../ui/separator";
@@ -268,6 +284,10 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({
           "before:content-[attr(data-placeholder)] before:text-muted-foreground before:float-left before:pointer-events-none",
       }),
       Markdown,
+      Table,
+      TableRow,
+      TableCell,
+      TableHeader,
     ],
     content: validateContent(content),
     onUpdate: ({ editor }) => {
@@ -809,6 +829,144 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({
           >
             <QuoteIcon className="w-4 h-4" />
           </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant={editor.isActive("table") ? "default" : "outline"}
+                size="sm"
+                className="p-2"
+                data-testid="tiptap-table-trigger"
+              >
+                <Table2 className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto p-1"
+              data-testid="tiptap-table-menu"
+            >
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full flex gap-2 justify-start"
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+                    .run()
+                }
+                data-testid="tiptap-insert-table"
+              >
+                <Table2 size={16} />
+                {t("table.insertTable")}
+              </Button>
+              {editor.isActive("table") && (
+                <>
+                  <Separator className="my-1" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full flex gap-2 justify-between"
+                    onClick={() =>
+                      editor.chain().focus().toggleHeaderRow().run()
+                    }
+                    data-testid="tiptap-toggle-header-row"
+                  >
+                    <span className="flex gap-2 items-center">
+                      <PanelTop size={16} />
+                      {t("table.headerRow")}
+                    </span>
+                    {findTable(editor.state.selection)?.node.firstChild
+                      ?.firstChild?.type.name === "tableHeader" && (
+                      <Check size={16} />
+                    )}
+                  </Button>
+                  <Separator className="my-1" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full flex gap-2 justify-start"
+                    onClick={() =>
+                      editor.chain().focus().addColumnBefore().run()
+                    }
+                    data-testid="tiptap-add-col-before"
+                  >
+                    <BetweenVerticalEnd size={16} />
+                    {t("table.addColumnBefore")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full flex gap-2 justify-start"
+                    onClick={() =>
+                      editor.chain().focus().addColumnAfter().run()
+                    }
+                    data-testid="tiptap-add-col-after"
+                  >
+                    <BetweenVerticalStart size={16} />
+                    {t("table.addColumnAfter")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full flex gap-2 justify-start text-destructive"
+                    onClick={() => editor.chain().focus().deleteColumn().run()}
+                    data-testid="tiptap-delete-col"
+                  >
+                    <Columns3 size={16} />
+                    {t("table.deleteColumn")}
+                  </Button>
+                  <Separator className="my-1" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full flex gap-2 justify-start"
+                    onClick={() =>
+                      editor.chain().focus().addRowBefore().run()
+                    }
+                    data-testid="tiptap-add-row-before"
+                  >
+                    <BetweenHorizontalEnd size={16} />
+                    {t("table.addRowBefore")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full flex gap-2 justify-start"
+                    onClick={() =>
+                      editor.chain().focus().addRowAfter().run()
+                    }
+                    data-testid="tiptap-add-row-after"
+                  >
+                    <BetweenHorizontalStart size={16} />
+                    {t("table.addRowAfter")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full flex gap-2 justify-start text-destructive"
+                    onClick={() => editor.chain().focus().deleteRow().run()}
+                    data-testid="tiptap-delete-row"
+                  >
+                    <Rows3 size={16} />
+                    {t("table.deleteRow")}
+                  </Button>
+                  <Separator className="my-1" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full flex gap-2 justify-start text-destructive"
+                    onClick={() => editor.chain().focus().deleteTable().run()}
+                    data-testid="tiptap-delete-table"
+                  >
+                    <Trash2 size={16} />
+                    {t("table.deleteTable")}
+                  </Button>
+                </>
+              )}
+            </PopoverContent>
+          </Popover>
 
           <Separator orientation="vertical" className="p-0.5 mx-0.5" />
 
@@ -890,6 +1048,11 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
                       <DropdownMenuItem
+                        onClick={() => handleAiPrompt("translate", "English")}
+                      >
+                        {tAi("english")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
                         onClick={() => handleAiPrompt("translate", "Spanish")}
                       >
                         {tAi("spanish")}
@@ -898,18 +1061,6 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({
                         onClick={() => handleAiPrompt("translate", "French")}
                       >
                         {tAi("french")}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleAiPrompt("translate", "German")}
-                      >
-                        {tAi("german")}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          handleAiPrompt("translate", "Portuguese")
-                        }
-                      >
-                        {tAi("portuguese")}
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
@@ -1050,6 +1201,12 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({
           className={`mt-0.5 ${!readOnly ? "pl-3 border-4 border-primary/20" : ""} border-accent-foreground/10 border rounded-lg prose prose-xs sm:prose-sm lg:prose xl:prose-lg max-w-none w-full focus:outline-none ${styles.editorContent}`}
         />
       </div>
+      {!readOnly && editor && (
+        <>
+          <TableRowMenu editor={editor} />
+          <TableColumnMenu editor={editor} />
+        </>
+      )}
 
       {/* AI Assistant Dialog */}
       <Dialog

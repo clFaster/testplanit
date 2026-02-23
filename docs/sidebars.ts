@@ -87,7 +87,20 @@ const sidebars: SidebarsConfig = {
               ],
             },
             'user-guide/integrations', // Issue integrations administration page
-            'user-guide/llm-integrations', // LLM/AI integrations administration page
+            {
+              type: 'category',
+              label: 'AI Models',
+              link: {
+                type: 'doc',
+                id: 'user-guide/llm-integrations',
+              },
+              items: [
+                'user-guide/llm-test-generation', // AI test case generation
+                'user-guide/llm-magic-select', // AI-powered test case selection
+                'user-guide/llm-writing-assistant', // In-editor AI writing assistant
+                'user-guide/llm-markdown-import', // AI-assisted markdown import
+              ],
+            },
             'user-guide/sso', // Authentication configuration and management
             'user-guide/audit-logs', // Audit logs for compliance and security
             // Add other admin pages here as they are created

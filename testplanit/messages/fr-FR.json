@@ -717,6 +717,22 @@
         "resetSize": "Rétablir la taille d'origine",
         "rotate": "Rotation de 90°",
         "delete": "Supprimer l'image"
+      },
+      "table": {
+        "insertTable": "Insérer un tableau",
+        "headerRow": "Ligne d'en-tête",
+        "addColumnBefore": "Ajouter une colonne avant",
+        "addColumnAfter": "Ajouter une colonne après",
+        "deleteColumn": "Supprimer la colonne",
+        "addRowBefore": "Ajouter une ligne avant",
+        "addRowAfter": "Ajouter une ligne après",
+        "deleteRow": "Supprimer la ligne",
+        "deleteTable": "Supprimer le tableau"
+      },
+      "contentMenu": {
+        "addParagraphBelow": "Ajoutez un paragraphe ci-dessous",
+        "clearFormatting": "Mise en forme claire",
+        "copyToClipboard": "Copier dans le presse-papiers"
       }
     },
     "ai": {
@@ -730,10 +746,9 @@
       "casual": "Occasionnel",
       "formal": "Officiel",
       "translate": "Traduire",
+      "english": "Anglais",
       "spanish": "Espagnol",
       "french": "Français",
-      "german": "Allemand",
-      "portuguese": "portugais",
       "summarize": "Résumer",
       "addExamples": "Ajouter des exemples",
       "originalText": "Texte original",
@@ -1676,6 +1691,7 @@
             "markdown": "Réduction"
           },
           "parsingMarkdown": "Analyse du fichier Markdown...",
+          "useAiParsing": "Utiliser l'IA pour faciliter la cartographie des champs",
           "importLocation": {
             "label": "Emplacement d'importation",
             "singleFolder": "Ajouter tous les dossiers à un seul dossier",

@@ -717,6 +717,22 @@
         "resetSize": "Reset to original size",
         "rotate": "Rotate 90°",
         "delete": "Delete image"
+      },
+      "table": {
+        "insertTable": "Insert table",
+        "headerRow": "Header row",
+        "addColumnBefore": "Add column before",
+        "addColumnAfter": "Add column after",
+        "deleteColumn": "Delete column",
+        "addRowBefore": "Add row before",
+        "addRowAfter": "Add row after",
+        "deleteRow": "Delete row",
+        "deleteTable": "Delete table"
+      },
+      "contentMenu": {
+        "addParagraphBelow": "Add paragraph below",
+        "clearFormatting": "Clear formatting",
+        "copyToClipboard": "Copy to clipboard"
       }
     },
     "ai": {
@@ -730,10 +746,9 @@
       "casual": "Casual",
       "formal": "Formal",
       "translate": "Translate",
+      "english": "English",
       "spanish": "Spanish",
       "french": "French",
-      "german": "German",
-      "portuguese": "Portuguese",
       "summarize": "Summarize",
       "addExamples": "Add Examples",
       "originalText": "Original Text",

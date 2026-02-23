@@ -22,7 +22,7 @@ const ToolbarWrapper = forwardRef<HTMLDivElement, ToolbarWrapperProps>(
     ref
   ) => {
     const toolbarClassName = cn(
-      "text-black inline-flex h-full leading-none gap-0.5",
+      "text-black dark:text-white inline-flex h-full leading-none gap-0.5",
       isVertical ? "flex-col p-2" : "flex-row p-1 items-center",
       className
     );

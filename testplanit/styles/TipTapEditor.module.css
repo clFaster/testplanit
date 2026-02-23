@@ -92,6 +92,233 @@
   color: #e5e7eb !important;
 }
 
+/* Table styles - override prose defaults */
+.editorContent table {
+  border-collapse: collapse !important;
+  border: 1px solid rgba(0, 0, 0, 0.3) !important;
+  border-radius: 0.25rem;
+  box-sizing: border-box;
+  width: 100% !important;
+  margin: 1rem 0 !important;
+}
+
+.editorContent table td,
+.editorContent table th {
+  border: 1px solid rgba(0, 0, 0, 0.3) !important;
+  min-width: 100px;
+  padding: 0.5rem !important;
+  position: relative;
+  text-align: left;
+  vertical-align: top;
+}
+
+.editorContent table th {
+  font-weight: 700;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.editorContent table td p,
+.editorContent table th p {
+  margin: 0 !important;
+}
+
+:global(.dark) .editorContent table {
+  border-color: rgba(203, 213, 225, 0.3) !important;
+}
+
+:global(.dark) .editorContent table td,
+:global(.dark) .editorContent table th {
+  border-color: rgba(203, 213, 225, 0.3) !important;
+}
+
+:global(.dark) .editorContent table th {
+  background-color: rgba(203, 213, 225, 0.08);
+}
+
+/* Table wrapper - ensure grips aren't clipped */
+.editorContent :global(.tableWrapper) {
+  margin: 1.5rem 0 !important;
+  overflow: visible !important;
+}
+
+/* Table cell overflow must be visible for grips */
+.editorContent table td,
+.editorContent table th {
+  overflow: visible !important;
+}
+
+/* Column resize handle */
+.editorContent table :global(.column-resize-handle) {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: -2px;
+  width: 8px;
+  display: flex;
+  pointer-events: none;
+}
+
+.editorContent table :global(.column-resize-handle)::before {
+  content: '';
+  height: 100%;
+  width: 1px;
+  margin-left: 8px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+:global(.dark) .editorContent table :global(.column-resize-handle)::before {
+  background-color: rgba(203, 213, 225, 0.15);
+}
+
+/* Selected cell highlight */
+.editorContent table :global(.selectedCell) {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
+  border-style: double !important;
+}
+
+:global(.dark) .editorContent table :global(.selectedCell) {
+  background-color: rgba(203, 213, 225, 0.08) !important;
+  border-color: rgba(203, 213, 225, 0.15) !important;
+}
+
+/* Grip handles - shared styles */
+.editorContent table :global(.grip-column),
+.editorContent table :global(.grip-row) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+:global(.dark) .editorContent table :global(.grip-column),
+:global(.dark) .editorContent table :global(.grip-row) {
+  background-color: rgba(203, 213, 225, 0.08);
+}
+
+/* Column grip - top of each column */
+.editorContent table :global(.grip-column) {
+  width: calc(100% + 1px);
+  height: 12px;
+  left: 0;
+  margin-left: -1px;
+  top: -12px;
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+:global(.dark) .editorContent table :global(.grip-column) {
+  border-left-color: rgba(203, 213, 225, 0.15);
+}
+
+.editorContent table :global(.grip-column):hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .editorContent table :global(.grip-column):hover {
+  background-color: rgba(203, 213, 225, 0.15);
+}
+
+.editorContent table :global(.grip-column):hover::before,
+.editorContent table :global(.grip-column.selected)::before {
+  content: '';
+  width: 10px;
+}
+
+.editorContent table :global(.grip-column):hover::before {
+  border-bottom: 2px dotted rgba(0, 0, 0, 0.6);
+}
+
+:global(.dark) .editorContent table :global(.grip-column):hover::before {
+  border-bottom-color: rgba(203, 213, 225, 0.4);
+}
+
+.editorContent table :global(.grip-column.first) {
+  border-color: transparent;
+  border-top-left-radius: 2px;
+}
+
+.editorContent table :global(.grip-column.last) {
+  border-top-right-radius: 2px;
+}
+
+.editorContent table :global(.grip-column.selected) {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .editorContent table :global(.grip-column.selected) {
+  background-color: rgba(203, 213, 225, 0.2);
+  border-color: rgba(203, 213, 225, 0.2);
+}
+
+.editorContent table :global(.grip-column.selected)::before {
+  border-bottom: 2px dotted currentColor;
+}
+
+/* Row grip - left of each row */
+.editorContent table :global(.grip-row) {
+  height: calc(100% + 1px);
+  width: 12px;
+  left: -12px;
+  top: 0;
+  margin-top: -1px;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+:global(.dark) .editorContent table :global(.grip-row) {
+  border-top-color: rgba(203, 213, 225, 0.15);
+}
+
+.editorContent table :global(.grip-row):hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .editorContent table :global(.grip-row):hover {
+  background-color: rgba(203, 213, 225, 0.15);
+}
+
+.editorContent table :global(.grip-row):hover::before,
+.editorContent table :global(.grip-row.selected)::before {
+  content: '';
+  height: 10px;
+}
+
+.editorContent table :global(.grip-row):hover::before {
+  border-left: 2px dotted rgba(0, 0, 0, 0.6);
+}
+
+:global(.dark) .editorContent table :global(.grip-row):hover::before {
+  border-left-color: rgba(203, 213, 225, 0.4);
+}
+
+.editorContent table :global(.grip-row.first) {
+  border-color: transparent;
+  border-top-left-radius: 2px;
+}
+
+.editorContent table :global(.grip-row.last) {
+  border-bottom-left-radius: 2px;
+}
+
+.editorContent table :global(.grip-row.selected) {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .editorContent table :global(.grip-row.selected) {
+  background-color: rgba(203, 213, 225, 0.2);
+  border-color: rgba(203, 213, 225, 0.2);
+}
+
+.editorContent table :global(.grip-row.selected)::before {
+  border-left: 2px dotted currentColor;
+}
+
 /* Drag handle styles */
 :global([data-drag-handle]) {
   cursor: grab;

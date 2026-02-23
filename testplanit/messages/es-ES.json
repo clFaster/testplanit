@@ -717,6 +717,22 @@
         "resetSize": "Restablecer al tamaño original",
         "rotate": "Girar 90°",
         "delete": "Eliminar imagen"
+      },
+      "table": {
+        "insertTable": "Insertar tabla",
+        "headerRow": "Fila de encabezado",
+        "addColumnBefore": "Agregar columna antes",
+        "addColumnAfter": "Agregar columna después",
+        "deleteColumn": "Eliminar columna",
+        "addRowBefore": "Agregar fila antes",
+        "addRowAfter": "Agregar fila después",
+        "deleteRow": "Eliminar fila",
+        "deleteTable": "Eliminar tabla"
+      },
+      "contentMenu": {
+        "addParagraphBelow": "Añadir párrafo a continuación",
+        "clearFormatting": "Borrar formato",
+        "copyToClipboard": "Copiar al portapapeles"
       }
     },
     "ai": {
@@ -730,10 +746,9 @@
       "casual": "Casual",
       "formal": "Formal",
       "translate": "Traducir",
+      "english": "Inglés",
       "spanish": "Español",
       "french": "Francés",
-      "german": "Alemán",
-      "portuguese": "Portugués",
       "summarize": "Summarize",
       "addExamples": "Añadir ejemplos",
       "originalText": "Texto original",
@@ -1676,6 +1691,7 @@
             "markdown": "Reducción"
           },
           "parsingMarkdown": "Analizando archivo Markdown...",
+          "useAiParsing": "Utilice la IA para ayudar con el mapeo de campos",
           "importLocation": {
             "label": "Importar Ubicación",
             "singleFolder": "Añadir todos los casos a una sola carpeta",

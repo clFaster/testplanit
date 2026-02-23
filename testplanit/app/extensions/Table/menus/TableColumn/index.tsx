@@ -1,5 +1,6 @@
 import { BubbleMenu } from "@tiptap/react/menus";
 import React, { useCallback } from "react";
+import { useTranslations } from "next-intl";
 import * as PopoverMenu from "@/components/tiptap/ui/PopoverMenu";
 
 import { Toolbar } from "@/components/tiptap/ui/Toolbar";
@@ -8,7 +9,18 @@ import { Icon } from "@/components/tiptap/ui/Icon";
 import { MenuProps, ShouldShowProps } from "@/components/tiptap/menus/types";
 
 export const TableColumnMenu = React.memo(
-  ({ editor, appendTo }: MenuProps): React.ReactElement => {
+  ({ editor, appendTo }: MenuProps): React.ReactElement | null => {
+    // Don't render BubbleMenu if editor doesn't support plugins (e.g., in tests)
+    if (!editor?.registerPlugin) {
+      return null;
+    }
+    const t = useTranslations("common.editor.table");
+    const menuRef = useCallback((el: HTMLDivElement | null) => {
+      if (el) {
+        el.style.zIndex = "9999";
+      }
+    }, []);
+
     const shouldShow = useCallback(
       ({ view, state, from }: ShouldShowProps) => {
         if (!state) {
@@ -34,10 +46,13 @@ export const TableColumnMenu = React.memo(
 
     return (
       <BubbleMenu
+        ref={menuRef}
         editor={editor}
         pluginKey="tableColumnMenu"
         updateDelay={0}
+        appendTo={appendTo?.current || document.body}
         options={{
+          strategy: "fixed",
           offset: { mainAxis: 15 },
           flip: false,
         }}
@@ -47,20 +62,21 @@ export const TableColumnMenu = React.memo(
           <PopoverMenu.Item
             iconComponent={<Icon name="ArrowLeftToLine" />}
             close={false}
-            label="Add column before"
+            label={t("addColumnBefore")}
             onClick={onAddColumnBefore}
           />
           <PopoverMenu.Item
             iconComponent={<Icon name="ArrowRightToLine" />}
             close={false}
-            label="Add column after"
+            label={t("addColumnAfter")}
             onClick={onAddColumnAfter}
           />
           <PopoverMenu.Item
             icon="Trash"
             close={false}
-            label="Delete column"
+            label={t("deleteColumn")}
             onClick={onDeleteColumn}
+            className="text-destructive! hover:bg-destructive! hover:text-destructive-foreground!"
           />
         </Toolbar.Wrapper>
       </BubbleMenu>
