@@ -12,7 +12,8 @@ TestPlanIt provides comprehensive import and export capabilities to help you mig
 The import/export system supports:
 
 - **CSV Import/Export** for test cases and bulk data operations
-- **Markdown support** for rich text fields during import and export
+- **[Markdown Import](./import-markdown.md)** for importing test cases from `.md` files (with optional AI-assisted parsing)
+- **Markdown support** for rich text fields during CSV import and export
 - **Automated Test Results Import** for multiple formats (JUnit, TestNG, NUnit, xUnit, MSTest, Mocha, Cucumber)
 - **Field Mapping** for flexible data transformation with auto-matching
 - **Bulk Operations** for efficient data management

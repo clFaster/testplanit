@@ -50,6 +50,12 @@ import { z } from "zod/v4";
 import LoadingSpinnerAlert from "@/components/LoadingSpinnerAlert";
 import { ensureTipTapJSON } from "~/utils/tiptapConversion";
 import { generateHTMLFallback } from "~/utils/tiptapToHtml";
+import {
+  parseMarkdownTestCases,
+  convertMarkdownCasesToImportData,
+  type ParsedMarkdownCase,
+} from "~/utils/markdownTestCaseParser";
+import { useFindManyProjectLlmIntegration } from "~/lib/hooks";
 
 interface ImportCasesWizardProps {
   onImportComplete?: () => void;
@@ -58,6 +64,7 @@ interface ImportCasesWizardProps {
   initialFile?: File | null;
 }
 
+type FileType = "csv" | "markdown";
 type ImportLocation = "single_folder" | "root_folder" | "top_level";
 type Delimiter = "," | ";" | ":" | "|" | "\t";
 type Encoding = "UTF-8" | "ISO-8859-1" | "ISO-8859-15" | "Windows-1252";
@@ -130,7 +137,9 @@ export function ImportCasesWizard({
   const [importProgress, setImportProgress] = useState(0);
 
   // Page 1 state
+  const [fileType, setFileType] = useState<FileType>("csv");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isParsingMarkdown, setIsParsingMarkdown] = useState(false);
   const [importLocation, setImportLocation] =
     useState<ImportLocation>("single_folder");
   const [selectedFolderId, setSelectedFolderId] = useState<string>("");
@@ -201,6 +210,14 @@ export function ImportCasesWizard({
       setSelectedTemplateId(defaultTemplate.id.toString());
     }
   }, [open, defaultTemplate, selectedTemplateId]);
+
+  // Check if project has an active LLM integration (for markdown parsing)
+  const { data: projectLlmIntegrations } =
+    useFindManyProjectLlmIntegration({
+      where: { projectId, isActive: true },
+    });
+  const hasLlmIntegration =
+    projectLlmIntegrations && projectLlmIntegrations.length > 0;
 
   // Get template fields for mapping
   const selectedTemplate = templates?.find(
@@ -336,6 +353,124 @@ export function ImportCasesWizard({
     return fields;
   }, [selectedTemplate, importLocation, tGlobal, tCommon]);
 
+  // Common field name mappings used by both CSV and Markdown parsers
+  const commonMappings: Record<string, string> = {
+    "case name": "name",
+    "test case name": "name",
+    title: "name",
+    tag: "tags",
+    step: "steps",
+    "test steps": "steps",
+    estimated: "estimate",
+    estimation: "estimate",
+    "is automated": "automated",
+    automation: "automated",
+    "folder path": "folder",
+    path: "folder",
+    attachment: "attachments",
+    issue: "issues",
+    "linked case": "linkedCases",
+    "linked test case": "linkedCases",
+    "workflow state": "workflowState",
+    state: "workflowState",
+    status: "workflowState",
+    "created at": "createdAt",
+    "created date": "createdAt",
+    "creation date": "createdAt",
+    "date created": "createdAt",
+    "created by": "createdBy",
+    creator: "createdBy",
+    author: "createdBy",
+    "created user": "createdBy",
+    version: "version",
+    "version number": "version",
+    "case version": "version",
+    revision: "version",
+    "test runs": "testRuns",
+    "test run": "testRuns",
+    runs: "testRuns",
+    executions: "testRuns",
+    id: "id",
+    "test case id": "id",
+    "case id": "id",
+    identifier: "id",
+    description: "description",
+    preconditions: "preconditions",
+    prerequisites: "preconditions",
+    "pre-conditions": "preconditions",
+  };
+
+  // Create field mappings from column headers using auto-matching
+  const createFieldMappings = (columnHeaders: string[]): FieldMapping[] => {
+    const usedFields = new Set<string>();
+    return columnHeaders.map((col: string) => {
+      let matchedField: string | null = null;
+      const normalizedColName = col.toLowerCase().trim();
+
+      // Skip template column
+      if (
+        normalizedColName === "template" ||
+        normalizedColName === "templatename" ||
+        normalizedColName === "template name"
+      ) {
+        return { csvColumn: col, templateField: null };
+      }
+
+      // Try exact match first
+      const exactMatch = templateFields.find(
+        (field) =>
+          !usedFields.has(field.id) &&
+          (field.displayName.toLowerCase() === normalizedColName ||
+            field.id.toLowerCase() === normalizedColName)
+      );
+
+      if (exactMatch) {
+        matchedField = exactMatch.id;
+        usedFields.add(exactMatch.id);
+      } else {
+        // Try common variations
+        for (const [commonName, fieldId] of Object.entries(commonMappings)) {
+          if (
+            normalizedColName === commonName ||
+            normalizedColName.includes(commonName)
+          ) {
+            const field = templateFields.find(
+              (f) => f.id === fieldId && !usedFields.has(f.id)
+            );
+            if (field) {
+              matchedField = fieldId;
+              usedFields.add(fieldId);
+              break;
+            }
+          }
+        }
+
+        // Partial matching fallback
+        if (!matchedField) {
+          const partialMatch = templateFields.find(
+            (field) =>
+              !usedFields.has(field.id) &&
+              (normalizedColName.includes(
+                field.displayName.toLowerCase()
+              ) ||
+                normalizedColName.includes(field.id.toLowerCase()) ||
+                field.displayName
+                  .toLowerCase()
+                  .includes(normalizedColName) ||
+                field.id.toLowerCase().includes(normalizedColName))
+          );
+
+          if (partialMatch) {
+            matchedField = partialMatch.id;
+            usedFields.add(partialMatch.id);
+          }
+        }
+      }
+
+      return { csvColumn: col, templateField: matchedField };
+    });
+  };
+
   // Parse CSV file - only called when advancing from page 1 to page 2
   const parseCSVFile = () => {
     if (!selectedFile) return;
@@ -369,130 +504,7 @@ export function ImportCasesWizard({
             );
           }
 
-          // Initialize field mappings with automatic matching
-          const usedFields = new Set<string>();
-          const mappings = columnHeaders.map((col: string) => {
-            // Try to auto-map columns based on name matching
-            let matchedField: string | null = null;
-
-            if (hasHeaders) {
-              const normalizedColName = col.toLowerCase().trim();
-
-              // Skip template column - template is already selected on page 1
-              if (
-                normalizedColName === "template" ||
-                normalizedColName === "templatename" ||
-                normalizedColName === "template name"
-              ) {
-                return {
-                  csvColumn: col,
-                  templateField: null,
-                };
-              }
-
-              // Try to find exact match first
-              const exactMatch = templateFields.find(
-                (field) =>
-                  !usedFields.has(field.id) &&
-                  (field.displayName.toLowerCase() === normalizedColName ||
-                    field.id.toLowerCase() === normalizedColName)
-              );
-
-              if (exactMatch) {
-                matchedField = exactMatch.id;
-                usedFields.add(exactMatch.id);
-              } else {
-                // Try common variations
-                const commonMappings: Record<string, string> = {
-                  "case name": "name",
-                  "test case name": "name",
-                  title: "name",
-                  tag: "tags",
-                  step: "steps",
-                  "test steps": "steps",
-                  estimated: "estimate",
-                  estimation: "estimate",
-                  "is automated": "automated",
-                  automation: "automated",
-                  "folder path": "folder",
-                  path: "folder",
-                  attachment: "attachments",
-                  issue: "issues",
-                  "linked case": "linkedCases",
-                  "linked test case": "linkedCases",
-                  "workflow state": "workflowState",
-                  state: "workflowState",
-                  status: "workflowState",
-                  "created at": "createdAt",
-                  "created date": "createdAt",
-                  "creation date": "createdAt",
-                  "date created": "createdAt",
-                  "created by": "createdBy",
-                  creator: "createdBy",
-                  author: "createdBy",
-                  "created user": "createdBy",
-                  version: "version",
-                  "version number": "version",
-                  "case version": "version",
-                  revision: "version",
-                  "test runs": "testRuns",
-                  "test run": "testRuns",
-                  runs: "testRuns",
-                  executions: "testRuns",
-                  id: "id",
-                  "test case id": "id",
-                  "case id": "id",
-                  identifier: "id",
-                };
-
-                // Check if column name matches any common mapping
-                for (const [commonName, fieldId] of Object.entries(
-                  commonMappings
-                )) {
-                  if (
-                    normalizedColName === commonName ||
-                    normalizedColName.includes(commonName)
-                  ) {
-                    const field = templateFields.find(
-                      (f) => f.id === fieldId && !usedFields.has(f.id)
-                    );
-                    if (field) {
-                      matchedField = fieldId;
-                      usedFields.add(fieldId);
-                      break;
-                    }
-                  }
-                }
-
-                // If still no match, try partial matching
-                if (!matchedField) {
-                  const partialMatch = templateFields.find(
-                    (field) =>
-                      !usedFields.has(field.id) &&
-                      (normalizedColName.includes(
-                        field.displayName.toLowerCase()
-                      ) ||
-                        normalizedColName.includes(field.id.toLowerCase()) ||
-                        field.displayName
-                          .toLowerCase()
-                          .includes(normalizedColName) ||
-                        field.id.toLowerCase().includes(normalizedColName))
-                  );
-
-                  if (partialMatch) {
-                    matchedField = partialMatch.id;
-                    usedFields.add(partialMatch.id);
-                  }
-                }
-              }
-            }
-
-            return {
-              csvColumn: col,
-              templateField: matchedField,
-            };
-          });
-          setFieldMappings(mappings);
+          setFieldMappings(createFieldMappings(columnHeaders));
         },
         error: (error: any) => {
           toast.error(tGlobal("sharedSteps.importWizard.errors.parseFailed"), {
@@ -502,6 +514,112 @@ export function ImportCasesWizard({
       });
     };
     reader.readAsText(selectedFile, encoding);
+  };
+
+  // Parse Markdown file - called when advancing from page 1 to page 2 with markdown file type
+  const parseMarkdownFile = async () => {
+    if (!selectedFile) return;
+
+    setIsParsingMarkdown(true);
+    try {
+      const text = await selectedFile.text();
+
+      // Try LLM-assisted parsing first if available
+      if (hasLlmIntegration) {
+        try {
+          const response = await fetch("/api/llm/parse-markdown-test-cases", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ projectId, markdown: text }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.testCases?.length > 0) {
+              // Convert LLM-parsed cases to import format
+              const llmCases: ParsedMarkdownCase[] = data.testCases.map(
+                (tc: any) => ({
+                  name: tc.name || "",
+                  description: tc.description,
+                  steps: (tc.steps || []).map((s: any) => ({
+                    action: s.action,
+                    expectedResult: s.expectedResult,
+                  })),
+                  preconditions: tc.preconditions,
+                  tags: tc.tags,
+                  ...Object.fromEntries(
+                    Object.entries(tc).filter(
+                      ([key]) =>
+                        ![
+                          "name",
+                          "description",
+                          "steps",
+                          "preconditions",
+                          "tags",
+                        ].includes(key)
+                    )
+                  ),
+                })
+              );
+              const { rows, columns } = convertMarkdownCasesToImportData({
+                cases: llmCases,
+                format: "heading",
+                detectedColumns: detectColumnsFromLlmCases(llmCases),
+              });
+              setParsedData(rows as ParsedCase[]);
+              setFieldMappings(createFieldMappings(columns));
+              return;
+            }
+          }
+          // If LLM parsing failed, fall through to deterministic parser
+          toast.info(t("importWizard.errors.markdownLlmFailed"));
+        } catch {
+          // LLM call failed, fall through to deterministic parser
+          toast.info(t("importWizard.errors.markdownLlmFailed"));
+        }
+      }
+
+      // Deterministic fallback parser
+      const result = parseMarkdownTestCases(text);
+      const { rows, columns } = convertMarkdownCasesToImportData(result);
+      setParsedData(rows as ParsedCase[]);
+      setFieldMappings(createFieldMappings(columns));
+    } catch (error: any) {
+      toast.error(t("importWizard.errors.markdownParseFailed"), {
+        description: error.message,
+      });
+    } finally {
+      setIsParsingMarkdown(false);
+    }
+  };
+
+  // Helper to detect columns from LLM-parsed cases
+  const detectColumnsFromLlmCases = (
+    cases: ParsedMarkdownCase[]
+  ): string[] => {
+    const columns = new Set<string>();
+    columns.add("name");
+    for (const c of cases) {
+      if (c.description) columns.add("description");
+      if (c.steps?.length > 0) columns.add("steps");
+      if (c.preconditions) columns.add("preconditions");
+      if (c.tags && c.tags.length > 0) columns.add("tags");
+      for (const key of Object.keys(c)) {
+        if (
+          ![
+            "name",
+            "description",
+            "steps",
+            "preconditions",
+            "tags",
+            "folder",
+          ].includes(key)
+        ) {
+          columns.add(key);
+        }
+      }
+    }
+    return Array.from(columns);
   };
 
   const handleFileSelect = (files: File[]) => {
@@ -602,17 +720,19 @@ export function ImportCasesWizard({
         },
         body: JSON.stringify({
           projectId,
-          file: await selectedFile?.text(),
-          delimiter,
-          hasHeaders,
-          encoding,
+          file: fileType === "csv" ? await selectedFile?.text() : undefined,
+          fileType,
+          delimiter: fileType === "csv" ? delimiter : undefined,
+          hasHeaders: fileType === "csv" ? hasHeaders : true,
+          encoding: fileType === "csv" ? encoding : "UTF-8",
           templateId: parseInt(selectedTemplateId),
           importLocation,
           folderId: selectedFolderId ? parseInt(selectedFolderId) : null,
           fieldMappings: getMappedFields(),
           folderSplitMode:
             importLocation !== "single_folder" ? folderSplitMode : null,
-          rowMode,
+          rowMode: fileType === "csv" ? rowMode : "single",
+          parsedData: fileType === "markdown" ? parsedData : undefined,
         }),
       });
 
@@ -718,6 +838,34 @@ export function ImportCasesWizard({
   const renderPage1 = () => (
     <div className="space-y-6">
       <div>
+        <Label>{t("importWizard.page1.fileType.label")}</Label>
+        <RadioGroup
+          value={fileType}
+          onValueChange={(v) => {
+            setFileType(v as FileType);
+            setSelectedFile(null);
+          }}
+          className="mt-2 flex gap-4"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="csv" id="filetype_csv" />
+            <Label htmlFor="filetype_csv" className="font-normal cursor-pointer">
+              {t("importWizard.page1.fileType.csv")}
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="markdown" id="filetype_markdown" />
+            <Label
+              htmlFor="filetype_markdown"
+              className="font-normal cursor-pointer"
+            >
+              {t("importWizard.page1.fileType.markdown")}
+            </Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      <div>
         <RequiredLabel required error={validationErrors.selectedFile}>
           {tGlobal("sharedSteps.importWizard.page1.uploadFile")}
         </RequiredLabel>
@@ -733,12 +881,32 @@ export function ImportCasesWizard({
               onFileSelect={handleFileSelect}
               compact
               previews={false}
-              accept=".csv"
-              allowedTypes={[".csv", "text/csv"]}
+              accept={
+                fileType === "csv" ? ".csv" : ".md,.markdown,.txt"
+              }
+              allowedTypes={
+                fileType === "csv"
+                  ? [".csv", "text/csv"]
+                  : [".md", ".markdown", ".txt", "text/markdown", "text/plain"]
+              }
               multiple={false}
               initialFiles={initialFile ? [initialFile] : undefined}
             />
           </div>
+          {selectedFile && (
+            <p
+              className="mt-2 text-sm text-muted-foreground"
+              data-testid="selected-file-info"
+            >
+              {tGlobal("sharedSteps.importWizard.page1.selectedFile")}:{" "}
+              {selectedFile.name}
+            </p>
+          )}
+          {fileType === "markdown" && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t("importWizard.page1.markdownDescription")}
+            </p>
+          )}
         </div>
       </div>
 
@@ -808,63 +976,67 @@ export function ImportCasesWizard({
         </div>
       )}
 
-      <div>
-        <Label>{tGlobal("sharedSteps.importWizard.page1.delimiter")}</Label>
-        <Select
-          value={delimiter}
-          onValueChange={(v) => setDelimiter(v as Delimiter)}
-        >
-          <SelectTrigger className="mt-2">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value=",">
-              {tGlobal("repository.exportModal.delimiter.comma")}
-            </SelectItem>
-            <SelectItem value=";">
-              {tGlobal("repository.exportModal.delimiter.semicolon")}
-            </SelectItem>
-            <SelectItem value=":">
-              {tGlobal("repository.exportModal.delimiter.colon")}
-            </SelectItem>
-            <SelectItem value="|">
-              {tGlobal("repository.exportModal.delimiter.pipe")}
-            </SelectItem>
-            <SelectItem value="\t">
-              {t("importWizard.page1.delimiters.tab")}
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {fileType === "csv" && (
+        <>
+          <div>
+            <Label>{tGlobal("sharedSteps.importWizard.page1.delimiter")}</Label>
+            <Select
+              value={delimiter}
+              onValueChange={(v) => setDelimiter(v as Delimiter)}
+            >
+              <SelectTrigger className="mt-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value=",">
+                  {tGlobal("repository.exportModal.delimiter.comma")}
+                </SelectItem>
+                <SelectItem value=";">
+                  {tGlobal("repository.exportModal.delimiter.semicolon")}
+                </SelectItem>
+                <SelectItem value=":">
+                  {tGlobal("repository.exportModal.delimiter.colon")}
+                </SelectItem>
+                <SelectItem value="|">
+                  {tGlobal("repository.exportModal.delimiter.pipe")}
+                </SelectItem>
+                <SelectItem value="\t">
+                  {t("importWizard.page1.delimiters.tab")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="hasHeaders"
-          checked={hasHeaders}
-          onCheckedChange={(c) => setHasHeaders(!!c)}
-        />
-        <Label htmlFor="hasHeaders" className="font-normal cursor-pointer">
-          {t("importWizard.page1.hasHeaders")}
-        </Label>
-      </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="hasHeaders"
+              checked={hasHeaders}
+              onCheckedChange={(c) => setHasHeaders(!!c)}
+            />
+            <Label htmlFor="hasHeaders" className="font-normal cursor-pointer">
+              {t("importWizard.page1.hasHeaders")}
+            </Label>
+          </div>
 
-      <div>
-        <Label>{tGlobal("sharedSteps.importWizard.page1.encoding")}</Label>
-        <Select
-          value={encoding}
-          onValueChange={(v) => setEncoding(v as Encoding)}
-        >
-          <SelectTrigger className="mt-2">
-            <SelectValue placeholder="Select encoding..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="UTF-8">{"UTF-8"}</SelectItem>
-            <SelectItem value="ISO-8859-1">{"ISO-8859-1"}</SelectItem>
-            <SelectItem value="ISO-8859-15">{"ISO-8859-15"}</SelectItem>
-            <SelectItem value="Windows-1252">{"Windows-1252"}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+          <div>
+            <Label>{tGlobal("sharedSteps.importWizard.page1.encoding")}</Label>
+            <Select
+              value={encoding}
+              onValueChange={(v) => setEncoding(v as Encoding)}
+            >
+              <SelectTrigger className="mt-2">
+                <SelectValue placeholder="Select encoding..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="UTF-8">{"UTF-8"}</SelectItem>
+                <SelectItem value="ISO-8859-1">{"ISO-8859-1"}</SelectItem>
+                <SelectItem value="ISO-8859-15">{"ISO-8859-15"}</SelectItem>
+                <SelectItem value="Windows-1252">{"Windows-1252"}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </>
+      )}
 
       <div>
         <RequiredLabel required error={validationErrors.selectedTemplateId}>
@@ -904,27 +1076,37 @@ export function ImportCasesWizard({
         </Select>
       </div>
 
-      <div>
-        <Label>{tGlobal("sharedSteps.importWizard.page1.rowMode.label")}</Label>
-        <RadioGroup
-          value={rowMode}
-          onValueChange={(v) => setRowMode(v as RowMode)}
-          className="mt-2"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="single" id="row_single" />
-            <Label htmlFor="row_single" className="font-normal cursor-pointer">
-              {t("importWizard.page1.rowMode.single")}
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="multi" id="row_multi" />
-            <Label htmlFor="row_multi" className="font-normal cursor-pointer">
-              {t("importWizard.page1.rowMode.multi")}
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
+      {fileType === "csv" && (
+        <div>
+          <Label>
+            {tGlobal("sharedSteps.importWizard.page1.rowMode.label")}
+          </Label>
+          <RadioGroup
+            value={rowMode}
+            onValueChange={(v) => setRowMode(v as RowMode)}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="single" id="row_single" />
+              <Label
+                htmlFor="row_single"
+                className="font-normal cursor-pointer"
+              >
+                {t("importWizard.page1.rowMode.single")}
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="multi" id="row_multi" />
+              <Label
+                htmlFor="row_multi"
+                className="font-normal cursor-pointer"
+              >
+                {t("importWizard.page1.rowMode.multi")}
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+      )}
     </div>
   );
 
@@ -1315,11 +1497,16 @@ export function ImportCasesWizard({
     return true;
   };
 
-  const handleNextPage = () => {
+  const handleNextPage = async () => {
     if (currentPage === 1) {
       if (validatePage1()) {
-        parseCSVFile();
-        setCurrentPage(currentPage + 1);
+        if (fileType === "csv") {
+          parseCSVFile();
+          setCurrentPage(currentPage + 1);
+        } else {
+          await parseMarkdownFile();
+          setCurrentPage(currentPage + 1);
+        }
       }
     } else if (currentPage === 2) {
       if (canProceedToPage3()) {
@@ -1383,6 +1570,11 @@ export function ImportCasesWizard({
         </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto px-0.5">
+          {isParsingMarkdown && (
+            <LoadingSpinnerAlert
+              message={t("importWizard.page1.parsingMarkdown")}
+            />
+          )}
           {isImporting && (
             <LoadingSpinnerAlert
               message={tGlobal("repository.generateTestCases.importing", {
@@ -1409,7 +1601,11 @@ export function ImportCasesWizard({
           )}
 
           {currentPage < 4 ? (
-            <Button onClick={handleNextPage} data-testid="next-button">
+            <Button
+              onClick={handleNextPage}
+              disabled={isParsingMarkdown}
+              data-testid="next-button"
+            >
               {tCommon("actions.next")}
               <ChevronRight className="h-4 w-4" />
             </Button>

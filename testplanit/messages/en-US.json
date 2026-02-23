@@ -1663,9 +1663,19 @@
         },
         "errors": {
           "templateRequired": "Template selection is required",
-          "folderRequired": "Folder selection is required for this import location"
+          "folderRequired": "Folder selection is required for this import location",
+          "markdownFileRequired": "A Markdown file is required",
+          "markdownParseFailed": "Failed to parse Markdown file",
+          "markdownLlmFailed": "AI parsing unavailable, using standard parser"
         },
         "page1": {
+          "fileType": {
+            "label": "File Type",
+            "csv": "CSV",
+            "markdown": "Markdown"
+          },
+          "markdownDescription": "Upload a Markdown file (.md) containing test cases. Each heading becomes a test case, with steps, expected results, and tags extracted automatically.",
+          "parsingMarkdown": "Parsing markdown file...",
           "importLocation": {
             "label": "Import Location",
             "singleFolder": "Add all cases to a single folder",

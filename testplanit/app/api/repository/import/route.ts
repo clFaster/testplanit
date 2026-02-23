@@ -128,7 +128,8 @@ interface FieldMapping {
 
 interface ImportRequest {
   projectId: number;
-  file: string;
+  file?: string;
+  fileType?: "csv" | "markdown";
   delimiter: string;
   hasHeaders: boolean;
   encoding: string;
@@ -138,6 +139,7 @@ interface ImportRequest {
   fieldMappings: FieldMapping[];
   folderSplitMode?: "plain" | "slash" | "dot" | "greater_than";
   rowMode: "single" | "multi";
+  parsedData?: any[];
 }
 
 interface ImportError {
@@ -260,19 +262,31 @@ export async function POST(request: NextRequest) {
           return;
         }
 
-        // Parse CSV
-        const parseResult = Papa.parse(body.file, {
-          delimiter: body.delimiter,
-          header: body.hasHeaders,
-          skipEmptyLines: true,
-        });
+        // Parse input data
+        let rows: any[];
 
-        if (parseResult.errors.length > 0) {
-          sendError("CSV parsing failed");
-          return;
+        if (body.fileType === "markdown" && body.parsedData) {
+          // For markdown, the frontend has already parsed the file
+          rows = body.parsedData;
+        } else {
+          // CSV parsing
+          if (!body.file) {
+            sendError("No file content provided");
+            return;
+          }
+          const parseResult = Papa.parse(body.file, {
+            delimiter: body.delimiter,
+            header: body.hasHeaders,
+            skipEmptyLines: true,
+          });
+
+          if (parseResult.errors.length > 0) {
+            sendError("CSV parsing failed");
+            return;
+          }
+
+          rows = parseResult.data as any[];
         }
-
-        const rows = parseResult.data as any[];
         const errors: ImportError[] = [];
         const casesToImport: any[] = [];
 
@@ -852,7 +866,7 @@ export async function POST(request: NextRequest) {
         // Audit the bulk import
         if (importedCount > 0) {
           auditBulkCreate("RepositoryCases", importedCount, body.projectId, {
-            source: "CSV Import",
+            source: body.fileType === "markdown" ? "Markdown Import" : "CSV Import",
             templateId: body.templateId,
             importLocation: body.importLocation,
           }).catch((error) =>

@@ -1663,9 +1663,19 @@
         },
         "errors": {
           "templateRequired": "La sélection du modèle est requise.",
-          "folderRequired": "La sélection du dossier est requise pour cet emplacement d'importation"
+          "folderRequired": "La sélection du dossier est requise pour cet emplacement d'importation",
+          "markdownFileRequired": "Un fichier Markdown est requis.",
+          "markdownParseFailed": "Impossible d'analyser le fichier Markdown",
+          "markdownLlmFailed": "Analyse par IA indisponible, utilisation de l'analyseur standard"
         },
         "page1": {
+          "fileType": {
+            "label": "Type de fichier",
+            "csv": "CSV",
+            "markdown": "Réduction"
+          },
+          "markdownDescription": "Importez un fichier Markdown (.md) contenant les cas de test. Chaque titre devient un cas de test, avec les étapes, les résultats attendus et les balises extraits automatiquement.",
+          "parsingMarkdown": "Analyse du fichier Markdown...",
           "importLocation": {
             "label": "Emplacement d'importation",
             "singleFolder": "Ajouter tous les dossiers à un seul dossier",

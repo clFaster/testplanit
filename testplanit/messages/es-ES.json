@@ -1663,9 +1663,19 @@
         },
         "errors": {
           "templateRequired": "La selección de plantillas es necesaria",
-          "folderRequired": "La selección de carpeta es necesaria para esta ubicación de importación"
+          "folderRequired": "La selección de carpeta es necesaria para esta ubicación de importación",
+          "markdownFileRequired": "Se requiere un archivo Markdown",
+          "markdownParseFailed": "No se pudo analizar el archivo Markdown",
+          "markdownLlmFailed": "Análisis de IA no disponible, se utiliza el analizador estándar"
         },
         "page1": {
+          "fileType": {
+            "label": "Tipo de archivo",
+            "csv": "CSV",
+            "markdown": "Reducción"
+          },
+          "markdownDescription": "Sube un archivo Markdown (.md) que contenga casos de prueba. Cada encabezado se convierte en un caso de prueba, con pasos, resultados esperados y etiquetas extraídas automáticamente.",
+          "parsingMarkdown": "Analizando archivo Markdown...",
           "importLocation": {
             "label": "Importar Ubicación",
             "singleFolder": "Añadir todos los casos a una sola carpeta",
