@@ -1187,6 +1187,22 @@ var TestPlanItService = class {
     }
   }
   /**
+   * afterTest - Runs in each worker process after each test.
+   *
+   * Captures a screenshot on test failure when `captureScreenshots` is enabled.
+   * The screenshot is intercepted and uploaded by the reporter automatically.
+   */
+  async afterTest(_test, _context, result) {
+    if (!this.options.captureScreenshots || result.passed) {
+      return;
+    }
+    try {
+      await globalThis.browser?.takeScreenshot();
+    } catch (error) {
+      this.log("Failed to capture screenshot:", error);
+    }
+  }
+  /**
    * onComplete - Runs once in the main process after all workers finish.
    *
    * Completes the test run and cleans up the shared state file.

@@ -266,6 +266,14 @@ interface TestPlanItServiceOptions {
      */
     completeRunOnFinish?: boolean;
     /**
+     * Automatically capture a screenshot when a test fails.
+     * The screenshot is taken via the WDIO `afterTest` hook and is
+     * automatically uploaded by the reporter when `uploadScreenshots`
+     * is enabled (the default).
+     * @default false
+     */
+    captureScreenshots?: boolean;
+    /**
      * Request timeout in milliseconds
      * @default 30000
      */
@@ -616,6 +624,16 @@ declare class TestPlanItService {
      * so all worker reporters can find and use the pre-created run.
      */
     onPrepare(): Promise<void>;
+    /**
+     * afterTest - Runs in each worker process after each test.
+     *
+     * Captures a screenshot on test failure when `captureScreenshots` is enabled.
+     * The screenshot is intercepted and uploaded by the reporter automatically.
+     */
+    afterTest(_test: Record<string, unknown>, _context: Record<string, unknown>, result: {
+        error?: Error;
+        passed: boolean;
+    }): Promise<void>;
     /**
      * onComplete - Runs once in the main process after all workers finish.
      *
