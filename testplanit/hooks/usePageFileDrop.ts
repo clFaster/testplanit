@@ -51,13 +51,19 @@ export function usePageFileDrop({
   const [isDragActive, setIsDragActive] = useState(false);
   const dragCounterRef = useRef(0);
   const onDropRef = useRef(onDrop);
-  onDropRef.current = onDrop;
+  useEffect(() => {
+    onDropRef.current = onDrop;
+  }, [onDrop]);
 
   const acceptedRef = useRef(acceptedExtensions);
-  acceptedRef.current = acceptedExtensions;
+  useEffect(() => {
+    acceptedRef.current = acceptedExtensions;
+  }, [acceptedExtensions]);
 
   const unsupportedMsgRef = useRef(unsupportedMessage);
-  unsupportedMsgRef.current = unsupportedMessage;
+  useEffect(() => {
+    unsupportedMsgRef.current = unsupportedMessage;
+  }, [unsupportedMessage]);
 
   const handleDragEnter = useCallback(
     (e: DragEvent) => {
