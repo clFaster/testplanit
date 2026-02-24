@@ -2262,7 +2262,11 @@
       "elasticsearch": "Moteur de recherche",
       "queues": "Files d'attente pour les tâches",
       "auditLogs": "Journaux d'audit",
-      "apiTokens": "Jetons API"
+      "apiTokens": "Jetons API",
+      "testManagement": "Gestion des tests",
+      "peopleAndAccess": "Personnes et accès",
+      "toolsAndIntegrations": "Outils et intégrations",
+      "system": "Système"
     },
     "imports": {
       "description": "Importez les données provenant d'outils de gestion de tests externes dans Testplanit.",

@@ -2262,7 +2262,11 @@
       "elasticsearch": "Search Engine",
       "queues": "Job Queues",
       "auditLogs": "Audit Logs",
-      "apiTokens": "API Tokens"
+      "apiTokens": "API Tokens",
+      "testManagement": "Test Management",
+      "peopleAndAccess": "People & Access",
+      "toolsAndIntegrations": "Tools & Integrations",
+      "system": "System"
     },
     "imports": {
       "description": "Bring data from external test management tools into Testplanit.",

@@ -2262,7 +2262,11 @@
       "elasticsearch": "Motor de búsqueda",
       "queues": "Colas de trabajos",
       "auditLogs": "Registros de auditoría",
-      "apiTokens": "Tokens API"
+      "apiTokens": "Tokens API",
+      "testManagement": "Gestión de pruebas",
+      "peopleAndAccess": "Personas y acceso",
+      "toolsAndIntegrations": "Herramientas e integraciones",
+      "system": "Sistema"
     },
     "imports": {
       "description": "Traiga datos de herramientas de gestión de pruebas externas a Testplanit.",
