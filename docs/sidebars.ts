@@ -101,6 +101,7 @@ const sidebars: SidebarsConfig = {
                 'user-guide/llm-markdown-import', // AI-assisted markdown import
               ],
             },
+            'user-guide/prompt-configurations', // AI prompt configuration management
             'user-guide/sso', // Authentication configuration and management
             'user-guide/audit-logs', // Audit logs for compliance and security
             // Add other admin pages here as they are created
