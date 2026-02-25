@@ -3539,7 +3539,13 @@
         "apiKeyWarningDescription": "Cuando se utiliza autenticación de clave API, los reporteros de problemas se determinan automáticamente:",
         "apiKeyWarningPoint1": "Si tu correo electrónico de TestPlanIt coincide con un correo de usuario de Jira, serás establecido como el reportador",
         "apiKeyWarningPoint2": "Si no hay coincidencias de correo electrónico, el nombre de tu TestPlanIt se igualará con los nombres mostrados en Jira",
-        "apiKeyWarningPoint3": "Si no se encuentra coincidencia, el propietario de la clave API se establecerá como reportero"
+        "apiKeyWarningPoint3": "Si no se encuentra coincidencia, el propietario de la clave API se establecerá como reportero",
+        "forgeApiKeyLabel": "Clave API de Forge",
+        "forgeApiKeyDescription": "La aplicación Atlassian Forge lo utiliza para autenticar solicitudes de los paneles de incidencias de Jira. Genere una clave aquí y péguela en la configuración de Forge.",
+        "forgeApiKeyPlaceholder": "Haga clic en Generar para crear una clave API",
+        "forgeApiKeyGenerate": "Generar",
+        "forgeApiKeyCopy": "Copiar",
+        "forgeApiKeyCopied": "Copiado"
       },
       "authType": {
         "api_key": "Clave API",
@@ -4281,7 +4287,8 @@
       "personalAccessToken": "## Token de Acceso personal\nUn token de acceso personal con los permisos apropiados para el servicio externo.\n\n- Generado en la configuración de tu cuenta\n- Debería tener permisos para leer y escribir asuntos\n- Más seguro que la autenticación de contraseña",
       "baseUrl": "## Patrón de URL\npatrón de URL para enlazar a problemas externos.\n\n- Usar '{issueId}' como marcador de posición para el identificador de problema\n- Ejemplo: https://example. om/issues/'{issueId}'\n- Utilizado para integraciones simples basadas en URL",
       "organizationUrl": "## URL de la organización\nLa URL de tu organización Azure DevOps.\n\n- Formato: https://dev.azure. om/tu-org\n- Debe ser accesible desde este servidor\n- Utilizado para acceder a las APIs de Azure DevOps",
-      "apiKey": "## Clave de API\nLa clave de API para la autenticación con el servicio externo.\n\n- Generado en la configuración de la API del servicio\n- Proporciona acceso programático al servicio\n- Mantén seguro y rota regularmente"
+      "apiKey": "## Clave de API\nLa clave de API para la autenticación con el servicio externo.\n\n- Generado en la configuración de la API del servicio\n- Proporciona acceso programático al servicio\n- Mantén seguro y rota regularmente",
+      "forgeApiKey": "## Clave API de Forge\nSe utiliza para autenticar la aplicación Atlassian Forge cuando obtiene datos de prueba de sus problemas de Jira.\n\n- Haga clic en Generar para crear una nueva clave\n- Copie la clave y péguela en la configuración de la aplicación Forge en Jira (Administrar aplicaciones → Configuración de TestPlanIt)\n- La regeneración invalidará la clave anterior"
     },
     "config": {
       "name": "## Nombre de configuración\nUn nombre claro y descriptivo que se utiliza en todos los proyectos.\n\n- Ayuda a describir las cominaciones variantes que componen la Configuración (por ejemplo, \"Chrome, Windows 10\", \"Safari/macOS 15.5\", \"Edge/Windows 11\", etc.)."

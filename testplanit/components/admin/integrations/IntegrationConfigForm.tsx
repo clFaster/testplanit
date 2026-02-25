@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { IntegrationProvider, IntegrationAuthType } from "@prisma/client";
 import {
@@ -11,10 +12,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { HelpPopover } from "@/components/ui/help-popover";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Lock, AlertTriangle } from "lucide-react";
+import { Lock, AlertTriangle, RefreshCw, Copy, Check } from "lucide-react";
 
 interface IntegrationConfigFormProps {
   provider: IntegrationProvider;
@@ -149,6 +151,13 @@ const providerFields: Record<IntegrationProvider, FieldConfig[]> = {
   ],
 };
 
+function generateApiKey(): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const array = new Uint8Array(48);
+  crypto.getRandomValues(array);
+  return "tpi_forge_" + Array.from(array, (b) => chars[b % chars.length]).join("");
+}
+
 export function IntegrationConfigForm({
   provider,
   authType,
@@ -160,6 +169,7 @@ export function IntegrationConfigForm({
 }: IntegrationConfigFormProps) {
   const t = useTranslations("admin.integrations");
   const tCommon = useTranslations();
+  const [copied, setCopied] = useState(false);
 
   // Get fields based on provider and authType combination, or fall back to provider-only fields
   const authKey = authType ? `${provider}_${authType}` : '';
@@ -265,6 +275,62 @@ export function IntegrationConfigForm({
           </FormItem>
         );
       })}
+
+      {provider === IntegrationProvider.JIRA && (
+        <div className="border-t pt-4 mt-4">
+          <FormItem>
+            <FormLabel className="flex items-center">
+              {t("config.forgeApiKeyLabel")}
+              <HelpPopover helpKey="integration.forgeApiKey" />
+            </FormLabel>
+            <FormDescription className="mb-2">
+              {t("config.forgeApiKeyDescription")}
+            </FormDescription>
+            <FormControl>
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  readOnly
+                  value={settings.forgeApiKey || ""}
+                  placeholder={t("config.forgeApiKeyPlaceholder")}
+                  className="font-mono text-xs"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const key = generateApiKey();
+                    onSettingsChange({ ...settings, forgeApiKey: key });
+                  }}
+                >
+                  <RefreshCw className="h-3.5 w-3.5 mr-1" />
+                  {t("config.forgeApiKeyGenerate")}
+                </Button>
+                {settings.forgeApiKey && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(settings.forgeApiKey);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                  >
+                    {copied ? (
+                      <Check className="h-3.5 w-3.5 mr-1" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5 mr-1" />
+                    )}
+                    {copied ? t("config.forgeApiKeyCopied") : t("config.forgeApiKeyCopy")}
+                  </Button>
+                )}
+              </div>
+            </FormControl>
+          </FormItem>
+        </div>
+      )}
     </div>
   );
 }

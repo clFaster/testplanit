@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma as db } from "@/lib/prisma";
 import { IntegrationProvider } from "@prisma/client";
+import { timingSafeEqual } from "crypto";
+
+function constantTimeCompare(a: string, b: string): boolean {
+  try {
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    if (bufA.length !== bufB.length) return false;
+    return timingSafeEqual(bufA, bufB);
+  } catch {
+    return false;
+  }
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -14,18 +26,41 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Add CORS headers for Atlassian Forge
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Forge-Api-Key",
   };
 
   try {
-    // For now, we'll allow unauthenticated access from Forge
-    // In production, implement proper JWT validation
+    // Validate Forge API key
+    const forgeApiKey = request.headers.get("X-Forge-Api-Key");
 
-    // Test-info request received
+    // Find a Jira integration that has a matching forgeApiKey in settings
+    const jiraIntegrations = await db.integration.findMany({
+      where: {
+        provider: IntegrationProvider.JIRA,
+        isDeleted: false,
+      },
+      select: {
+        id: true,
+        settings: true,
+      },
+    });
+
+    const authenticatedIntegration = jiraIntegrations.find((integration) => {
+      const settings = integration.settings as Record<string, unknown> | null;
+      const storedKey = settings?.forgeApiKey as string | undefined;
+      if (!storedKey || !forgeApiKey) return false;
+      return constantTimeCompare(storedKey, forgeApiKey);
+    });
+
+    if (!authenticatedIntegration) {
+      return NextResponse.json(
+        { error: "Invalid or missing API key. Configure a Forge API key in your Jira integration settings." },
+        { status: 401, headers }
+      );
+    }
 
     // Get the first status (typically "Untested" or similar) for test cases with no results
     const firstStatus = await db.status.findFirst({
@@ -429,27 +464,12 @@ export async function GET(request: NextRequest) {
       },
       });
     } catch (dbError) {
-      console.error('Database query failed:', dbError);
+      console.error("Forge test-info DB error:", dbError instanceof Error ? dbError.message : dbError);
       return NextResponse.json(
-        { error: "Database query failed", details: dbError instanceof Error ? dbError.message : String(dbError) },
+        { error: "Database query failed" },
         { status: 500, headers }
       );
     }
-
-    // Found matching issues
-
-    // console.log('Found matching issues:', allMatchingIssues.map(issue => ({
-    //   id: issue.id,
-    //   name: issue.name,
-    //   externalKey: issue.externalKey,
-    //   externalId: issue.externalId,
-    //   testCasesCount: issue.repositoryCases.length,
-    //   sessionsCount: issue.sessions.length,
-    //   directTestRunsCount: issue.testRuns.length,
-    //   testRunResultsCount: issue.testRunResults?.length || 0,
-    //   testRunStepResultsCount: issue.testRunStepResults?.length || 0,
-    //   sessionResultsCount: issue.sessionResults?.length || 0
-    // })));
 
     // Aggregate data from all matching issues
     const issue =
@@ -476,51 +496,6 @@ export async function GET(request: NextRequest) {
             ),
           }
         : null;
-
-    // Log details for debugging
-    if (issue) {
-      // console.log('Test Cases found:', issue.repositoryCases.map((tc: any) => ({
-      //   id: tc.id,
-      //   name: tc.name,
-      //   projectId: tc.project?.id,
-      //   source: tc.source,
-      //   isDeleted: tc.isDeleted,
-      //   isArchived: tc.isArchived
-      // })));
-      // console.log('Sessions found:', issue.sessions.map((s: any) => ({
-      //   id: s.id,
-      //   name: s.name,
-      //   projectId: s.project?.id,
-      //   isDeleted: s.isDeleted
-      // })));
-      // console.log('Direct Test Runs found:', issue.testRuns.map((tr: any) => ({
-      //   id: tr.id,
-      //   name: tr.name,
-      //   projectId: tr.project?.id,
-      //   isDeleted: tr.isDeleted
-      // })));
-      // console.log('Test Runs from Results found:', issue.testRunResults?.map((result: any) => result.testRun ? ({
-      //   id: result.testRun.id,
-      //   name: result.testRun.name,
-      //   projectId: result.testRun.project?.id,
-      //   isDeleted: result.testRun.isDeleted,
-      //   source: 'testRunResult'
-      // }) : null).filter(Boolean) || []);
-      // console.log('Test Runs from Step Results found:', issue.testRunStepResults?.map((stepResult: any) => stepResult.testRunResult?.testRun ? ({
-      //   id: stepResult.testRunResult.testRun.id,
-      //   name: stepResult.testRunResult.testRun.name,
-      //   projectId: stepResult.testRunResult.testRun.project?.id,
-      //   isDeleted: stepResult.testRunResult.testRun.isDeleted,
-      //   source: 'testRunStepResult'
-      // }) : null).filter(Boolean) || []);
-      // console.log('Sessions from Session Results found:', issue.sessionResults?.map((result: any) => result.session ? ({
-      //   id: result.session.id,
-      //   name: result.session.name,
-      //   projectId: result.session.project?.id,
-      //   isDeleted: result.session.isDeleted,
-      //   source: 'sessionResult'
-      // }) : null).filter(Boolean) || []);
-    }
 
     if (!issue) {
       return NextResponse.json(
@@ -627,7 +602,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // console.log('All unique test runs found:', Array.from(allTestRuns.keys()));
+
 
     // Collect all unique sessions from different sources
     const allSessions = new Map();
@@ -644,7 +619,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // console.log('All unique sessions found:', Array.from(allSessions.keys()));
+
 
     const formattedSessions = Array.from(allSessions.values()).map(
       (session: any) => {
@@ -777,13 +752,13 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new Response(null, {
     status: 200,
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Forge-Api-Key",
     },
   });
 }

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { invoke } from '@forge/bridge';
-import * as LucideIcons from 'lucide-react';
+import { TestTube, Save, AlertCircle, CheckCircle, XCircle, Info, Circle } from 'lucide-react';
 import './app.css';
 
+const iconMap = { TestTube, Save, AlertCircle, CheckCircle, XCircle, Info, Circle };
+
 const DynamicIcon = ({ name, className = "h-4 w-4", style }) => {
-  const IconComponent = LucideIcons[name] || LucideIcons.Circle;
+  const IconComponent = iconMap[name] || Circle;
   return <IconComponent className={className} style={style} />;
 };
 
@@ -13,6 +15,7 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [instanceUrl, setInstanceUrl] = useState('');
+  const [apiKey, setApiKey] = useState('');
   const [testStatus, setTestStatus] = useState(null);
   const [testing, setTesting] = useState(false);
   const [error, setError] = useState(null);
@@ -27,6 +30,9 @@ const Settings = () => {
       const response = await invoke('getSettings');
       if (response.instanceUrl) {
         setInstanceUrl(response.instanceUrl);
+      }
+      if (response.apiKey) {
+        setApiKey(response.apiKey);
       }
     } catch (err) {
       console.error('Error loading settings:', err);
@@ -86,7 +92,8 @@ const Settings = () => {
 
     try {
       const response = await invoke('saveSettings', {
-        instanceUrl: instanceUrl.replace(/\/$/, '') // Remove trailing slash
+        instanceUrl: instanceUrl.replace(/\/$/, ''),
+        apiKey: apiKey.trim()
       });
 
       if (response.success) {
@@ -141,7 +148,26 @@ const Settings = () => {
               className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground"
             />
             <p className="text-xs text-muted-foreground mt-2">
-              Enter the full URL of your TestPlanIt instance (e.g., https://demo.testplanit.com or https://testplanit.yourcompany.com)
+              Enter the full URL of your TestPlanIt instance (e.g., https://demo.testplanit.com)
+            </p>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-foreground mb-2">
+              API Key
+            </label>
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => {
+                setApiKey(e.target.value);
+                setError(null);
+              }}
+              placeholder="Enter your Forge integration API key"
+              className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground"
+            />
+            <p className="text-xs text-muted-foreground mt-2">
+              Generate an API key from your TestPlanIt instance under Admin &gt; Integrations &gt; Jira &gt; Forge API Key.
             </p>
           </div>
 
@@ -244,6 +270,8 @@ const Settings = () => {
               <p className="text-sm font-medium text-blue-800 mb-2">Setup Instructions</p>
               <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
                 <li>Enter your TestPlanIt instance URL above</li>
+                <li>Generate a Forge API key in TestPlanIt (Admin &gt; Integrations &gt; Jira)</li>
+                <li>Paste the API key in the field above</li>
                 <li>Click "Test Connection" to verify the URL is accessible</li>
                 <li>Click "Save Configuration" to apply the settings</li>
                 <li>Navigate to any Jira issue to see linked TestPlanIt data</li>

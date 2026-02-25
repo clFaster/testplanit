@@ -25,7 +25,7 @@
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
     "@babel/preset-react": "^7.28.5",
-    "@forge/cli": "^11.6.0",
+    "@forge/cli": "^12.14.1",
     "autoprefixer": "^10.4.24",
     "babel-loader": "^10.0.0",
     "css-loader": "^7.1.3",

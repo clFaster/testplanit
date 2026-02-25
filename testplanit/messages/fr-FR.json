@@ -3539,7 +3539,13 @@
         "apiKeyWarningDescription": "Lors de l'utilisation de l'authentification par clé API, les personnes qui signalent les problèmes sont identifiées automatiquement :",
         "apiKeyWarningPoint1": "Si votre adresse e-mail TestPlanIt correspond à celle d'un utilisateur Jira, vous serez désigné comme rapporteur.",
         "apiKeyWarningPoint2": "Si aucune adresse e-mail ne correspond, votre nom TestPlanIt sera associé aux noms d'affichage Jira.",
-        "apiKeyWarningPoint3": "Si aucune correspondance n'est trouvée, le propriétaire de la clé API sera désigné comme rapporteur."
+        "apiKeyWarningPoint3": "Si aucune correspondance n'est trouvée, le propriétaire de la clé API sera désigné comme rapporteur.",
+        "forgeApiKeyLabel": "Clé API Forge",
+        "forgeApiKeyDescription": "Utilisée par l'application Atlassian Forge pour authentifier les requêtes provenant des panneaux de tickets Jira. Générez une clé ici et collez-la dans les paramètres de votre application Forge.",
+        "forgeApiKeyPlaceholder": "Cliquez sur Générer pour créer une clé API",
+        "forgeApiKeyGenerate": "Générer",
+        "forgeApiKeyCopy": "Copie",
+        "forgeApiKeyCopied": "Copié"
       },
       "authType": {
         "api_key": "Clé API",
@@ -4281,7 +4287,8 @@
       "personalAccessToken": "## Jeton d'accès personnel\nUn jeton d'accès personnel disposant des autorisations appropriées pour le service externe.\n\n- Généré dans les paramètres de votre compte\n- Doit disposer des autorisations de lecture et d'écriture\n- Plus sécurisé que l'authentification par mot de passe",
       "baseUrl": "## Modèle d'URL\nModèle d'URL pour créer un lien vers des tickets externes.\n\n- Utilisez '{issueId}' comme espace réservé pour l'identifiant du ticket.\n- Exemple : https://example.com/issues/'{issueId}'\n- Utilisé pour les intégrations simples basées sur une URL",
       "organizationUrl": "## URL de l'organisation\nURL de votre organisation Azure DevOps.\n\n- Format : https://dev.azure.com/votre-organisation\n- Doit être accessible depuis ce serveur\n- Utilisé pour accéder aux API Azure DevOps",
-      "apiKey": "## Clé API\nClé API pour l'authentification auprès du service externe.\n\n- Générée dans les paramètres API du service.\n- Permet un accès programmatique au service.\n- À conserver en lieu sûr et à renouveler régulièrement."
+      "apiKey": "## Clé API\nClé API pour l'authentification auprès du service externe.\n\n- Générée dans les paramètres API du service.\n- Permet un accès programmatique au service.\n- À conserver en lieu sûr et à renouveler régulièrement.",
+      "forgeApiKey": "## Clé API Forge\nUtilisée pour authentifier l'application Atlassian Forge lorsqu'elle récupère les données de test de vos tickets Jira.\n\n- Cliquez sur Générer pour créer une nouvelle clé.\n- Copiez la clé et collez-la dans les paramètres de l'application Forge dans Jira (Gérer les applications → Paramètres TestPlanIt).\n- La régénération invalidera la clé précédente."
     },
     "config": {
       "name": "## Nom de la configuration\nUn nom clair et descriptif utilisé dans tous les projets.\n\n- Permet de décrire les combinaisons de variantes qui composent la configuration (par exemple « Chrome, Windows 10 », « Safari/macOS 15.5 », « Edge/Windows 11 », etc.)."

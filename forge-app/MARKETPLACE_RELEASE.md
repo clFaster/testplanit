@@ -1,15 +1,16 @@
 # TestPlanIt Jira App - Marketplace Release Guide
 
-## Changes Made for Multi-Tenant Support
+## Changes Made for Production Readiness
 
-Your Forge app has been updated to support **customer-hosted TestPlanIt instances**. Users can now install the app from the marketplace and configure their own TestPlanIt URL.
+The Forge app supports **customer-hosted TestPlanIt instances** on `*.testplanit.com` subdomains. Users install the app from the marketplace and configure their own TestPlanIt URL and API key.
 
 ### Key Changes:
 
-1. **Configuration Page** - Added admin settings page at `Apps → Manage Apps → TestPlanIt Settings`
-2. **Dynamic URLs** - Removed hardcoded `dev.testplanit.com`, now uses stored instance URL
-3. **Storage API** - Saves instance URL per Jira installation
-4. **Wildcard Permissions** - Updated manifest to allow connections to any TestPlanIt domain
+1. **Configuration Page** - Admin settings page at `Apps → TestPlanIt Settings` for URL + API key
+2. **API Key Authentication** - Forge app sends `X-Forge-Api-Key` header; backend validates with timing-safe comparison
+3. **Dynamic URLs** - Uses Forge Storage API to save instance URL per Jira installation
+4. **Wildcard Permissions** - Manifest allows connections to any `*.testplanit.com` subdomain
+5. **Optimized Bundle** - Settings page uses selective lucide-react imports (~184KB vs ~729KB)
 
 ---
 
@@ -41,12 +42,15 @@ pnpm exec forge install
 ```
 
 **Test checklist:**
+
 - [ ] Configure TestPlanIt instance URL in settings
+- [ ] Configure Forge API key (generated from TestPlanIt Admin > Integrations > Jira)
 - [ ] Test connection button works
 - [ ] Visit a Jira issue and verify panel loads
-- [ ] Link a test case to an issue
+- [ ] Verify test cases, test runs, and sessions display correctly
 - [ ] Verify all links open correct TestPlanIt pages
-- [ ] Test with different instance URLs (demo.testplanit.com, allego.testplanit.com)
+- [ ] Verify 401 response when API key is missing or invalid
+- [ ] Test with different instance URLs (demo.testplanit.com, etc.)
 
 ### 4. Deploy to Production Environment
 
@@ -96,12 +100,14 @@ Perfect for teams using TestPlanIt who want deeper integration with their Jira w
 **Long Description**
 
 Expand on features, use cases, benefits. Include:
+
 - Installation instructions
 - Configuration steps
 - How to link test cases
 - Screenshots with explanations
 
 **Support Information**
+
 - Support Email: support@testplanit.com
 - Documentation URL: https://docs.testplanit.com
 - Privacy Policy URL: https://testplanit.com/privacy
@@ -218,11 +224,11 @@ This is due to Atlassian Forge security requirements that mandate explicit domai
 
 1. **Verify** your TestPlanIt instance uses a `*.testplanit.com` subdomain
 2. **Install the app** from Atlassian Marketplace
-3. Go to **Apps → Manage Apps**
-4. Find **TestPlanIt** in the list
-5. Click **Configure** or access **TestPlanIt Settings**
-6. Enter your TestPlanIt instance URL (e.g., `https://demo.testplanit.com`)
-7. Click **Test Connection** to verify
+3. Go to **Settings (gear icon) → Apps → TestPlanIt Settings**
+4. Enter your TestPlanIt instance URL (e.g., `https://demo.testplanit.com`)
+5. Generate a Forge API key in TestPlanIt (Admin > Integrations > Jira > Forge API Key)
+6. Paste the API key in the settings page
+7. Click **Test Connection** to verify the URL is accessible
 8. Click **Save Configuration**
 
 ### For End Users:
@@ -255,11 +261,10 @@ This is due to Atlassian Forge security requirements that mandate explicit domai
 
 Your app calls these TestPlanIt endpoints:
 
-- `GET /api/health` - Connection testing
-- `GET /api/integrations/jira/test-info` - Fetch linked test data
-- `POST /api/integrations/jira/link-issue` - Link test cases to issues
+- `GET /version.json` - Connection testing (returns app version)
+- `GET /api/integrations/jira/test-info` - Fetch linked test data (requires `X-Forge-Api-Key` header)
 
-Make sure these endpoints are available in all TestPlanIt instances.
+The `test-info` endpoint validates the API key against the `forgeApiKey` stored in the Jira integration's settings. Make sure these endpoints are available in all TestPlanIt instances.
 
 ---
 

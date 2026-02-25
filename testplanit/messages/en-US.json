@@ -3539,7 +3539,13 @@
         "apiKeyWarningDescription": "When using API key authentication, issue reporters are determined automatically:",
         "apiKeyWarningPoint1": "If your TestPlanIt email matches a Jira user email, you'll be set as the reporter",
         "apiKeyWarningPoint2": "If no email match, your TestPlanIt name will be matched to Jira display names",
-        "apiKeyWarningPoint3": "If no match is found, the API key owner will be set as reporter"
+        "apiKeyWarningPoint3": "If no match is found, the API key owner will be set as reporter",
+        "forgeApiKeyLabel": "Forge API Key",
+        "forgeApiKeyDescription": "Used by the Atlassian Forge app to authenticate requests from Jira issue panels. Generate a key here and paste it in your Forge app settings.",
+        "forgeApiKeyPlaceholder": "Click Generate to create an API key",
+        "forgeApiKeyGenerate": "Generate",
+        "forgeApiKeyCopy": "Copy",
+        "forgeApiKeyCopied": "Copied"
       },
       "authType": {
         "api_key": "API Key",
@@ -4281,7 +4287,8 @@
       "personalAccessToken": "## Personal Access Token\nA personal access token with appropriate permissions for the external service.\n\n- Generated in your account settings\n- Should have permissions for reading and writing issues\n- More secure than password authentication",
       "baseUrl": "## URL Pattern\nURL pattern for linking to external issues.\n\n- Use '{issueId}' as a placeholder for the issue identifier\n- Example: https://example.com/issues/'{issueId}'\n- Used for simple URL-based integrations",
       "organizationUrl": "## Organization URL\nYour Azure DevOps organization URL.\n\n- Format: https://dev.azure.com/your-org\n- Must be accessible from this server\n- Used to access Azure DevOps APIs",
-      "apiKey": "## API Key\nThe API key for authentication with the external service.\n\n- Generated in the service's API settings\n- Provides programmatic access to the service\n- Keep secure and rotate regularly"
+      "apiKey": "## API Key\nThe API key for authentication with the external service.\n\n- Generated in the service's API settings\n- Provides programmatic access to the service\n- Keep secure and rotate regularly",
+      "forgeApiKey": "## Forge API Key\nUsed to authenticate the Atlassian Forge app when it fetches test data from your Jira issues.\n\n- Click Generate to create a new key\n- Copy the key and paste it in the Forge app settings in Jira (Manage Apps → TestPlanIt Settings)\n- Regenerating will invalidate the previous key"
     },
     "config": {
       "name": "## Configuration Name\nA clear, descriptive name that is used across all projects.\n\n- Helps describe the variant cominations that make up the Configuration (e.g. \"Chrome, Windows 10\",  \"Safari/macOS 15.5\", \"Edge/Windows 11\", etc.)."
