@@ -163,6 +163,26 @@ export const upgradeNotifications: Record<string, UpgradeNotification> = {
       </ul>
     `,
   },
+  "0.14.0": {
+    title: "New Feature: Configurable AI Prompts",
+    message: `
+      <p>TestPlanIt now gives you <strong>full control over every AI prompt</strong> — view, edit, and customize them per project directly in the admin UI.</p>
+      <h4>Configurable AI Features</h4>
+      <ul>
+        <li><strong>Test Case Generation</strong> — Control the system prompt, user prompt template, temperature, and token limits</li>
+        <li><strong>Markdown Test Case Parsing</strong> — Customize how markdown documents are converted into structured test cases</li>
+        <li><strong>Smart Test Case Selection</strong> — Tune how AI selects relevant test cases for test runs</li>
+        <li><strong>Editor Writing Assistant</strong> — Adjust the in-editor AI for descriptions, steps, and expected results</li>
+      </ul>
+      <h4>Per-Project Customization</h4>
+      <ul>
+        <li>Create prompt configurations tailored to specific teams or domains</li>
+        <li>Assign configurations per project in <strong>Settings → AI Models</strong></li>
+        <li>Three-level resolution: project-specific → system default → built-in fallback</li>
+      </ul>
+      <p>System Administrators get started at <strong>Admin → Prompt Configs</strong> (Tools & Integrations section). See the <a href="https://docs.testplanit.io/user-guide/llm-integrations#prompt-configurations" target="_blank">documentation</a> for details.</p>
+    `,
+  },
 };
 
 /**

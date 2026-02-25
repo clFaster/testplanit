@@ -1,9 +1,9 @@
 ---
 slug: your-ai-prompts-are-not-yours-until-now
-title: "Your AI Prompts Are Not Yours — Until Now"
+title: "v0.14.0: Your AI Prompts Are Not Yours — Until Now"
 description: "Every AI-powered test management tool ships with prompts you can't see, can't modify, and can't adapt to your workflow. TestPlanIt changes that with fully configurable prompt management."
 authors: [bdermanouelian]
-tags: [best-practices, thought-leadership]
+tags: [best-practices, thought-leadership, release]
 ---
 
 <figure>
@@ -13,7 +13,7 @@ tags: [best-practices, thought-leadership]
 
 A few weeks ago, I wrote about [bringing your own LLM](/blog/stop-renting-ai-bring-your-own-llm) — choosing your model, using your API key, keeping your data on your infrastructure. But choosing your model was only half the equation. You still couldn't easily tune the prompts that shaped the output.
 
-Today, TestPlanIt ships with a full prompt configuration system — every AI prompt visible, editable, and customizable per project, directly in the admin UI.
+With **v0.14.0**, TestPlanIt ships with a full prompt configuration system — every AI prompt visible, editable, and customizable per project, directly in the admin UI.
 
 <!-- truncate -->
 
@@ -23,7 +23,7 @@ Every other AI-powered test management tool works the same way: the vendor write
 
 But one prompt does not fit all. A fintech team needs test cases that account for regulatory edge cases. A medical device team needs output aligned with IEC 62304. A mobile team needs accessibility and platform-specific coverage. Generic prompts can't serve any of them well.
 
-## What We Built
+## What's New in v0.14.0
 
 TestPlanIt now exposes **every AI prompt** through a dedicated admin interface — no hidden system instructions, no magic strings buried in server code.
 
