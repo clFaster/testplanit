@@ -9,7 +9,12 @@
         "releaseRules": [
           { "type": "enhance", "release": "patch" },
           { "type": "enhancement", "release": "patch" },
-          { "scope": "docs", "release": false }
+          { "scope": "docs", "release": false },
+          { "scope": "packages", "release": false },
+          { "scope": "cli", "release": false },
+          { "scope": "forge-app", "release": false },
+          { "scope": "dependencies", "release": false },
+          { "scope": "deps", "release": false }
         ]
       }
     ],
