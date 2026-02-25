@@ -1,3 +1,18 @@
+## [0.14.2](https://github.com/TestPlanIt/testplanit/compare/v0.14.1...v0.14.2) (2026-02-25)
+
+### Features
+
+* **docs:** add client redirects for LLM integrations to prompt configurations ([f7d89aa](https://github.com/TestPlanIt/testplanit/commit/f7d89aab2e29f599d455d39bdb057337ccca2d95))
+
+### Bug Fixes
+
+* **integrations:** add Forge API key authentication for Jira test-info endpoint ([9e1cbe3](https://github.com/TestPlanIt/testplanit/commit/9e1cbe35723c61d1e360392b6058e24c8e3c4fc1))
+* **integrations:** add Forge API key authentication for Jira test-info endpoint ([2183a6b](https://github.com/TestPlanIt/testplanit/commit/2183a6b72a9c00c059da41958259e215a2445ef8))
+
+### Enhancements
+
+* **integrations:** add Forge API key authentication for Jira integration ([be246b5](https://github.com/TestPlanIt/testplanit/commit/be246b55698f588ee3f3ab7881ceef9c7629858e))
+
 ## [0.15.0](https://github.com/TestPlanIt/testplanit/compare/v0.14.1...v0.15.0) (2026-02-25)
 
 ### Features
