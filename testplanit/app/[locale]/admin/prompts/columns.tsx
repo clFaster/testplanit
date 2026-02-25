@@ -1,16 +1,35 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { PromptConfig, PromptConfigPrompt } from "@prisma/client";
+import { PromptConfig, PromptConfigPrompt, Projects } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { DateFormatter } from "@/components/DateFormatter";
 import { MessageSquareCode } from "lucide-react";
+import { ProjectListDisplay } from "@/components/tables/ProjectListDisplay";
+import { useCountProjects } from "~/lib/hooks/projects";
 import { EditPromptConfig } from "./EditPromptConfig";
 import { DeletePromptConfig } from "./DeletePromptConfig";
 
 export interface ExtendedPromptConfig extends PromptConfig {
   prompts?: PromptConfigPrompt[];
-  _count?: { projects: number };
+  projects?: Projects[];
+}
+
+/** Wrapper component that fetches the count of projects using the default prompt config (explicitly assigned or null promptConfigId). */
+function DefaultPromptProjectList({ configId }: { configId: string }) {
+  const filter = {
+    OR: [{ promptConfigId: configId }, { promptConfigId: null }],
+  };
+  const { data: count } = useCountProjects({
+    where: { isDeleted: false, ...filter },
+  });
+
+  return (
+    <ProjectListDisplay
+      filter={filter}
+      count={typeof count === "number" ? count : undefined}
+    />
+  );
 }
 
 export const getColumns = (
@@ -56,32 +75,24 @@ export const getColumns = (
     ),
   },
   {
-    id: "features",
-    header: t("features"),
-    enableSorting: false,
-    enableResizing: true,
-    size: 120,
-    cell: ({ row }) => {
-      const promptCount = row.original.prompts?.length || 0;
-      return (
-        <Badge variant="outline">
-          {t("featureCount", { count: promptCount })}
-        </Badge>
-      );
-    },
-  },
-  {
     id: "projects",
     header: tCommon("fields.projects"),
     enableSorting: false,
     enableResizing: true,
     size: 100,
     cell: ({ row }) => {
-      const projectCount = row.original._count?.projects || 0;
+      if (row.original.isDefault) {
+        return (
+          <div className="text-center">
+            <DefaultPromptProjectList configId={row.original.id} />
+          </div>
+        );
+      }
+      const projects = row.original.projects || [];
       return (
-        <span className="text-sm text-muted-foreground">
-          {projectCount}
-        </span>
+        <div className="text-center">
+          <ProjectListDisplay projects={projects} />
+        </div>
       );
     },
   },

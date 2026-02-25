@@ -118,7 +118,7 @@ function PromptConfigList() {
         : { name: "asc" },
       include: {
         prompts: true,
-        _count: { select: { projects: true } },
+        projects: true,
       },
       where: {
         AND: [
