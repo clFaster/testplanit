@@ -1,3 +1,9 @@
+## [0.15.0](https://github.com/TestPlanIt/testplanit/compare/v0.14.1...v0.15.0) (2026-02-25)
+
+### Features
+
+* **docs:** add client redirects for LLM integrations to prompt configurations ([f7d89aa](https://github.com/TestPlanIt/testplanit/commit/f7d89aab2e29f599d455d39bdb057337ccca2d95))
+
 ## [0.14.1](https://github.com/TestPlanIt/testplanit/compare/v0.14.0...v0.14.1) (2026-02-25)
 
 ### Bug Fixes
