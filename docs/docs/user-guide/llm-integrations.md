@@ -154,12 +154,9 @@ If you need to connect to a self-hosted LLM running on a local network, you must
 
 After creating an LLM integration:
 
-1. Go to **Project Settings** → **LLM Integrations**
+1. Go to **Project Settings** → **AI Models**
 2. Select the integration from available options
-3. Configure project-specific settings:
-   - Default generation parameters
-   - Field selection preferences
-   - Auto-tagging preferences
+3. Optionally assign a **[Prompt Configuration](./prompt-configurations)** to customize how AI prompts behave for this project
 4. Save settings
 
 ## Security Considerations

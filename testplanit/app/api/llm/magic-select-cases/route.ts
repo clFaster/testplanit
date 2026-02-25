@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "~/server/auth";
 import { prisma } from "@/lib/prisma";
 import { LlmManager } from "@/lib/llm/services/llm-manager.service";
+import { PromptResolver } from "@/lib/llm/services/prompt-resolver.service";
+import { LLM_FEATURES } from "@/lib/llm/constants";
 import type { LlmRequest } from "@/lib/llm/types";
 import { ProjectAccessType } from "@prisma/client";
 import { z } from "zod/v4";
@@ -982,8 +984,17 @@ export async function POST(request: NextRequest) {
 
     const manager = LlmManager.getInstance(prisma);
 
-    // Build the prompts
-    const systemPrompt = buildSystemPrompt();
+    // Resolve prompt from database (falls back to hard-coded default)
+    const resolver = new PromptResolver(prisma);
+    const resolvedPrompt = await resolver.resolve(
+      LLM_FEATURES.MAGIC_SELECT_CASES,
+      projectId
+    );
+
+    // Use resolved system prompt if from DB, otherwise use built-in
+    const systemPrompt = resolvedPrompt.source !== "fallback"
+      ? resolvedPrompt.systemPrompt
+      : buildSystemPrompt();
     const userPrompt = buildUserPrompt(
       testRunMetadata,
       issues,
@@ -997,6 +1008,7 @@ export async function POST(request: NextRequest) {
     console.log("Test Run Name:", testRunMetadata.name);
     console.log("Total Cases:", compressedCases.length);
     console.log("Linked Issues:", issues.length);
+    console.log("Prompt Source:", resolvedPrompt.source);
     console.log("\n--- System Prompt ---");
     console.log(systemPrompt);
     console.log("\n--- User Prompt ---");
@@ -1006,7 +1018,7 @@ export async function POST(request: NextRequest) {
     // Use configured max tokens
     const configuredMaxTokens =
       activeLlmIntegration.llmIntegration.llmProviderConfig?.defaultMaxTokens ||
-      4000;
+      resolvedPrompt.maxOutputTokens;
     const maxTokens = Math.max(configuredMaxTokens, 2000);
 
     const llmRequest: LlmRequest = {
@@ -1020,7 +1032,7 @@ export async function POST(request: NextRequest) {
           content: userPrompt,
         },
       ],
-      temperature: 0.3, // Lower temperature for more consistent selections
+      temperature: resolvedPrompt.temperature,
       maxTokens,
       userId: session.user.id,
       feature: "magic_select_cases",

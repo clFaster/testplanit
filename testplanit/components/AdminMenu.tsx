@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, Link, useRouter } from "~/lib/navigation";
 import {
   CircleCheckBig,
@@ -27,115 +27,161 @@ import {
   Activity,
   KeyRound,
   Share2,
+  MessageSquareCode,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 import { cn } from "~/utils";
 import { useTranslations } from "next-intl";
 
+type MenuSection =
+  | "testManagement"
+  | "peopleAndAccess"
+  | "toolsAndIntegrations"
+  | "system";
+
 type MenuOption = {
-  icon?: React.ElementType;
+  icon: React.ElementType;
   translationKey: string;
-  path?: string;
-  section?: string;
+  path: string;
+  section: MenuSection;
 };
 
+const sectionOrder: MenuSection[] = [
+  "testManagement",
+  "peopleAndAccess",
+  "toolsAndIntegrations",
+  "system",
+];
+
 const menuOptions: MenuOption[] = [
-  { translationKey: "header", section: "main" },
+  // Test Management
   {
     icon: Boxes,
     translationKey: "projects",
     path: "projects",
-    section: "main",
+    section: "testManagement",
   },
   {
     icon: LayoutList,
     translationKey: "templatesAndFields",
     path: "fields",
-    section: "main",
+    section: "testManagement",
   },
   {
     icon: Workflow,
     translationKey: "workflows",
     path: "workflows",
-    section: "main",
+    section: "testManagement",
   },
   {
     icon: CircleCheckBig,
     translationKey: "statuses",
     path: "statuses",
-    section: "main",
+    section: "testManagement",
   },
   {
     icon: Milestone,
     translationKey: "milestoneTypes",
     path: "milestones",
-    section: "main",
+    section: "testManagement",
   },
   {
     icon: Combine,
     translationKey: "configurations",
     path: "configurations",
-    section: "main",
+    section: "testManagement",
   },
-  { icon: User, translationKey: "users", path: "users", section: "main" },
   {
-    icon: Users,
-    translationKey: "groups",
-    path: "groups",
-    section: "main",
+    icon: Tags,
+    translationKey: "tags",
+    path: "tags",
+    section: "testManagement",
   },
-  { icon: Drama, translationKey: "roles", path: "roles", section: "main" },
-  { icon: Tags, translationKey: "tags", path: "tags", section: "main" },
   {
     icon: Bug,
     translationKey: "issues",
     path: "issues",
-    section: "main",
-  },
-  {
-    icon: Plug,
-    translationKey: "integrations",
-    path: "integrations",
-    section: "main",
+    section: "testManagement",
   },
   {
     icon: ChartNoAxesCombined,
     translationKey: "reports",
     path: "reports",
-    section: "main",
+    section: "testManagement",
+  },
+
+  // People & Access
+  {
+    icon: User,
+    translationKey: "users",
+    path: "users",
+    section: "peopleAndAccess",
   },
   {
-    icon: Share2,
-    translationKey: "shares",
-    path: "shares",
-    section: "main",
+    icon: Users,
+    translationKey: "groups",
+    path: "groups",
+    section: "peopleAndAccess",
   },
   {
-    icon: Bell,
-    translationKey: "notifications",
-    path: "notifications",
-    section: "main",
-  },
-  {
-    icon: Sparkles,
-    translationKey: "llm",
-    path: "llm",
-    section: "main",
+    icon: Drama,
+    translationKey: "roles",
+    path: "roles",
+    section: "peopleAndAccess",
   },
   {
     icon: ShieldUser,
     translationKey: "sso",
     path: "sso",
-    section: "main",
+    section: "peopleAndAccess",
   },
   {
     icon: KeyRound,
     translationKey: "apiTokens",
     path: "api-tokens",
-    section: "main",
+    section: "peopleAndAccess",
   },
-  { translationKey: "systemHeader", section: "system" },
+
+  // Tools & Integrations
+  {
+    icon: Plug,
+    translationKey: "integrations",
+    path: "integrations",
+    section: "toolsAndIntegrations",
+  },
+  {
+    icon: Share2,
+    translationKey: "shares",
+    path: "shares",
+    section: "toolsAndIntegrations",
+  },
+  {
+    icon: Bell,
+    translationKey: "notifications",
+    path: "notifications",
+    section: "toolsAndIntegrations",
+  },
+  {
+    icon: Sparkles,
+    translationKey: "llm",
+    path: "llm",
+    section: "toolsAndIntegrations",
+  },
+  {
+    icon: MessageSquareCode,
+    translationKey: "prompts",
+    path: "prompts",
+    section: "toolsAndIntegrations",
+  },
+
+  // System
   {
     icon: Settings,
     translationKey: "appConfig",
@@ -174,6 +220,47 @@ const menuOptions: MenuOption[] = [
   },
 ];
 
+function getGroupedItems() {
+  return sectionOrder.map((sectionKey) => ({
+    key: sectionKey,
+    items: menuOptions.filter((opt) => opt.section === sectionKey),
+  }));
+}
+
+function MenuLink({
+  option,
+  isActive,
+  menuButtonClass,
+  t,
+}: {
+  option: MenuOption;
+  isActive: boolean;
+  menuButtonClass: string;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const IconComponent = option.icon;
+  return (
+    <Link
+      key={option.path}
+      id={`admin-menu-${option.path}`}
+      href={`/admin/${option.path}`}
+      className={cn(
+        buttonVariants({ variant: "ghost" }),
+        menuButtonClass,
+        "flex items-center py-2 md:py-0 no-underline",
+        isActive
+          ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
+          : "hover:bg-primary/10 hover:text-primary"
+      )}
+    >
+      <IconComponent className="min-w-6 min-h-6" />
+      <span className={`hidden md:inline ${isActive ? "font-bold" : ""}`}>
+        {t(option.translationKey as any)}
+      </span>
+    </Link>
+  );
+}
+
 export default function AdminMenu() {
   const router = useRouter();
   const page = usePathname().split("/")[2];
@@ -181,22 +268,26 @@ export default function AdminMenu() {
   const t = useTranslations("admin.menu");
   const tGlobal = useTranslations();
 
+  const groups = getGroupedItems();
+
+  const [openSections, setOpenSections] = useState<string[]>([]);
+
   useEffect(() => {
     if (page === undefined) {
-      // Navigate to the first menu item's route
       const firstMenuItem = menuOptions.find((option) => option.path);
-      if (firstMenuItem && firstMenuItem.path) {
+      if (firstMenuItem) {
         router.replace(`/admin/${firstMenuItem.path}`);
       }
+      return;
     }
-  }, [page, router]);
-
-  const mainMenuItems = menuOptions.filter(
-    (option) => option.section === "main"
-  );
-  const systemMenuItems = menuOptions.filter(
-    (option) => option.section === "system"
-  );
+    // Ensure the section containing the active page is open
+    const activeSection = groups.find((group) =>
+      group.items.some((item) => item.path === page)
+    );
+    if (activeSection && !openSections.includes(activeSection.key)) {
+      setOpenSections((prev) => [...prev, activeSection.key]);
+    }
+  }, [page, router]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Card className="sticky top-0 z-10 rounded-none border-none h-full shadow-none">
@@ -207,89 +298,36 @@ export default function AdminMenu() {
           </CardTitle>
         </CardHeader>
         <div className="grow overflow-y-auto">
-          {mainMenuItems.map((option: MenuOption, index: number) => {
-            const isActive = page === `${option.path}`;
-            const IconComponent = option.icon;
-
-            if (!option.path) {
-              // Render header
-              return (
-                <div
-                  key={`header-${index}`}
-                  className="ml-3 mb-2 mt-6 uppercase text-xs hidden md:inline"
-                >
-                  {t(option.translationKey as any)}
-                </div>
-              );
-            }
-
-            return (
-              <Link
-                key={option.path}
-                id={`admin-menu-${option.path}`}
-                href={`/admin/${option.path}`}
-                className={cn(
-                  buttonVariants({ variant: "ghost" }),
-                  menuButtonClass,
-                  "flex items-center py-2 md:py-0 no-underline",
-                  isActive
-                    ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
-                    : "hover:bg-primary/10 hover:text-primary"
-                )}
+          <Accordion
+            type="multiple"
+            value={openSections}
+            onValueChange={setOpenSections}
+            className="w-full"
+          >
+            {groups.map((group) => (
+              <AccordionItem
+                key={group.key}
+                value={group.key}
+                className="border-b-0"
+                data-testid={`admin-menu-section-${group.key}`}
               >
-                {IconComponent && <IconComponent className="min-w-6 min-h-6" />}
-                <span
-                  className={`hidden md:inline ${isActive ? "font-bold" : ""}`}
-                >
-                  {t(option.translationKey as any)}
-                </span>
-              </Link>
-            );
-          })}
-
-          <div className="border-t border-border mt-6">
-            {systemMenuItems.map((option: MenuOption, index: number) => {
-              const isActive = page === `${option.path}`;
-              const IconComponent = option.icon;
-
-              if (!option.path) {
-                // Render header
-                return (
-                  <div
-                    key={`header-${index}`}
-                    className="ml-3 mb-2 mt-4 uppercase text-xs hidden md:inline"
-                  >
-                    {t(option.translationKey as any)}
-                  </div>
-                );
-              }
-
-              return (
-                <Link
-                  key={option.path}
-                  id={`admin-menu-${option.path}`}
-                  href={`/admin/${option.path}`}
-                  className={cn(
-                    buttonVariants({ variant: "ghost" }),
-                    menuButtonClass,
-                    "flex items-center py-2 md:py-0 no-underline",
-                    isActive
-                      ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
-                      : "hover:bg-primary/10 hover:text-primary"
-                  )}
-                >
-                  {IconComponent && (
-                    <IconComponent className="min-w-6 min-h-6" />
-                  )}
-                  <span
-                    className={`hidden md:inline ${isActive ? "font-bold" : ""}`}
-                  >
-                    {t(option.translationKey as any)}
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
+                <AccordionTrigger className="ml-3 py-2 mt-2 uppercase text-xs hover:no-underline hidden md:flex">
+                  {t(group.key as any)}
+                </AccordionTrigger>
+                <AccordionContent className="pb-0 pt-0 max-md:block! max-md:h-auto! max-md:overflow-visible!">
+                  {group.items.map((option) => (
+                    <MenuLink
+                      key={option.path}
+                      option={option}
+                      isActive={page === option.path}
+                      menuButtonClass={menuButtonClass}
+                      t={t}
+                    />
+                  ))}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </CardContent>
     </Card>

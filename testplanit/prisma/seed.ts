@@ -2,6 +2,7 @@ import { PrismaClient, WorkflowScope, ApplicationArea } from "@prisma/client";
 import { seedFieldIcons } from "./seedFieldIcons";
 import { seedTestData } from "./seedTestData";
 import { seedDemoProject } from "./seedDemoProject";
+import { seedDefaultPromptConfig } from "./seedPromptConfig";
 import bcrypt from "bcrypt";
 
 export const prisma = new PrismaClient();
@@ -1621,6 +1622,9 @@ async function main() {
         `✓ Created Magic Link provider (disabled by default - must be manually enabled in admin settings)`
       );
     }
+
+    // Seed default prompt configuration (must run before demo project)
+    await seedDefaultPromptConfig(prisma);
 
     // Seed demo project with sample data for new users
     await seedDemoProject();

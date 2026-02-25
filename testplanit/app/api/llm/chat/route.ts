@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "~/server/auth";
 import { prisma } from "@/lib/prisma";
 import { LlmManager } from "@/lib/llm/services/llm-manager.service";
+import { PromptResolver } from "@/lib/llm/services/prompt-resolver.service";
+import { LLM_FEATURES } from "@/lib/llm/constants";
 import type { LlmRequest } from "@/lib/llm/types";
 
 export async function POST(request: NextRequest) {
@@ -96,15 +98,22 @@ export async function POST(request: NextRequest) {
 
     const manager = LlmManager.getInstance(prisma);
 
+    // Resolve prompt from database (falls back to hard-coded default)
+    const resolver = new PromptResolver(prisma);
+    const resolvedPrompt = await resolver.resolve(
+      LLM_FEATURES.EDITOR_ASSISTANT,
+      parseInt(projectId)
+    );
+
     // Get the configured token limits from the LLM integration
     const llmProviderConfig = projectLlmIntegration.llmIntegration.llmProviderConfig;
-    const maxTokens = llmProviderConfig?.defaultMaxTokens || 2048; // fallback to 2048 if not configured
+    const maxTokens = llmProviderConfig?.defaultMaxTokens || resolvedPrompt.maxOutputTokens;
 
     const llmRequest: LlmRequest = {
       messages: [
         {
           role: "system",
-          content: "You are a helpful writing assistant. Provide clear, concise improvements to the text while maintaining the original intent and structure. Return the improved text using simple HTML formatting that works with rich text editors: use <p> tags for paragraphs, <strong> for bold text, <em> for italic text, <ul><li> for bullet points, <ol><li> for numbered lists, and <h1>, <h2>, <h3> for headings. Preserve the original structure and formatting. Do not include any commentary or explanations, only return the formatted improved text.",
+          content: resolvedPrompt.systemPrompt,
         },
         {
           role: "user",
@@ -112,7 +121,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       model,
-      temperature: 0.3,
+      temperature: resolvedPrompt.temperature,
       maxTokens,
       stream: false,
       userId: session.user.id,

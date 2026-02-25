@@ -149,13 +149,20 @@ export function IntegrationsList({
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {integrations.map((integration) => {
         const isActive = currentIntegration?.integrationId === integration.id;
+        const isDimmed = !isActive && !!currentIntegration;
 
         return (
           <Card
             key={integration.id}
-            className={`flex flex-col h-full ${isActive ? "border-primary" : ""}`}
+            className={`flex flex-col h-full ${
+              isActive
+                ? "border-primary ring-2 ring-primary/20"
+                : isDimmed
+                  ? "bg-muted-foreground/10"
+                  : ""
+            }`}
           >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2${isDimmed ? " opacity-70" : ""}`}>
               <CardTitle className="text-base font-medium">
                 {integration.name}
               </CardTitle>
@@ -166,7 +173,7 @@ export function IntegrationsList({
               )}
             </CardHeader>
             <CardContent className="grow">
-              <div className="flex items-start gap-3">
+              <div className={`flex items-start gap-3${isDimmed ? " opacity-70" : ""}`}>
                 <IntegrationIcon
                   provider={integration.provider}
                   className="h-10 w-10"

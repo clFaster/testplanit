@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useRequireAuth } from "~/hooks/useRequireAuth";
 import { useTranslations } from "next-intl";
@@ -8,9 +8,13 @@ import { Link } from "~/lib/navigation";
 import { ChevronRight } from "lucide-react";
 import {
   useFindFirstProjects,
+  useUpdateProjects,
   useFindManyLlmIntegration,
   useFindManyProjectLlmIntegration,
 } from "~/lib/hooks";
+import {
+  useFindManyPromptConfig,
+} from "~/lib/hooks/prompt-config";
 import {
   Card,
   CardContent,
@@ -18,6 +22,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 import { LlmIntegrationsList } from "./llm-integrations-list";
 import { ProjectIcon } from "@/components/ProjectIcon";
 import { Loading } from "@/components/Loading";
@@ -41,6 +53,7 @@ export default function ProjectAiModelsPage() {
         id: true,
         name: true,
         iconUrl: true,
+        promptConfigId: true,
         assignedUsers: {
           where: {
             user: {
@@ -98,6 +111,35 @@ export default function ProjectAiModelsPage() {
   });
 
   const currentIntegration = projectLlmIntegrations?.[0];
+
+  // Fetch available prompt configurations
+  const { data: promptConfigs } = useFindManyPromptConfig({
+    where: { isDeleted: false, isActive: true },
+    orderBy: { name: "asc" },
+  });
+
+  const { mutateAsync: updateProject } = useUpdateProjects();
+  const [updatingPromptConfig, setUpdatingPromptConfig] = useState(false);
+
+  const handlePromptConfigChange = async (value: string) => {
+    setUpdatingPromptConfig(true);
+    try {
+      await updateProject({
+        where: { id: projectId },
+        data: {
+          promptConfigId: value === "system-default" ? null : value,
+        },
+      });
+      toast.success(t("promptConfigChanged"));
+    } catch (error: any) {
+      console.error("Error updating prompt config:", error);
+      toast.error(tCommon("errors.error"), {
+        description: error?.info?.message || error?.message,
+      });
+    } finally {
+      setUpdatingPromptConfig(false);
+    }
+  };
 
   useEffect(() => {
     if (!projectLoading && project && session?.user) {
@@ -250,6 +292,37 @@ export default function ProjectAiModelsPage() {
               </CardContent>
             </Card>
           )}
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("promptConfig")}</CardTitle>
+              <CardDescription>
+                {t("promptConfigDescription")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Select
+                value={project.promptConfigId || "system-default"}
+                onValueChange={handlePromptConfigChange}
+                disabled={updatingPromptConfig}
+              >
+                <SelectTrigger className="w-full md:w-100">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="system-default">
+                    {t("useSystemDefault")}
+                  </SelectItem>
+                  {promptConfigs?.map((config) => (
+                    <SelectItem key={config.id} value={config.id}>
+                      {config.name}
+                      {config.isDefault ? ` (${tCommon("fields.default")})` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
     </main>

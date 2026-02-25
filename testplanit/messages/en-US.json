@@ -1144,7 +1144,11 @@
         "currency": {
           "dollar": "$",
           "perMonth": "/mo"
-        }
+        },
+        "promptConfig": "Prompt Configuration",
+        "promptConfigDescription": "Select which AI prompt configuration to use for this project",
+        "useSystemDefault": "Use System Default",
+        "promptConfigChanged": "Prompt configuration updated successfully."
       },
       "shares": {
         "title": "Manage Shares",
@@ -2255,6 +2259,7 @@
       "imports": "Data Imports",
       "integrations": "Issue Integrations",
       "llm": "AI Models",
+      "prompts": "Prompt Configs",
       "sso": "Authentication",
       "trash": "Trash",
       "reports": "Reports",
@@ -2262,7 +2267,11 @@
       "elasticsearch": "Search Engine",
       "queues": "Job Queues",
       "auditLogs": "Audit Logs",
-      "apiTokens": "API Tokens"
+      "apiTokens": "API Tokens",
+      "testManagement": "Test Management",
+      "peopleAndAccess": "People & Access",
+      "toolsAndIntegrations": "Tools & Integrations",
+      "system": "System"
     },
     "imports": {
       "description": "Bring data from external test management tools into Testplanit.",
@@ -3672,6 +3681,42 @@
         "failedToGetResponse": "Failed to get response from AI model",
         "failedToSendMessage": "Failed to send test message",
         "defaultTestMessage": "Hello! Please respond with a brief confirmation that you're working correctly."
+      }
+    },
+    "prompts": {
+      "title": "Prompt Configurations",
+      "description": "Manage AI prompt templates for different features",
+      "addPromptConfig": "Add Prompt Configuration",
+      "filterPlaceholder": "Filter prompt configurations...",
+      "features": "Features",
+      "featureCount": "{count} features",
+      "systemPrompt": "System Prompt",
+      "userPrompt": "User Prompt",
+      "temperature": "Temperature",
+      "maxOutputTokens": "Max Output Tokens",
+      "variables": "Variables",
+      "noConfigs": "No prompt configurations found. Add your first configuration to get started.",
+      "add": {
+        "title": "Add Prompt Configuration",
+        "description": "Create a new AI prompt configuration with prompts for each feature. Defaults have been applied automaticallty."
+      },
+      "edit": {
+        "title": "Edit Prompt Configuration",
+        "description": "Update this AI prompt configuration"
+      },
+      "delete": {
+        "title": "Delete Prompt Configuration",
+        "confirmMessage": "Are you sure you want to delete <strong>{name}</strong>? Projects using this prompt will fall back to the system default.",
+        "warning": "This action cannot be undone. All projects using this configuration will revert to the default prompt configuration."
+      },
+      "cannotDeleteDefault": "Cannot delete the default prompt configuration. Set another as default first.",
+      "defaultChanged": "Default prompt configuration updated successfully.",
+      "featureLabels": {
+        "markdown_parsing": "Markdown Test Case Parsing",
+        "test_case_generation": "Test Case Generation",
+        "magic_select_cases": "Smart Test Case Selection",
+        "editor_assistant": "Editor Writing Assistant",
+        "llm_test": "LLM Connection Test"
       }
     },
     "elasticsearch": {

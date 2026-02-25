@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "~/server/auth";
 import { prisma } from "@/lib/prisma";
 import { LlmManager } from "@/lib/llm/services/llm-manager.service";
+import { PromptResolver } from "@/lib/llm/services/prompt-resolver.service";
+import { LLM_FEATURES } from "@/lib/llm/constants";
 import type { LlmRequest } from "@/lib/llm/types";
 import { ProjectAccessType } from "@prisma/client";
 
@@ -63,7 +65,8 @@ function buildSystemPrompt(
   template: TemplateData,
   _context: GenerationContext,
   quantity?: string,
-  autoGenerateTags?: boolean
+  autoGenerateTags?: boolean,
+  baseTemplate?: string
 ): string {
   // Separate required and optional fields
   const requiredFields = template.fields.filter((f) => f.required);
@@ -206,6 +209,27 @@ function buildSystemPrompt(
     "    "
   );
 
+  // Build dynamic replacement values
+  const exampleStructure = exampleStructureJson.substring(exampleStructureJson.indexOf("{"));
+  const requiredFieldsList = requiredFields.map((f) => `- ${f.name} (${f.type})${f.options ? ` - options: [${f.options.join(", ")}]` : ""}${f.type.toLowerCase() === "multi-select" ? " - provide array of selected options" : ""}`).join("\n");
+  const optionalFieldsList = optionalFields.map((f) => `- ${f.name} (${f.type})${f.options ? ` - options: [${f.options.join(", ")}]` : ""}${f.type.toLowerCase() === "multi-select" ? " - provide array of selected options" : ""}`).join("\n");
+  const stepsInstruction = includeSteps ? "\n- Test steps must be detailed and actionable for the specific issue requirements" : "";
+  const priorityInstruction = !priorityField ? '\n- Use priority: "High", "Medium", or "Low"' : priorityField?.options ? `\n- For Priority field, use ONLY these values: [${priorityField.options.join(", ")}]` : "";
+  const tagInstructions = autoGenerateTags ? '- TAGS: Include 2-4 relevant tags per test case that categorize the test (e.g., "UI", "API", "Security", "Performance", "Integration", "Smoke", "Regression", "Functional", "Edge Case", "Mobile", "Desktop", etc.)' : "";
+
+  // If a DB-stored template is provided, hydrate it with runtime values
+  if (baseTemplate) {
+    return baseTemplate
+      .replace("{{EXAMPLE_STRUCTURE}}", exampleStructure)
+      .replace("{{REQUIRED_FIELDS_LIST}}", requiredFieldsList)
+      .replace("{{OPTIONAL_FIELDS_LIST}}", optionalFieldsList)
+      .replace("{{QUANTITY_GUIDANCE}}", quantityGuidance)
+      .replace("{{STEPS_INSTRUCTION}}", stepsInstruction)
+      .replace("{{PRIORITY_INSTRUCTION}}", priorityInstruction)
+      .replace("{{TAG_INSTRUCTIONS}}", tagInstructions);
+  }
+
+  // Fallback: build the prompt from scratch (original hard-coded logic)
   return `You are an expert test case generator. Analyze the provided issue and create specific, targeted test cases that validate the exact requirements and functionality described in that issue.
 
 CRITICAL: You must respond with ONLY valid JSON. No explanations, no comments, no text before or after the JSON.
@@ -213,19 +237,19 @@ CRITICAL: You must respond with ONLY valid JSON. No explanations, no comments, n
 JSON structure (EXACT format required):
 {
   "testCases": [
-${exampleStructureJson.substring(exampleStructureJson.indexOf("{"))}
+${exampleStructure}
   ]
 }
 
 REQUIRED FIELDS (must be included in every test case):
-${requiredFields.map((f) => `- ${f.name} (${f.type})${f.options ? ` - options: [${f.options.join(", ")}]` : ""}${f.type.toLowerCase() === "multi-select" ? " - provide array of selected options" : ""}`).join("\n")}
+${requiredFieldsList}
 
 ADDITIONAL FIELDS (include ALL of these in fieldValues):
-${optionalFields.map((f) => `- ${f.name} (${f.type})${f.options ? ` - options: [${f.options.join(", ")}]` : ""}${f.type.toLowerCase() === "multi-select" ? " - provide array of selected options" : ""}`).join("\n")}
+${optionalFieldsList}
 
 REQUIREMENTS:
 - Generate ${quantityGuidance} test cases that are SPECIFIC to the provided issue
-- Each test case name should reference the actual feature/functionality being tested${includeSteps ? "\n- Test steps must be detailed and actionable for the specific issue requirements" : ""}${!priorityField ? '\n- Use priority: "High", "Medium", or "Low"' : priorityField?.options ? `\n- For Priority field, use ONLY these values: [${priorityField.options.join(", ")}]` : ""}
+- Each test case name should reference the actual feature/functionality being tested${stepsInstruction}${priorityInstruction}
 - CRITICAL: ALL REQUIRED FIELDS must be included in fieldValues with meaningful content
 - IMPORTANT: Include ALL optional fields in fieldValues, especially text fields like Description, Preconditions, and Post Conditions
 - For text/textarea fields (Description, Preconditions, Post Conditions, etc.):
@@ -237,7 +261,7 @@ REQUIREMENTS:
 - For single-select fields with options, use exactly one of the provided options
 - For multiselect fields, provide an array of 1-3 relevant options from the list
 - CRITICAL: Never create new option values for dropdown/select fields - always use provided options exactly
-${autoGenerateTags ? '- TAGS: Include 2-4 relevant tags per test case that categorize the test (e.g., "UI", "API", "Security", "Performance", "Integration", "Smoke", "Regression", "Functional", "Edge Case", "Mobile", "Desktop", etc.)' : ""}
+${tagInstructions}
 - DO NOT create generic test cases - they must validate the specific issue requirements
 - DO NOT leave optional text fields empty - they provide critical context for test execution
 - IMPORTANT: If existing test cases are provided, DO NOT generate duplicates or test cases that cover the same scenarios. Focus on NEW test scenarios not already covered.
@@ -245,7 +269,56 @@ ${autoGenerateTags ? '- TAGS: Include 2-4 relevant tags per test case that categ
 Return ONLY the JSON.`;
 }
 
-function buildUserPrompt(issue: IssueData, context: GenerationContext): string {
+function buildUserPrompt(issue: IssueData, context: GenerationContext, baseTemplate?: string): string {
+  // Build dynamic sections
+  let commentsSection = "";
+  if (issue.comments && issue.comments.length > 0) {
+    commentsSection = `\n\nRELEVANT COMMENTS:`;
+    issue.comments.slice(0, 3).forEach((c, i) => {
+      commentsSection += `\n${i + 1}. ${c.author}: ${c.body.substring(0, 300)}`;
+    });
+  }
+
+  let userNotesSection = "";
+  if (context.userNotes) {
+    userNotesSection = `\n\nADDITIONAL TESTING GUIDANCE: ${context.userNotes}`;
+  }
+
+  let existingCasesSection = "";
+  if (context.existingTestCases && context.existingTestCases.length > 0) {
+    existingCasesSection = `\n\nEXISTING TEST CASES IN FOLDER - DO NOT DUPLICATE THESE:`;
+    context.existingTestCases.forEach((tc, i) => {
+      existingCasesSection += `\n${i + 1}. ${tc.name}`;
+      if (tc.description) {
+        existingCasesSection += `\n   Description: ${tc.description}`;
+      }
+      if (tc.steps && tc.steps.length > 0) {
+        existingCasesSection += `\n   Steps:`;
+        tc.steps.forEach((step, stepIndex) => {
+          existingCasesSection += `\n     ${stepIndex + 1}. ${step.step}`;
+          if (step.expectedResult) {
+            existingCasesSection += ` → Expected: ${step.expectedResult}`;
+          }
+        });
+      }
+    });
+    existingCasesSection += `\n\nCRITICAL: Do NOT generate test cases that duplicate or substantially overlap with the existing test cases listed above. Each new test case must cover different functionality, scenarios, or edge cases not already tested.`;
+  }
+
+  // If a DB-stored template is provided, hydrate it with runtime values
+  if (baseTemplate) {
+    return baseTemplate
+      .replace("{{ISSUE_KEY}}", issue.key)
+      .replace("{{ISSUE_TITLE}}", issue.title)
+      .replace("{{ISSUE_DESCRIPTION}}", issue.description || "No description provided")
+      .replace("{{ISSUE_STATUS}}", issue.status)
+      .replace("{{ISSUE_PRIORITY}}", issue.priority ? ` | PRIORITY: ${issue.priority}` : "")
+      .replace("{{COMMENTS_SECTION}}", commentsSection)
+      .replace("{{USER_NOTES_SECTION}}", userNotesSection)
+      .replace("{{EXISTING_CASES_SECTION}}", existingCasesSection);
+  }
+
+  // Fallback: build the prompt from scratch (original hard-coded logic)
   let prompt = `ISSUE TO TEST: ${issue.key} - "${issue.title}"
 
 ISSUE DETAILS:
@@ -253,36 +326,9 @@ ${issue.description || "No description provided"}
 
 STATUS: ${issue.status}${issue.priority ? ` | PRIORITY: ${issue.priority}` : ""}`;
 
-  if (issue.comments && issue.comments.length > 0) {
-    prompt += `\n\nRELEVANT COMMENTS:`;
-    issue.comments.slice(0, 3).forEach((c, i) => {
-      prompt += `\n${i + 1}. ${c.author}: ${c.body.substring(0, 300)}`;
-    });
-  }
-
-  if (context.userNotes) {
-    prompt += `\n\nADDITIONAL TESTING GUIDANCE: ${context.userNotes}`;
-  }
-
-  if (context.existingTestCases && context.existingTestCases.length > 0) {
-    prompt += `\n\nEXISTING TEST CASES IN FOLDER - DO NOT DUPLICATE THESE:`;
-    context.existingTestCases.forEach((tc, i) => {
-      prompt += `\n${i + 1}. ${tc.name}`;
-      if (tc.description) {
-        prompt += `\n   Description: ${tc.description}`;
-      }
-      if (tc.steps && tc.steps.length > 0) {
-        prompt += `\n   Steps:`;
-        tc.steps.forEach((step, stepIndex) => {
-          prompt += `\n     ${stepIndex + 1}. ${step.step}`;
-          if (step.expectedResult) {
-            prompt += ` → Expected: ${step.expectedResult}`;
-          }
-        });
-      }
-    });
-    prompt += `\n\nCRITICAL: Do NOT generate test cases that duplicate or substantially overlap with the existing test cases listed above. Each new test case must cover different functionality, scenarios, or edge cases not already tested.`;
-  }
+  prompt += commentsSection;
+  prompt += userNotesSection;
+  prompt += existingCasesSection;
 
   prompt += `\n\nBased on this issue, generate specific test cases that validate the requirements and functionality described above. Make test case names and descriptions specific to this issue, not generic. Focus on what needs to be tested to verify this specific feature/fix works correctly.`;
 
@@ -423,19 +469,30 @@ export async function POST(request: NextRequest) {
 
     const manager = LlmManager.getInstance(prisma);
 
-    // Build the prompts
+    // Resolve prompt template from database (falls back to hard-coded default)
+    const resolver = new PromptResolver(prisma);
+    const resolvedPrompt = await resolver.resolve(
+      LLM_FEATURES.TEST_CASE_GENERATION,
+      projectId
+    );
+
+    // Build the prompts using resolved template as base (or fall back to hard-coded)
+    const systemPromptBase = resolvedPrompt.source !== "fallback" ? resolvedPrompt.systemPrompt : undefined;
+    const userPromptBase = resolvedPrompt.source !== "fallback" ? resolvedPrompt.userPrompt || undefined : undefined;
+
     const systemPrompt = buildSystemPrompt(
       template,
       context,
       quantity,
-      autoGenerateTags
+      autoGenerateTags,
+      systemPromptBase
     );
-    const userPrompt = buildUserPrompt(issue, context);
+    const userPrompt = buildUserPrompt(issue, context, userPromptBase);
 
     // Use the configured max tokens from the LLM provider, but ensure it's at least 6000
     const configuredMaxTokens =
       activeLlmIntegration.llmIntegration.llmProviderConfig?.defaultMaxTokens ||
-      4000;
+      resolvedPrompt.maxOutputTokens;
     const maxTokens = Math.max(configuredMaxTokens, 6000);
 
     const llmRequest: LlmRequest = {
@@ -449,7 +506,7 @@ export async function POST(request: NextRequest) {
           content: userPrompt,
         },
       ],
-      temperature: 0.7, // Some creativity but not too random
+      temperature: resolvedPrompt.temperature,
       maxTokens, // Use the higher of configured or minimum required
       userId: session.user.id,
       feature: "test_case_generation",

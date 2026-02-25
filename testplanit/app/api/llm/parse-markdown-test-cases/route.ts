@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "~/server/auth";
 import { prisma } from "@/lib/prisma";
 import { LlmManager } from "@/lib/llm/services/llm-manager.service";
+import { PromptResolver } from "@/lib/llm/services/prompt-resolver.service";
+import { LLM_FEATURES } from "@/lib/llm/constants";
 import type { LlmRequest } from "@/lib/llm/types";
 import { ProjectAccessType } from "@prisma/client";
 
@@ -18,43 +20,6 @@ interface ParsedTestCase {
   preconditions?: string;
   tags?: string[];
   [key: string]: any;
-}
-
-function buildSystemPrompt(): string {
-  return `You are an expert at parsing test case documentation written in Markdown. Your job is to extract structured test case data from arbitrary markdown formats.
-
-CRITICAL: You must respond with ONLY valid JSON. No explanations, no comments, no text before or after the JSON.
-
-JSON structure (EXACT format required):
-{
-  "testCases": [
-    {
-      "name": "Test case name/title",
-      "description": "Optional description or summary of the test case",
-      "preconditions": "Optional prerequisites or setup requirements",
-      "steps": [
-        {
-          "action": "What to do in this step",
-          "expectedResult": "What should happen (optional)"
-        }
-      ],
-      "tags": ["optional", "tags"]
-    }
-  ]
-}
-
-PARSING RULES:
-- Extract ALL test cases found in the document
-- For heading-based documents: each major heading typically defines a separate test case
-- For table-based documents: each row typically defines a separate test case
-- For documents with only one logical test case: return an array with a single test case
-- Identify steps, expected results, preconditions, tags, and descriptions from any format
-- If steps have expected results (via "->", "|", or separate sections), include them
-- If a section name doesn't match a known field, include it as a custom key on the test case
-- Preserve the original content as closely as possible (don't rewrite or summarize)
-- If the document has no clear test case structure, treat the whole content as a single test case with the content as the description
-
-Return ONLY the JSON.`;
 }
 
 export async function POST(request: NextRequest) {
@@ -159,22 +124,27 @@ export async function POST(request: NextRequest) {
 
     const manager = LlmManager.getInstance(prisma);
 
-    const systemPrompt = buildSystemPrompt();
+    // Resolve prompt from database (falls back to hard-coded default)
+    const resolver = new PromptResolver(prisma);
+    const resolvedPrompt = await resolver.resolve(
+      LLM_FEATURES.MARKDOWN_PARSING,
+      projectId
+    );
 
     const configuredMaxTokens =
       activeLlmIntegration.llmIntegration.llmProviderConfig?.defaultMaxTokens ||
-      4000;
+      resolvedPrompt.maxOutputTokens;
     const maxTokens = Math.max(configuredMaxTokens, 4000);
 
     const llmRequest: LlmRequest = {
       messages: [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: resolvedPrompt.systemPrompt },
         {
           role: "user",
           content: `Parse the following markdown document and extract all test cases:\n\n${markdown}`,
         },
       ],
-      temperature: 0.1, // Low temperature for consistent parsing
+      temperature: resolvedPrompt.temperature,
       maxTokens,
       userId: session.user.id,
       feature: "markdown_test_case_parsing",

@@ -363,6 +363,8 @@ model Projects {
     sharedStepGroups       SharedStepGroup[]
     projectIntegrations    ProjectIntegration[]
     projectLlmIntegrations ProjectLlmIntegration[]
+    promptConfigId         String?
+    promptConfig           PromptConfig?               @relation(fields: [promptConfigId], references: [id])
     issues                 Issue[]
     llmUsages              LlmUsage[]
     llmFeatureConfigs      LlmFeatureConfig[]
@@ -2306,7 +2308,6 @@ model LlmIntegration {
     llmFeatureConfigs      LlmFeatureConfig[]
     llmResponseCaches      LlmResponseCache[]
     projectLlmIntegrations ProjectLlmIntegration[]
-    llmPromptTemplates     LlmPromptTemplate[]
     llmRateLimits          LlmRateLimit[]
 
     @@unique([name])
@@ -3053,6 +3054,49 @@ model LlmProviderConfig {
     @@allow('all', auth().access == 'ADMIN')
 }
 
+model PromptConfig {
+    id          String               @id @default(cuid())
+    name        String               @unique @length(1)
+    description String?
+    isDefault   Boolean              @default(false)
+    isActive    Boolean              @default(true)
+    isDeleted   Boolean              @default(false)
+    createdAt   DateTime             @default(now()) @db.Timestamptz(6)
+    updatedAt   DateTime             @updatedAt
+
+    // Child prompts (one per feature)
+    prompts     PromptConfigPrompt[]
+
+    // Project assignments
+    projects    Projects[]
+
+    @@index([isDefault, isActive, isDeleted])
+    @@deny('all', !auth())
+    @@allow('read', auth().access != null)
+    @@allow('create,update', auth().access == 'ADMIN')
+    @@allow('delete', auth().access == 'ADMIN' && isDefault != true)
+}
+
+model PromptConfigPrompt {
+    id              String       @id @default(cuid())
+    promptConfigId  String
+    promptConfig    PromptConfig @relation(fields: [promptConfigId], references: [id], onDelete: Cascade)
+    feature         String       // e.g., "test_case_generation", "markdown_parsing"
+    systemPrompt    String       @db.Text
+    userPrompt      String       @db.Text  // Can include {{placeholders}}
+    temperature     Float        @default(0.7)
+    maxOutputTokens Int          @default(2048)
+    variables       Json         @default("[]") // Array of variable definitions
+    createdAt       DateTime     @default(now()) @db.Timestamptz(6)
+    updatedAt       DateTime     @updatedAt
+
+    @@unique([promptConfigId, feature])
+    @@index([feature])
+    @@deny('all', !auth())
+    @@allow('read', auth().access != null)
+    @@allow('all', auth().access == 'ADMIN')
+}
+
 model OllamaModelRegistry {
     id               String         @id @default(cuid())
     llmIntegrationId Int
@@ -3124,49 +3168,6 @@ model LlmUsage {
     @@allow('all', auth().access == 'ADMIN')
 }
 
-model LlmPromptTemplate {
-    id               String             @id @default(cuid())
-    name             String             @length(1)
-    feature          String   // e.g., "test_case_generation", "bug_analysis"
-    version          Int                @default(1)
-
-    // Optional association with specific LLM integration
-    llmIntegrationId Int?
-    llmIntegration   LlmIntegration?    @relation(fields: [llmIntegrationId], references: [id])
-
-    // Template configuration
-    systemPrompt     String             @db.Text
-    userPrompt       String             @db.Text  // Can include placeholders like {{context}}
-    variables        Json     // Array of required variables
-    examples         Json?    // Few-shot examples
-
-    // Model preferences
-    recommendedModel String?  // e.g., "gpt-4" for complex tasks
-    minContextWindow Int                @default(2048)
-    maxOutputTokens  Int                @default(2048)
-    temperature      Float              @default(0.7)
-
-    // Metadata
-    description      String?
-    tags             String[] // ["testing", "automation", "analysis"]
-    isActive         Boolean            @default(true)
-    isDefault        Boolean            @default(false) // Default template for a feature
-
-    createdAt        DateTime           @default(now()) @db.Timestamptz(6)
-    updatedAt        DateTime           @updatedAt
-
-    // Relations
-    featureConfigs   LlmFeatureConfig[]
-
-    @@unique([feature, name, version])
-    @@index([feature, isActive, isDefault])
-    @@index([tags])
-    @@deny('all', !auth())
-    @@allow('read', auth().access != null)
-    @@allow('create,update', auth().access == 'ADMIN' || auth().access == 'PROJECTADMIN')
-    @@allow('all', auth().access == 'ADMIN')
-}
-
 model LlmFeatureConfig {
     id                String             @id @default(cuid())
     projectId         Int
@@ -3177,9 +3178,6 @@ model LlmFeatureConfig {
     enabled           Boolean            @default(false)
     llmIntegrationId  Int?     // Specific integration to use
     llmIntegration    LlmIntegration?    @relation(fields: [llmIntegrationId], references: [id])
-    templateId        String?  // Specific template to use
-    template          LlmPromptTemplate? @relation(fields: [templateId], references: [id])
-
     // Override settings
     model             String?  // Override default model
     temperature       Float?   // Override temperature
@@ -3200,7 +3198,6 @@ model LlmFeatureConfig {
 
     @@unique([projectId, feature])
     @@index([llmIntegrationId])
-    @@index([templateId])
     @@deny('all', !auth())
     @@allow('read', project.assignedUsers?[user == auth()])
     @@allow('create,update,delete', project.assignedUsers?[user == auth() && auth().access == 'PROJECTADMIN'])

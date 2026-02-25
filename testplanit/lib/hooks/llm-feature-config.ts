@@ -327,7 +327,7 @@ export function useSuspenseCountLlmFeatureConfig<TArgs extends Prisma.LlmFeature
     return useSuspenseModelQuery<TQueryFnData, TData, TError>('LlmFeatureConfig', `${endpoint}/llmFeatureConfig/count`, args, options, fetch);
 }
 
-export function useCheckLlmFeatureConfig<TError = DefaultError>(args: { operation: PolicyCrudKind; where?: { id?: string; projectId?: number; feature?: string; enabled?: boolean; llmIntegrationId?: number; templateId?: string; model?: string; maxTokens?: number; autoTrigger?: boolean; outputFormat?: string; dailyLimit?: number; monthlyLimit?: number }; }, options?: (Omit<UseQueryOptions<boolean, TError, boolean>, 'queryKey'> & ExtraQueryOptions)) {
+export function useCheckLlmFeatureConfig<TError = DefaultError>(args: { operation: PolicyCrudKind; where?: { id?: string; projectId?: number; feature?: string; enabled?: boolean; llmIntegrationId?: number; model?: string; maxTokens?: number; autoTrigger?: boolean; outputFormat?: string; dailyLimit?: number; monthlyLimit?: number }; }, options?: (Omit<UseQueryOptions<boolean, TError, boolean>, 'queryKey'> & ExtraQueryOptions)) {
     const { endpoint, fetch } = getHooksContext();
     return useModelQuery<boolean, boolean, TError>('LlmFeatureConfig', `${endpoint}/llmFeatureConfig/check`, args, options, fetch);
 }

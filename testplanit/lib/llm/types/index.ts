@@ -3,19 +3,17 @@
  */
 
 // Import all types from Prisma - it generates them for us!
-import type { 
+import type {
   LlmIntegration as Integration,
   LlmProviderConfig,
-  LlmPromptTemplate,
-  LlmProvider 
+  LlmProvider
 } from "@prisma/client";
 
 // Re-export the Prisma types
-export type { 
+export type {
   Integration,
   LlmProviderConfig,
-  LlmPromptTemplate,
-  LlmProvider 
+  LlmProvider
 };
 
 export interface LlmMessage {

@@ -918,6 +918,20 @@ const metadata: ModelMeta = {
                     isDataModel: true,
                     isArray: true,
                     backLink: 'project',
+                }, promptConfigId: {
+                    name: "promptConfigId",
+                    type: "String",
+                    isOptional: true,
+                    isForeignKey: true,
+                    relationField: 'promptConfig',
+                }, promptConfig: {
+                    name: "promptConfig",
+                    type: "PromptConfig",
+                    isDataModel: true,
+                    isOptional: true,
+                    backLink: 'projects',
+                    isRelationOwner: true,
+                    foreignKeyMapping: { "id": "promptConfigId" },
                 }, issues: {
                     name: "issues",
                     type: "Issue",
@@ -4821,12 +4835,6 @@ const metadata: ModelMeta = {
                     isDataModel: true,
                     isArray: true,
                     backLink: 'llmIntegration',
-                }, llmPromptTemplates: {
-                    name: "llmPromptTemplates",
-                    type: "LlmPromptTemplate",
-                    isDataModel: true,
-                    isArray: true,
-                    backLink: 'llmIntegration',
                 }, llmRateLimits: {
                     name: "llmRateLimits",
                     type: "LlmRateLimit",
@@ -6100,6 +6108,123 @@ const metadata: ModelMeta = {
                 },
             },
         },
+        promptConfig: {
+            name: 'PromptConfig', fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    isId: true,
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                }, name: {
+                    name: "name",
+                    type: "String",
+                }, description: {
+                    name: "description",
+                    type: "String",
+                    isOptional: true,
+                }, isDefault: {
+                    name: "isDefault",
+                    type: "Boolean",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": false }] }],
+                }, isActive: {
+                    name: "isActive",
+                    type: "Boolean",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": true }] }],
+                }, isDeleted: {
+                    name: "isDeleted",
+                    type: "Boolean",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": false }] }],
+                }, createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                }, updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    attributes: [{ "name": "@updatedAt", "args": [] }],
+                }, prompts: {
+                    name: "prompts",
+                    type: "PromptConfigPrompt",
+                    isDataModel: true,
+                    isArray: true,
+                    backLink: 'promptConfig',
+                }, projects: {
+                    name: "projects",
+                    type: "Projects",
+                    isDataModel: true,
+                    isArray: true,
+                    backLink: 'promptConfig',
+                },
+            }, uniqueConstraints: {
+                id: {
+                    name: "id",
+                    fields: ["id"]
+                }, name: {
+                    name: "name",
+                    fields: ["name"]
+                },
+            },
+        },
+        promptConfigPrompt: {
+            name: 'PromptConfigPrompt', fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    isId: true,
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                }, promptConfigId: {
+                    name: "promptConfigId",
+                    type: "String",
+                    isForeignKey: true,
+                    relationField: 'promptConfig',
+                }, promptConfig: {
+                    name: "promptConfig",
+                    type: "PromptConfig",
+                    isDataModel: true,
+                    backLink: 'prompts',
+                    isRelationOwner: true,
+                    onDeleteAction: 'Cascade',
+                    foreignKeyMapping: { "id": "promptConfigId" },
+                }, feature: {
+                    name: "feature",
+                    type: "String",
+                }, systemPrompt: {
+                    name: "systemPrompt",
+                    type: "String",
+                }, userPrompt: {
+                    name: "userPrompt",
+                    type: "String",
+                }, temperature: {
+                    name: "temperature",
+                    type: "Float",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": 0 }] }],
+                }, maxOutputTokens: {
+                    name: "maxOutputTokens",
+                    type: "Int",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": 2048 }] }],
+                }, variables: {
+                    name: "variables",
+                    type: "Json",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": "[]" }] }],
+                }, createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                }, updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    attributes: [{ "name": "@updatedAt", "args": [] }],
+                },
+            }, uniqueConstraints: {
+                id: {
+                    name: "id",
+                    fields: ["id"]
+                }, promptConfigId_feature: {
+                    name: "promptConfigId_feature",
+                    fields: ["promptConfigId", "feature"]
+                },
+            },
+        },
         ollamaModelRegistry: {
             name: 'OllamaModelRegistry', fields: {
                 id: {
@@ -6277,107 +6402,6 @@ const metadata: ModelMeta = {
                 },
             },
         },
-        llmPromptTemplate: {
-            name: 'LlmPromptTemplate', fields: {
-                id: {
-                    name: "id",
-                    type: "String",
-                    isId: true,
-                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
-                }, name: {
-                    name: "name",
-                    type: "String",
-                }, feature: {
-                    name: "feature",
-                    type: "String",
-                }, version: {
-                    name: "version",
-                    type: "Int",
-                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": 1 }] }],
-                }, llmIntegrationId: {
-                    name: "llmIntegrationId",
-                    type: "Int",
-                    isOptional: true,
-                    isForeignKey: true,
-                    relationField: 'llmIntegration',
-                }, llmIntegration: {
-                    name: "llmIntegration",
-                    type: "LlmIntegration",
-                    isDataModel: true,
-                    isOptional: true,
-                    backLink: 'llmPromptTemplates',
-                    isRelationOwner: true,
-                    foreignKeyMapping: { "id": "llmIntegrationId" },
-                }, systemPrompt: {
-                    name: "systemPrompt",
-                    type: "String",
-                }, userPrompt: {
-                    name: "userPrompt",
-                    type: "String",
-                }, variables: {
-                    name: "variables",
-                    type: "Json",
-                }, examples: {
-                    name: "examples",
-                    type: "Json",
-                    isOptional: true,
-                }, recommendedModel: {
-                    name: "recommendedModel",
-                    type: "String",
-                    isOptional: true,
-                }, minContextWindow: {
-                    name: "minContextWindow",
-                    type: "Int",
-                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": 2048 }] }],
-                }, maxOutputTokens: {
-                    name: "maxOutputTokens",
-                    type: "Int",
-                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": 2048 }] }],
-                }, temperature: {
-                    name: "temperature",
-                    type: "Float",
-                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": 0 }] }],
-                }, description: {
-                    name: "description",
-                    type: "String",
-                    isOptional: true,
-                }, tags: {
-                    name: "tags",
-                    type: "String",
-                    isArray: true,
-                }, isActive: {
-                    name: "isActive",
-                    type: "Boolean",
-                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": true }] }],
-                }, isDefault: {
-                    name: "isDefault",
-                    type: "Boolean",
-                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": false }] }],
-                }, createdAt: {
-                    name: "createdAt",
-                    type: "DateTime",
-                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
-                }, updatedAt: {
-                    name: "updatedAt",
-                    type: "DateTime",
-                    attributes: [{ "name": "@updatedAt", "args": [] }],
-                }, featureConfigs: {
-                    name: "featureConfigs",
-                    type: "LlmFeatureConfig",
-                    isDataModel: true,
-                    isArray: true,
-                    backLink: 'template',
-                },
-            }, uniqueConstraints: {
-                id: {
-                    name: "id",
-                    fields: ["id"]
-                }, feature_name_version: {
-                    name: "feature_name_version",
-                    fields: ["feature", "name", "version"]
-                },
-            },
-        },
         llmFeatureConfig: {
             name: 'LlmFeatureConfig', fields: {
                 id: {
@@ -6419,20 +6443,6 @@ const metadata: ModelMeta = {
                     backLink: 'llmFeatureConfigs',
                     isRelationOwner: true,
                     foreignKeyMapping: { "id": "llmIntegrationId" },
-                }, templateId: {
-                    name: "templateId",
-                    type: "String",
-                    isOptional: true,
-                    isForeignKey: true,
-                    relationField: 'template',
-                }, template: {
-                    name: "template",
-                    type: "LlmPromptTemplate",
-                    isDataModel: true,
-                    isOptional: true,
-                    backLink: 'featureConfigs',
-                    isRelationOwner: true,
-                    foreignKeyMapping: { "id": "templateId" },
                 }, model: {
                     name: "model",
                     type: "String",
@@ -7477,6 +7487,7 @@ const metadata: ModelMeta = {
         jUnitTestResult: ['Attachments'],
         sharedStepGroup: ['SharedStepItem'],
         shareLink: ['ShareLinkAccessLog'],
+        promptConfig: ['PromptConfigPrompt'],
         ssoProvider: ['SamlConfiguration'],
         testmoImportJob: ['TestmoImportDataset'],
         comment: ['CommentMention'],

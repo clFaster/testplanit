@@ -1144,7 +1144,11 @@
         "currency": {
           "dollar": "$",
           "perMonth": "/mes"
-        }
+        },
+        "promptConfig": "Configuración del mensaje",
+        "promptConfigDescription": "Seleccione qué configuración de solicitud de IA utilizar para este proyecto",
+        "useSystemDefault": "Usar el sistema predeterminado",
+        "promptConfigChanged": "La configuración del mensaje se actualizó correctamente."
       },
       "shares": {
         "title": "Administrar acciones",
@@ -2255,6 +2259,7 @@
       "imports": "Importaciones de datos",
       "integrations": "Integraciones del problema",
       "llm": "AI Models",
+      "prompts": "Configuraciones de aviso",
       "sso": "Autenticación",
       "trash": "Basura",
       "reports": "Informes",
@@ -2262,7 +2267,11 @@
       "elasticsearch": "Motor de búsqueda",
       "queues": "Colas de trabajos",
       "auditLogs": "Registros de auditoría",
-      "apiTokens": "Tokens API"
+      "apiTokens": "Tokens API",
+      "testManagement": "Gestión de pruebas",
+      "peopleAndAccess": "Personas y acceso",
+      "toolsAndIntegrations": "Herramientas e integraciones",
+      "system": "Sistema"
     },
     "imports": {
       "description": "Traiga datos de herramientas de gestión de pruebas externas a Testplanit.",
@@ -3672,6 +3681,42 @@
         "failedToGetResponse": "Error al obtener respuesta del modelo de IA",
         "failedToSendMessage": "Error al enviar el mensaje de prueba",
         "defaultTestMessage": "¡Hola! Por favor, responde con una breve confirmación de que estás trabajando correctamente."
+      }
+    },
+    "prompts": {
+      "title": "Configuraciones de aviso",
+      "description": "Administrar plantillas de indicaciones de IA para diferentes funciones",
+      "addPromptConfig": "Agregar configuración de solicitud",
+      "filterPlaceholder": "Configuraciones de solicitud de filtro...",
+      "features": "Características",
+      "featureCount": "{count} características",
+      "systemPrompt": "Indicador del sistema",
+      "userPrompt": "Aviso al usuario",
+      "temperature": "Temperatura",
+      "maxOutputTokens": "Tokens de salida máxima",
+      "variables": "Variables",
+      "noConfigs": "No se encontraron configuraciones de solicitud. Agrega tu primera configuración para comenzar.",
+      "add": {
+        "title": "Agregar configuración de solicitud",
+        "description": "Cree una nueva configuración de avisos de IA con avisos para cada función. Los valores predeterminados se aplican automáticamente."
+      },
+      "edit": {
+        "title": "Editar configuración del mensaje",
+        "description": "Actualizar esta configuración del mensaje de IA"
+      },
+      "delete": {
+        "title": "Eliminar configuración del mensaje",
+        "confirmMessage": "¿Seguro que desea eliminar <strong>{name}</strong>? Los proyectos que usen este mensaje volverán a la configuración predeterminada del sistema.",
+        "warning": "Esta acción no se puede deshacer. Todos los proyectos que utilicen esta configuración volverán a la configuración de solicitud predeterminada."
+      },
+      "cannotDeleteDefault": "No se puede eliminar la configuración predeterminada del mensaje. Primero, configure otra como predeterminada.",
+      "defaultChanged": "La configuración del mensaje predeterminado se actualizó correctamente.",
+      "featureLabels": {
+        "markdown_parsing": "Análisis de casos de prueba de Markdown",
+        "test_case_generation": "Generación de casos de prueba",
+        "magic_select_cases": "Selección inteligente de casos de prueba",
+        "editor_assistant": "Asistente de redacción del editor",
+        "llm_test": "Prueba de conexión LLM"
       }
     },
     "elasticsearch": {

@@ -1144,7 +1144,11 @@
         "currency": {
           "dollar": "$",
           "perMonth": "/mo"
-        }
+        },
+        "promptConfig": "Configuration de l'invite",
+        "promptConfigDescription": "Sélectionnez la configuration d'invite IA à utiliser pour ce projet.",
+        "useSystemDefault": "Utiliser les paramètres par défaut du système",
+        "promptConfigChanged": "Configuration de l'invite mise à jour avec succès."
       },
       "shares": {
         "title": "Gérer les actions",
@@ -2255,6 +2259,7 @@
       "imports": "Importation de données",
       "integrations": "Intégrations de problèmes",
       "llm": "Modèles d'IA",
+      "prompts": "Configurations d'invite",
       "sso": "Authentification",
       "trash": "Poubelle",
       "reports": "Rapports",
@@ -2262,7 +2267,11 @@
       "elasticsearch": "Moteur de recherche",
       "queues": "Files d'attente pour les tâches",
       "auditLogs": "Journaux d'audit",
-      "apiTokens": "Jetons API"
+      "apiTokens": "Jetons API",
+      "testManagement": "Gestion des tests",
+      "peopleAndAccess": "Personnes et accès",
+      "toolsAndIntegrations": "Outils et intégrations",
+      "system": "Système"
     },
     "imports": {
       "description": "Importez les données provenant d'outils de gestion de tests externes dans Testplanit.",
@@ -3672,6 +3681,42 @@
         "failedToGetResponse": "Aucune réponse du modèle d'IA",
         "failedToSendMessage": "Échec de l'envoi du message de test",
         "defaultTestMessage": "Bonjour ! Veuillez confirmer brièvement que tout fonctionne correctement."
+      }
+    },
+    "prompts": {
+      "title": "Configurations d'invite",
+      "description": "Gérer les modèles d'invites IA pour différentes fonctionnalités",
+      "addPromptConfig": "Ajouter une configuration d'invite",
+      "filterPlaceholder": "Configurations des invites de filtre...",
+      "features": "Caractéristiques",
+      "featureCount": "{count} fonctionnalités",
+      "systemPrompt": "Invite système",
+      "userPrompt": "Invite de l'utilisateur",
+      "temperature": "Température",
+      "maxOutputTokens": "Jetons de sortie maximum",
+      "variables": "Variables",
+      "noConfigs": "Aucune configuration d'invite trouvée. Ajoutez votre première configuration pour commencer.",
+      "add": {
+        "title": "Ajouter une configuration d'invite",
+        "description": "Créez une nouvelle configuration d'invites IA avec des invites pour chaque fonctionnalité. Les valeurs par défaut ont été appliquées automatiquement."
+      },
+      "edit": {
+        "title": "Configuration de l'invite de modification",
+        "description": "Mettre à jour cette configuration d'invite IA"
+      },
+      "delete": {
+        "title": "Supprimer la configuration d'invite",
+        "confirmMessage": "Êtes-vous sûr de vouloir supprimer <strong>{name}</strong>? Les projets utilisant cette invite utiliseront la valeur par défaut du système.",
+        "warning": "Cette action est irréversible. Tous les projets utilisant cette configuration reviendront à la configuration d'invite de commande par défaut."
+      },
+      "cannotDeleteDefault": "Impossible de supprimer la configuration d'invite par défaut. Veuillez d'abord en définir une autre comme invite par défaut.",
+      "defaultChanged": "La configuration d'invite par défaut a été mise à jour avec succès.",
+      "featureLabels": {
+        "markdown_parsing": "Analyse des cas de test Markdown",
+        "test_case_generation": "Génération de cas de test",
+        "magic_select_cases": "Sélection intelligente des cas de test",
+        "editor_assistant": "Assistant de rédaction",
+        "llm_test": "Test de connexion LLM"
       }
     },
     "elasticsearch": {

@@ -10,17 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Check,
-  Loader2,
-  AlertTriangle,
-  DollarSign,
-  Zap,
-} from "lucide-react";
-import {
-  getProviderColor,
-  getProviderIcon,
-} from "~/lib/llm/provider-styles";
+import { Check, Loader2, AlertTriangle, DollarSign, Zap } from "lucide-react";
+import { getProviderColor, getProviderIcon } from "~/lib/llm/provider-styles";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -155,16 +146,21 @@ export function LlmIntegrationsList({
         {integrations.map((integration) => {
           const isActive =
             currentIntegration?.llmIntegrationId === integration.id;
+          const isDimmed = !isActive && !!currentIntegration;
           const config = integration.llmProviderConfig;
 
           return (
             <Card
               key={integration.id}
               className={
-                isActive ? "border-primary ring-2 ring-primary/20" : ""
+                isActive
+                  ? "border-primary ring-2 ring-primary/20"
+                  : isDimmed
+                    ? "bg-muted-foreground/10"
+                    : ""
               }
             >
-              <CardHeader className="pb-3">
+              <CardHeader className={`pb-3${isDimmed ? " opacity-70" : ""}`}>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     {getProviderIcon(integration.provider)}
@@ -187,7 +183,9 @@ export function LlmIntegrationsList({
               </CardHeader>
               <CardContent className="space-y-4">
                 {config && (
-                  <div className="space-y-2 text-sm">
+                  <div
+                    className={`space-y-2 text-sm${isDimmed ? " opacity-70" : ""}`}
+                  >
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">
                         {t("model")}:
@@ -261,7 +259,7 @@ export function LlmIntegrationsList({
                       {isAssigning === integration.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <Check className="h-4 w-4 mr-2" />
+                        <Check className="h-4 w-4" />
                       )}
                       {t("useForProject")}
                     </Button>

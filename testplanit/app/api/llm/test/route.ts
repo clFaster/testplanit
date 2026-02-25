@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "~/server/auth";
 import { prisma } from "@/lib/prisma";
 import { LlmManager } from "@/lib/llm/services/llm-manager.service";
+import { PromptResolver } from "@/lib/llm/services/prompt-resolver.service";
+import { LLM_FEATURES } from "@/lib/llm/constants";
 import type { LlmRequest } from "@/lib/llm/types";
 
 /**
@@ -117,12 +119,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Resolve prompt from database (falls back to hard-coded default)
+    const resolver = new PromptResolver(prisma);
+    const resolvedPrompt = await resolver.resolve(LLM_FEATURES.LLM_TEST);
+
     const llmRequest: LlmRequest = {
       messages: [
         {
           role: "system",
-          content:
-            "You are a helpful assistant. Keep your responses brief and friendly.",
+          content: resolvedPrompt.systemPrompt,
         },
         {
           role: "user",
@@ -130,8 +135,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       model,
-      temperature: 0.7,
-      maxTokens: 200,
+      temperature: resolvedPrompt.temperature,
+      maxTokens: resolvedPrompt.maxOutputTokens,
       stream,
       userId: session.user.id,
       feature: "test",

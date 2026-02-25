@@ -461,6 +461,8 @@ model Projects {
   sharedStepGroups       SharedStepGroup[]
   projectIntegrations    ProjectIntegration[]
   projectLlmIntegrations ProjectLlmIntegration[]
+  promptConfigId         String?
+  promptConfig           PromptConfig?               @relation(fields: [promptConfigId], references: [id])
   issues                 Issue[]
   llmUsages              LlmUsage[]
   llmFeatureConfigs      LlmFeatureConfig[]
@@ -1356,7 +1358,6 @@ model LlmIntegration {
   llmFeatureConfigs      LlmFeatureConfig[]
   llmResponseCaches      LlmResponseCache[]
   projectLlmIntegrations ProjectLlmIntegration[]
-  llmPromptTemplates     LlmPromptTemplate[]
   llmRateLimits          LlmRateLimit[]
 
   @@unique([name])
@@ -1669,6 +1670,38 @@ model LlmProviderConfig {
   updatedAt            DateTime        @updatedAt()
 }
 
+model PromptConfig {
+  id          String               @id() @default(cuid())
+  name        String               @unique()
+  description String?
+  isDefault   Boolean              @default(false)
+  isActive    Boolean              @default(true)
+  isDeleted   Boolean              @default(false)
+  createdAt   DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime             @updatedAt()
+  prompts     PromptConfigPrompt[]
+  projects    Projects[]
+
+  @@index([isDefault, isActive, isDeleted])
+}
+
+model PromptConfigPrompt {
+  id              String       @id() @default(cuid())
+  promptConfigId  String
+  promptConfig    PromptConfig @relation(fields: [promptConfigId], references: [id], onDelete: Cascade)
+  feature         String
+  systemPrompt    String       @db.Text()
+  userPrompt      String       @db.Text()
+  temperature     Float        @default(0.7)
+  maxOutputTokens Int          @default(2048)
+  variables       Json         @default("[]")
+  createdAt       DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime     @updatedAt()
+
+  @@unique([promptConfigId, feature])
+  @@index([feature])
+}
+
 model OllamaModelRegistry {
   id               String         @id() @default(cuid())
   llmIntegrationId Int
@@ -1720,59 +1753,28 @@ model LlmUsage {
   @@index([createdAt])
 }
 
-model LlmPromptTemplate {
-  id               String             @id() @default(cuid())
-  name             String
-  feature          String
-  version          Int                @default(1)
-  llmIntegrationId Int?
-  llmIntegration   LlmIntegration?    @relation(fields: [llmIntegrationId], references: [id])
-  systemPrompt     String             @db.Text()
-  userPrompt       String             @db.Text()
-  variables        Json
-  examples         Json?
-  recommendedModel String?
-  minContextWindow Int                @default(2048)
-  maxOutputTokens  Int                @default(2048)
-  temperature      Float              @default(0.7)
-  description      String?
-  tags             String[]
-  isActive         Boolean            @default(true)
-  isDefault        Boolean            @default(false)
-  createdAt        DateTime           @default(now()) @db.Timestamptz(6)
-  updatedAt        DateTime           @updatedAt()
-  featureConfigs   LlmFeatureConfig[]
-
-  @@unique([feature, name, version])
-  @@index([feature, isActive, isDefault])
-  @@index([tags])
-}
-
 model LlmFeatureConfig {
-  id                String             @id() @default(cuid())
+  id                String          @id() @default(cuid())
   projectId         Int
-  project           Projects           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project           Projects        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   feature           String
-  enabled           Boolean            @default(false)
+  enabled           Boolean         @default(false)
   llmIntegrationId  Int?
-  llmIntegration    LlmIntegration?    @relation(fields: [llmIntegrationId], references: [id])
-  templateId        String?
-  template          LlmPromptTemplate? @relation(fields: [templateId], references: [id])
+  llmIntegration    LlmIntegration? @relation(fields: [llmIntegrationId], references: [id])
   model             String?
   temperature       Float?
   maxTokens         Int?
-  autoTrigger       Boolean            @default(false)
+  autoTrigger       Boolean         @default(false)
   triggerConditions Json?
   outputFormat      String?
   postProcessing    Json?
   dailyLimit        Int?
   monthlyLimit      Int?
-  createdAt         DateTime           @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime           @updatedAt()
+  createdAt         DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime        @updatedAt()
 
   @@unique([projectId, feature])
   @@index([llmIntegrationId])
-  @@index([templateId])
 }
 
 model LlmResponseCache {
