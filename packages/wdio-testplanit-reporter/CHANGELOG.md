@@ -1,5 +1,11 @@
 # @testplanit/wdio-reporter
 
+## 0.3.1
+
+### Patch Changes
+
+- [`5e1ab2c`](https://github.com/TestPlanIt/testplanit/commit/5e1ab2ca0f5da500b824286b8554d53fa7068aa5) Thanks [@therealbrad](https://github.com/therealbrad)! - Update README with launcher service documentation, service configuration options, and correct reporter options to match actual implementation
+
 ## 0.3.0
 
 ### Minor Changes
