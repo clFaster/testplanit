@@ -8,7 +8,8 @@
         "preset": "conventionalcommits",
         "releaseRules": [
           { "type": "enhance", "release": "patch" },
-          { "type": "enhancement", "release": "patch" }
+          { "type": "enhancement", "release": "patch" },
+          { "scope": "docs", "release": false }
         ]
       }
     ],
