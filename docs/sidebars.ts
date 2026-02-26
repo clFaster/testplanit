@@ -217,6 +217,7 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'sdk/api-client', // @testplanit/api package
+        'sdk/jira-forge-app', // Jira Forge app (Marketplace plugin)
         {
           type: 'category',
           label: 'WebdriverIO Reporter',
