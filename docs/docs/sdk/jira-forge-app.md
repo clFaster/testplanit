@@ -13,7 +13,13 @@ The TestPlanIt for Jira app is an [Atlassian Forge](https://developer.atlassian.
 - **Settings Page** — Admin configuration for your TestPlanIt instance URL and API key
 - **Secure Authentication** — API key authentication with timing-safe validation
 
-![Jira Issue Panel](/img/jira-forge-panel.png)
+### Test Runs & Sessions
+
+![Test runs and sessions panel](/img/jira-forge-panel-runs.png)
+
+### Test Cases
+
+![Test cases panel](/img/jira-forge-panel-cases.png)
 
 ## Requirements
 
@@ -59,6 +65,8 @@ Select your Jira instance when prompted.
 3. Enter the **Forge API Key** from Step 1
 4. Click **Test Connection** to verify connectivity
 5. Click **Save Configuration**
+
+![TestPlanIt settings page](/img/jira-forge-settings.png)
 
 ### Step 3: Verify
 
