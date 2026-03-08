@@ -99,7 +99,7 @@ export class OllamaAdapter extends BaseLlmAdapter {
     try {
       // Use request timeout if provided, otherwise fall back to config timeout
       const timeout = request.timeout ?? this.getTimeout();
-      const response = await fetch(`${this.baseUrl}/api/chat`, {
+      const response = await this.safeFetch(`${this.baseUrl}/api/chat`, {
         method: "POST",
         headers: this.getHeaders(),
         body: JSON.stringify(ollamaRequest),
@@ -155,13 +155,14 @@ export class OllamaAdapter extends BaseLlmAdapter {
       keep_alive: this.keepAlive,
     };
 
-    // Use request timeout if provided, otherwise fall back to config timeout
+    // Use request timeout if provided, otherwise fall back to config timeout.
+    // timeout === 0 means no timeout (e.g. streaming where the full duration is unknown).
     const timeout = request.timeout ?? this.getTimeout();
-    const response = await fetch(`${this.baseUrl}/api/chat`, {
+    const response = await this.safeFetch(`${this.baseUrl}/api/chat`, {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify(ollamaRequest),
-      signal: AbortSignal.timeout(timeout),
+      signal: timeout > 0 ? AbortSignal.timeout(timeout) : undefined,
     });
 
     if (!response.ok) {
@@ -218,7 +219,7 @@ export class OllamaAdapter extends BaseLlmAdapter {
 
   async getAvailableModels(): Promise<LlmModelInfo[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/tags`, {
+      const response = await this.safeFetch(`${this.baseUrl}/api/tags`, {
         headers: this.getHeaders(),
         signal: AbortSignal.timeout(10000),
       });
@@ -248,7 +249,7 @@ export class OllamaAdapter extends BaseLlmAdapter {
   }
 
   async *pullModel(modelName: string): AsyncGenerator<OllamaPullProgress, void, unknown> {
-    const response = await fetch(`${this.baseUrl}/api/pull`, {
+    const response = await this.safeFetch(`${this.baseUrl}/api/pull`, {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify({ name: modelName }),
@@ -300,7 +301,7 @@ export class OllamaAdapter extends BaseLlmAdapter {
   }
 
   async deleteModel(modelName: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/api/delete`, {
+    const response = await this.safeFetch(`${this.baseUrl}/api/delete`, {
       method: "DELETE",
       headers: this.getHeaders(),
       body: JSON.stringify({ name: modelName }),
@@ -317,7 +318,7 @@ export class OllamaAdapter extends BaseLlmAdapter {
 
   async testConnection(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/tags`, {
+      const response = await this.safeFetch(`${this.baseUrl}/api/tags`, {
         headers: this.getHeaders(),
         signal: AbortSignal.timeout(5000),
       });

@@ -377,9 +377,10 @@ export class LlmManager {
     if (!config) return;
 
     const inputCost =
-      (response.promptTokens / 1000) * Number(config.costPerInputToken);
+      (response.promptTokens / 1_000_000) * Number(config.costPerInputToken);
     const outputCost =
-      (response.completionTokens / 1000) * Number(config.costPerOutputToken);
+      (response.completionTokens / 1_000_000) *
+      Number(config.costPerOutputToken);
 
     await this.prisma.llmUsage.create({
       data: {
@@ -400,6 +401,32 @@ export class LlmManager {
     });
 
     await this.updateRateLimit(llmIntegrationId, request.userId);
+
+    // Fire-and-forget budget check — never blocks LLM response (CHCK-01, CHCK-03)
+    if (config.monthlyBudget && Number(config.monthlyBudget) > 0) {
+      try {
+        const { getBudgetAlertQueue } = await import("~/lib/queues");
+        const { BUDGET_ALERT_JOB_CHECK } = await import(
+          "~/workers/budgetAlertWorker"
+        );
+        const { getCurrentTenantId } = await import(
+          "~/lib/multiTenantPrisma"
+        );
+        getBudgetAlertQueue()
+          ?.add(BUDGET_ALERT_JOB_CHECK, {
+            llmIntegrationId,
+            tenantId: getCurrentTenantId(),
+          })
+          .catch((err: unknown) => {
+            console.error(
+              "[BudgetAlert] Failed to enqueue budget check:",
+              err
+            );
+          });
+      } catch (err) {
+        console.error("[BudgetAlert] Failed to enqueue budget check:", err);
+      }
+    }
   }
 
   private async trackStreamUsage(
@@ -414,7 +441,7 @@ export class LlmManager {
     if (!config) return;
 
     const estimatedCost =
-      (estimatedTokens / 1000) * Number(config.costPerOutputToken);
+      (estimatedTokens / 1_000_000) * Number(config.costPerOutputToken);
 
     await this.prisma.llmUsage.create({
       data: {
@@ -435,6 +462,32 @@ export class LlmManager {
     });
 
     await this.updateRateLimit(llmIntegrationId, request.userId);
+
+    // Fire-and-forget budget check — never blocks LLM response (CHCK-01, CHCK-03)
+    if (config.monthlyBudget && Number(config.monthlyBudget) > 0) {
+      try {
+        const { getBudgetAlertQueue } = await import("~/lib/queues");
+        const { BUDGET_ALERT_JOB_CHECK } = await import(
+          "~/workers/budgetAlertWorker"
+        );
+        const { getCurrentTenantId } = await import(
+          "~/lib/multiTenantPrisma"
+        );
+        getBudgetAlertQueue()
+          ?.add(BUDGET_ALERT_JOB_CHECK, {
+            llmIntegrationId,
+            tenantId: getCurrentTenantId(),
+          })
+          .catch((err: unknown) => {
+            console.error(
+              "[BudgetAlert] Failed to enqueue budget check:",
+              err
+            );
+          });
+      } catch (err) {
+        console.error("[BudgetAlert] Failed to enqueue budget check:", err);
+      }
+    }
   }
 
   private async trackError(
