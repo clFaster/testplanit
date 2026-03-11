@@ -1,3 +1,9 @@
+## [0.15.3](https://github.com/TestPlanIt/testplanit/compare/v0.15.2...v0.15.3) (2026-03-11)
+
+### Enhancements
+
+* Replaced deprecated methods with new hooks for fetching project data ([#116](https://github.com/TestPlanIt/testplanit/issues/116)) ([f2edeef](https://github.com/TestPlanIt/testplanit/commit/f2edeef31d2540dc32d25edab002fe0b4ddbe372))
+
 ## [0.15.2](https://github.com/TestPlanIt/testplanit/compare/v0.15.1...v0.15.2) (2026-03-09)
 
 ### Bug Fixes
