@@ -3,8 +3,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRequireAuth } from "~/hooks/useRequireAuth";
 import { useRouter } from "~/lib/navigation";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Tags } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AutoTagWizardDialog } from "@/components/auto-tag/AutoTagWizardDialog";
 import {
   usePagination,
   PaginationProvider,
@@ -210,6 +213,14 @@ function TagList() {
     [repositoryCases]
   );
 
+  const untaggedCaseIds = useMemo(
+    () =>
+      repositoryCases
+        ?.filter((c) => !c.tags || c.tags.length === 0)
+        .map((c) => c.id) || [],
+    [repositoryCases]
+  );
+
   const activeSessionMap = useMemo(() => {
     return (
       sessions?.reduce(
@@ -224,6 +235,14 @@ function TagList() {
 
   const activeSessionIds = useMemo(
     () => sessions?.map((s) => s.id) || [],
+    [sessions]
+  );
+
+  const untaggedSessionIds = useMemo(
+    () =>
+      sessions
+        ?.filter((s) => !s.tags || s.tags.length === 0)
+        .map((s) => s.id) || [],
     [sessions]
   );
 
@@ -243,6 +262,30 @@ function TagList() {
     () => testRuns?.map((r) => r.id) || [],
     [testRuns]
   );
+
+  const untaggedRunIds = useMemo(
+    () =>
+      testRuns
+        ?.filter((r) => !r.tags || r.tags.length === 0)
+        .map((r) => r.id) || [],
+    [testRuns]
+  );
+
+  // ── AI Auto-Tag ──────────────────────────────────────────────────────
+  const searchParams = useSearchParams();
+  const [showAutoTagWizard, setShowAutoTagWizard] = useState(false);
+
+  // Auto-open wizard when navigated with ?autoTag=true, then clear the param
+  useEffect(() => {
+    if (searchParams.get("autoTag") === "true") {
+      setShowAutoTagWizard(true);
+      // Remove the search param so closing the dialog isn't blocked
+      const url = new URL(window.location.href);
+      url.searchParams.delete("autoTag");
+      window.history.replaceState({}, "", url.pathname + url.search);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filteredTags = useMemo(() => {
     if (!tags) return [];
@@ -504,6 +547,20 @@ function TagList() {
           <CardTitle>
             <div className="flex items-center justify-between text-primary text-xl md:text-2xl pb-2 pt-1">
               <CardTitle>{t("common.fields.tags")}</CardTitle>
+              <Button
+                variant="default"
+                onClick={() => setShowAutoTagWizard(true)}
+                disabled={
+                  activeCaseIds.length +
+                    activeSessionIds.length +
+                    activeRunIds.length ===
+                  0
+                }
+                data-testid="ai-auto-tag-button"
+              >
+                <Tags className="h-4 w-4" />
+                {t("autoTag.actions.aiAutoTag")}
+              </Button>
             </div>
           </CardTitle>
           <CardDescription className="uppercase">
@@ -571,6 +628,17 @@ function TagList() {
           </div>
         </CardContent>
       </Card>
+      <AutoTagWizardDialog
+        open={showAutoTagWizard}
+        onOpenChange={setShowAutoTagWizard}
+        projectId={projectId as string}
+        caseIds={activeCaseIds}
+        sessionIds={activeSessionIds}
+        runIds={activeRunIds}
+        untaggedCaseIds={untaggedCaseIds}
+        untaggedSessionIds={untaggedSessionIds}
+        untaggedRunIds={untaggedRunIds}
+      />
     </main>
   );
 }

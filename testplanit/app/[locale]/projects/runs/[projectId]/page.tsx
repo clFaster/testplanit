@@ -448,6 +448,7 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
 
   // Drag/drop from desktop to import test results
   const canAddEdit = permissions?.canAddEdit ?? false;
+
   const [droppedFiles, setDroppedFiles] = useState<File[]>([]);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const tFileDropZone = useTranslations("common.fileDropZone");

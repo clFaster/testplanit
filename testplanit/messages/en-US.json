@@ -2,6 +2,7 @@
   "common": {
     "name": "Name",
     "cancel": "Cancel",
+    "dismiss": "Dismiss",
     "of": "of",
     "on": "on",
     "at": "at",
@@ -3914,7 +3915,9 @@
         "spendLabel": "Current Month Spend",
         "spendOfBudget": "{currentSpend} of {budgetLimit}",
         "overBudget": "Over budget",
-        "budgetPercentage": "{percentage}% of budget used"
+        "budgetPercentage": "{percentage}% of budget used",
+        "resetSpend": "Reset",
+        "spendReset": "Current month spend has been reset"
       }
     },
     "prompts": {
@@ -3952,7 +3955,8 @@
         "magic_select_cases": "Smart Test Case Selection",
         "editor_assistant": "Editor Writing Assistant",
         "llm_test": "LLM Connection Test",
-        "export_code_generation": "Export Code Generation"
+        "export_code_generation": "Export Code Generation",
+        "auto_tag": "AI Tag Suggestions"
       }
     },
     "elasticsearch": {
@@ -4020,7 +4024,9 @@
         "emails": "Email Queue",
         "issue-sync": "Issue Synchronization",
         "testmo-imports": "Testmo Imports",
-        "elasticsearch-reindex": "Elasticsearch Reindex"
+        "elasticsearch-reindex": "Elasticsearch Reindex",
+        "audit-logs": "Audit Logs",
+        "auto-tag": "AI Auto-Tag"
       },
       "status": {
         "paused": "Paused",
@@ -5596,8 +5602,7 @@
     "authBypass": {
       "title": "You have access to this project",
       "description": "Viewing as {userName} with access to {projectName}.",
-      "viewInApp": "View in full app",
-      "dismiss": "Dismiss"
+      "viewInApp": "View in full app"
     }
   },
   "sharedSteps": {
@@ -5837,6 +5842,70 @@
     "expiresT oday": "Trial expires today",
     "expired": "{count, plural, =1 {Trial expired 1 day ago} other {Trial expired # days ago}}",
     "contactSales": "Contact Sales"
+  },
+  "autoTag": {
+    "actions": {
+      "aiTag": "AI Tag",
+      "tagAll": "Tag All",
+      "aiAutoTag": "Auto-Tag",
+      "tagActions": "Tag Actions",
+      "startTagging": "Start Tagging",
+      "selectEntityType": "Select entity type",
+      "selectProject": "Select a project",
+      "entityTypes": {
+        "repositoryCase": "{count, plural, one {Test Case} other {Test Cases}}",
+        "testRun": "{count, plural, one {Test Run} other {Test Runs}}",
+        "session": "{count, plural, one {Session} other {Sessions}}"
+      }
+    },
+    "review": {
+      "title": "Review Tag Suggestions",
+      "description": "Click tags to toggle acceptance. Double-click to edit a tag name.",
+      "selectEntity": "Select an entity to view tag suggestions.",
+      "noTagsSelected": "No tags selected",
+      "footerSummary": "{assignCount, plural, one {# tag} other {# tags}} will be assigned, {newCount, plural, one {# new tag} other {# new tags}} will be created",
+      "applying": "Applying...",
+      "applySuccess": "{tagCount, plural, one {# tag} other {# tags}} applied to {entityCount, plural, one {# entity} other {# entities}}",
+      "applySuccessNewTags": "{tagCount, plural, one {# tag} other {# tags}} applied to {entityCount, plural, one {# entity} other {# entities}}, {newCount, plural, one {# new tag} other {# new tags}} created",
+      "applyError": "Failed to apply tags. Please try again.",
+      "suggestedTags": "Suggested Tags",
+      "noSuggestions": "AI could not generate any tags.",
+      "alreadyApplied": "Already Applied",
+      "filterEntities": "Filter entities...",
+      "noEntitiesMatch": "No entities match your search.",
+      "tagCount": "{count, plural, one {# tag} other {# tags}}",
+      "noTags": "none",
+      "failed": "Failed",
+      "analysisFailed": "Could not analyze this entity",
+      "responseTruncated": "Response truncated — increase Max Output Tokens in LLM settings",
+      "tooltipExisting": "Existing tag",
+      "tooltipNew": "New tag — will be created",
+      "tooltipAssign": "Assign existing tag",
+      "toggleFailed": "Show/hide failed entities",
+      "showFailed": "Show failed"
+    },
+    "progress": {
+      "starting": "Starting analysis...",
+      "analyzed": "Analyzed {analyzed}/{total} entities",
+      "finalizing": "Preparing results...",
+      "complete": "Analysis complete",
+      "reviewSuggestions": "Review Suggestions",
+      "failed": "Analysis failed"
+    },
+    "wizard": {
+      "description": "AI will analyze your entire project's test cases, test runs, and sessions to suggest relevant tags based on their content.",
+      "entityLine": "{count} {type}",
+      "startAnalysis": "Start Analysis",
+      "untaggedOnly": "Only analyze records without existing tags",
+      "noLlmConfigured": "(No LLM configured)",
+      "analyzingDescription": "AI is analyzing your entities and generating tag suggestions. This may take a moment."
+    },
+    "entityDetail": {
+      "customFields": "Custom Fields",
+      "documentation": "Documentation",
+      "noDetails": "No additional details available.",
+      "openInNewTab": "Open in new tab"
+    }
   },
   "TrialExpired": {
     "title": "Your Trial Has Expired",

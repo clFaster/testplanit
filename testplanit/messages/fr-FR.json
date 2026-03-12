@@ -2,6 +2,7 @@
   "common": {
     "name": "Nom",
     "cancel": "Annuler",
+    "dismiss": "Rejeter",
     "of": "de",
     "on": "sur",
     "at": "à",
@@ -3914,7 +3915,9 @@
         "spendLabel": "Dépenses du mois en cours",
         "spendOfBudget": "{currentSpend} de {budgetLimit}",
         "overBudget": "Dépassement du budget",
-        "budgetPercentage": "{percentage}% du budget utilisé"
+        "budgetPercentage": "{percentage}% du budget utilisé",
+        "resetSpend": "Réinitialiser",
+        "spendReset": "Les dépenses du mois en cours ont été réinitialisées."
       }
     },
     "prompts": {
@@ -3952,7 +3955,8 @@
         "magic_select_cases": "Sélection intelligente des cas de test",
         "editor_assistant": "Assistant de rédaction",
         "llm_test": "Test de connexion LLM",
-        "export_code_generation": "Génération du code d'exportation"
+        "export_code_generation": "Génération du code d'exportation",
+        "auto_tag": "Suggestions de balises IA"
       }
     },
     "elasticsearch": {
@@ -4020,7 +4024,9 @@
         "emails": "File d'attente des e-mails",
         "issue-sync": "Synchronisation des problèmes",
         "testmo-imports": "Importations Testmo",
-        "elasticsearch-reindex": "Réindexation Elasticsearch"
+        "elasticsearch-reindex": "Réindexation Elasticsearch",
+        "audit-logs": "Journaux d'audit",
+        "auto-tag": "Étiquetage automatique par IA"
       },
       "status": {
         "paused": "En pause",
@@ -5596,8 +5602,7 @@
     "authBypass": {
       "title": "Vous avez accès à ce projet",
       "description": "Affichage en tant que {userName} avec accès à {projectName}.",
-      "viewInApp": "Voir dans l'application complète",
-      "dismiss": "Rejeter"
+      "viewInApp": "Voir dans l'application complète"
     }
   },
   "sharedSteps": {
@@ -5837,6 +5842,70 @@
     "expiresT oday": "L'essai gratuit expire aujourd'hui",
     "expired": "{count, plural, =1 {Essai expiré il y a 1 jour} other {Essai expiré il y a # jours}}",
     "contactSales": "Contactez le service commercial"
+  },
+  "autoTag": {
+    "actions": {
+      "aiTag": "Étiquette IA",
+      "tagAll": "Étiqueter tout",
+      "aiAutoTag": "Étiquette automatique",
+      "tagActions": "Actions des balises",
+      "startTagging": "Commencez à étiqueter",
+      "selectEntityType": "Sélectionnez le type d'entité",
+      "selectProject": "Sélectionnez un projet",
+      "entityTypes": {
+        "repositoryCase": "{count, plural, one {Cas de test} other {Cas de test}}",
+        "testRun": "{count, plural, one {Exécution de test} other {Exécutions de test}}",
+        "session": "{count, plural, one {Session} other {Sessions}}"
+      }
+    },
+    "review": {
+      "title": "Suggestions de balises pour les avis",
+      "description": "Cliquez sur les étiquettes pour les autoriser ou les désactiver. Double-cliquez pour modifier le nom d'une étiquette.",
+      "selectEntity": "Sélectionnez une entité pour afficher les suggestions de balises.",
+      "noTagsSelected": "Aucune étiquette sélectionnée",
+      "footerSummary": "{assignCount, plural, one {# étiquette} other {# étiquettes}} seront attribuées, {newCount, plural, one {# nouvelle étiquette} other {# nouvelles étiquettes}} seront créées",
+      "applying": "Candidature...",
+      "applySuccess": "{tagCount, plural, one {# étiquette} other {# étiquettes}} appliquées à {entityCount, plural, one {# entité} other {# entités}}",
+      "applySuccessNewTags": "{tagCount, plural, one {# étiquette} other {# étiquettes}} appliquées à {entityCount, plural, one {# entité} other {# entités}}, {newCount, plural, one {# nouvelle étiquette} other {# nouvelles étiquettes}} créées",
+      "applyError": "Impossible d'appliquer les balises. Veuillez réessayer.",
+      "suggestedTags": "Suggestions de balises",
+      "noSuggestions": "L'IA n'a pu générer aucune étiquette.",
+      "alreadyApplied": "Déjà postulé",
+      "filterEntities": "Entités de filtrage...",
+      "noEntitiesMatch": "Aucun résultat ne correspond à votre recherche.",
+      "tagCount": "{count, plural, one {# balise} other {# balises}}",
+      "noTags": "aucun",
+      "failed": "Échoué",
+      "analysisFailed": "Impossible d'analyser cette entité",
+      "responseTruncated": "Réponse tronquée — augmentez le nombre maximal de jetons de sortie dans les paramètres LLM",
+      "tooltipExisting": "Balise existante",
+      "tooltipNew": "Nouvelle étiquette — sera créée",
+      "tooltipAssign": "Attribuer une étiquette existante",
+      "toggleFailed": "Afficher/masquer les entités défaillantes",
+      "showFailed": "Échec de l'affichage"
+    },
+    "progress": {
+      "starting": "Début de l'analyse...",
+      "analyzed": "Entités analysées {analyzed}/{total}",
+      "finalizing": "Préparation des résultats...",
+      "complete": "Analyse complète",
+      "reviewSuggestions": "Suggestions de révision",
+      "failed": "L'analyse a échoué"
+    },
+    "wizard": {
+      "description": "L'IA analysera l'ensemble des cas de test, des exécutions de test et des sessions de votre projet afin de suggérer des balises pertinentes en fonction de leur contenu.",
+      "entityLine": "{count} {type}",
+      "startAnalysis": "Lancer l'analyse",
+      "untaggedOnly": "Analyser uniquement les enregistrements sans balises existantes",
+      "noLlmConfigured": "(Aucun LLM configuré)",
+      "analyzingDescription": "L'IA analyse vos entités et génère des suggestions de balises. Cela peut prendre quelques instants."
+    },
+    "entityDetail": {
+      "customFields": "Champs personnalisés",
+      "documentation": "Documentation",
+      "noDetails": "Aucun détail supplémentaire disponible.",
+      "openInNewTab": "Ouvrir dans un nouvel onglet"
+    }
   },
   "TrialExpired": {
     "title": "Votre période d'essai a expiré.",

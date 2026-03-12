@@ -2,6 +2,7 @@
   "common": {
     "name": "Nombre",
     "cancel": "Cancelar",
+    "dismiss": "Despedir",
     "of": "de",
     "on": "en",
     "at": "en",
@@ -3914,7 +3915,9 @@
         "spendLabel": "Gastos del mes actual",
         "spendOfBudget": "{currentSpend} de {budgetLimit}",
         "overBudget": "Por encima del presupuesto",
-        "budgetPercentage": "{percentage}% del presupuesto utilizado"
+        "budgetPercentage": "{percentage}% del presupuesto utilizado",
+        "resetSpend": "Reiniciar",
+        "spendReset": "El gasto del mes actual se ha restablecido"
       }
     },
     "prompts": {
@@ -3952,7 +3955,8 @@
         "magic_select_cases": "Selección inteligente de casos de prueba",
         "editor_assistant": "Asistente de redacción del editor",
         "llm_test": "Prueba de conexión LLM",
-        "export_code_generation": "Generación de código de exportación"
+        "export_code_generation": "Generación de código de exportación",
+        "auto_tag": "Sugerencias de etiquetas de IA"
       }
     },
     "elasticsearch": {
@@ -4020,7 +4024,9 @@
         "emails": "Cola de correo electrónico",
         "issue-sync": "Sincronización de problemas",
         "testmo-imports": "Importaciones de Testmo",
-        "elasticsearch-reindex": "Reindexación de Elasticsearch"
+        "elasticsearch-reindex": "Reindexación de Elasticsearch",
+        "audit-logs": "Registros de auditoría",
+        "auto-tag": "Etiquetado automático con IA"
       },
       "status": {
         "paused": "En pausa",
@@ -5596,8 +5602,7 @@
     "authBypass": {
       "title": "Tienes acceso a este proyecto",
       "description": "Visualización como {userName} con acceso a {projectName}.",
-      "viewInApp": "Ver en la aplicación completa",
-      "dismiss": "Despedir"
+      "viewInApp": "Ver en la aplicación completa"
     }
   },
   "sharedSteps": {
@@ -5837,6 +5842,70 @@
     "expiresT oday": "El período de prueba finaliza hoy",
     "expired": "{count, plural, =1 {La prueba expiró hace 1 día} other {La prueba expiró hace # días}}",
     "contactSales": "Contacte con el departamento de ventas"
+  },
+  "autoTag": {
+    "actions": {
+      "aiTag": "Etiqueta de IA",
+      "tagAll": "Etiquetar a todos",
+      "aiAutoTag": "Etiquetado automático",
+      "tagActions": "Acciones de etiquetas",
+      "startTagging": "Empezar a etiquetar",
+      "selectEntityType": "Seleccionar el tipo de entidad",
+      "selectProject": "Seleccione un proyecto",
+      "entityTypes": {
+        "repositoryCase": "{count, plural, one {Caso de prueba} other {Casos de prueba}}",
+        "testRun": "{count, plural, one {Ejecución de prueba} other {Ejecuciones de prueba}}",
+        "session": "{count, plural, one {Sesión} other {Sesiones}}"
+      }
+    },
+    "review": {
+      "title": "Sugerencias de etiquetas de revisión",
+      "description": "Haga clic en las etiquetas para activar o desactivar la aceptación. Haga doble clic para editar el nombre de una etiqueta.",
+      "selectEntity": "Seleccione una entidad para ver sugerencias de etiquetas.",
+      "noTagsSelected": "No hay etiquetas seleccionadas",
+      "footerSummary": "{assignCount, plural, one {# etiqueta} other {# etiquetas}} serán asignadas, {newCount, plural, one {# nueva etiqueta} other {# nuevas etiquetas}} serán creadas",
+      "applying": "Aplicando...",
+      "applySuccess": "{tagCount, plural, one {# etiqueta} other {# etiquetas}} aplicadas a {entityCount, plural, one {# entidad} other {# entidades}}",
+      "applySuccessNewTags": "{tagCount, plural, one {# etiqueta} other {# etiquetas}} aplicadas a {entityCount, plural, one {# entidad} other {# entidades}}, {newCount, plural, one {# nueva etiqueta} other {# nuevas etiquetas}} creadas",
+      "applyError": "No se pudieron aplicar las etiquetas. Inténtalo de nuevo.",
+      "suggestedTags": "Etiquetas sugeridas",
+      "noSuggestions": "La IA no pudo generar ninguna etiqueta.",
+      "alreadyApplied": "Ya aplicado",
+      "filterEntities": "Filtrar entidades...",
+      "noEntitiesMatch": "No hay entidades que coincidan con tu búsqueda.",
+      "tagCount": "{count, plural, one {# etiqueta} other {# etiquetas}}",
+      "noTags": "ninguno",
+      "failed": "Fallido",
+      "analysisFailed": "No se pudo analizar esta entidad",
+      "responseTruncated": "Respuesta truncada: aumente los tokens de salida máximos en la configuración de LLM",
+      "tooltipExisting": "Etiqueta existente",
+      "tooltipNew": "Se creará una nueva etiqueta",
+      "tooltipAssign": "Asignar etiqueta existente",
+      "toggleFailed": "Mostrar/ocultar entidades fallidas",
+      "showFailed": "El espectáculo falló"
+    },
+    "progress": {
+      "starting": "Comenzando el análisis...",
+      "analyzed": "Entidades analizadas {analyzed}/{total}",
+      "finalizing": "Preparando resultados...",
+      "complete": "Análisis completo",
+      "reviewSuggestions": "Sugerencias de revisión",
+      "failed": "Análisis fallido"
+    },
+    "wizard": {
+      "description": "La IA analizará todos los casos de prueba, ejecuciones de pruebas y sesiones de su proyecto para sugerir etiquetas relevantes según su contenido.",
+      "entityLine": "{count} {type}",
+      "startAnalysis": "Iniciar análisis",
+      "untaggedOnly": "Analizar únicamente registros sin etiquetas existentes",
+      "noLlmConfigured": "(No hay LLM configurado)",
+      "analyzingDescription": "La IA está analizando tus entidades y generando sugerencias de etiquetas. Esto puede tardar un momento."
+    },
+    "entityDetail": {
+      "customFields": "Campos personalizados",
+      "documentation": "Documentación",
+      "noDetails": "No hay detalles adicionales disponibles.",
+      "openInNewTab": "Abrir en nueva pestaña"
+    }
   },
   "TrialExpired": {
     "title": "Su período de prueba ha expirado.",

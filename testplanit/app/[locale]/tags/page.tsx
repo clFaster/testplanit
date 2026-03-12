@@ -3,13 +3,33 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "~/lib/navigation";
-import { useFindManyTags, useCountTags } from "~/lib/hooks";
+import {
+  useFindManyTags,
+  useCountTags,
+  useFindManyProjects,
+} from "~/lib/hooks";
 import { DataTable } from "@/components/tables/DataTable";
 import { getColumns } from "./columns";
 import { useDebounce } from "@/components/Debounce";
 import { Filter } from "@/components/tables/Filter";
 import { PaginationComponent } from "@/components/tables/Pagination";
 import { PaginationInfo } from "@/components/tables/PaginationControls";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import { Button } from "@/components/ui/button";
+import { TagsIcon, Boxes } from "lucide-react";
+import Image from "next/image";
+import { cn } from "~/utils";
 import {
   Card,
   CardHeader,
@@ -54,6 +74,20 @@ function Tags() {
   }>({
     column: "name",
     direction: "asc",
+  });
+
+  // ── AI Auto-Tag ──────────────────────────────────────────────────
+  const [autoTagOpen, setAutoTagOpen] = useState(false);
+  const { data: projects } = useFindManyProjects({
+    where: { isDeleted: false },
+    include: {
+      projectLlmIntegrations: {
+        where: { isActive: true },
+        select: { id: true },
+        take: 1,
+      },
+    },
+    orderBy: [{ isCompleted: "asc" }, { name: "asc" }],
   });
 
   // Valid column IDs for sorting
@@ -143,7 +177,8 @@ function Tags() {
   // When sorting by count columns, we need to fetch ALL tags to sort properly
   // Otherwise we can paginate server-side
   const needsClientSideSorting = sortConfig.column !== "name";
-  const shouldPaginate = !needsClientSideSorting && typeof effectivePageSize === "number";
+  const shouldPaginate =
+    !needsClientSideSorting && typeof effectivePageSize === "number";
   const paginationArgs = {
     skip: shouldPaginate ? skip : undefined,
     take: shouldPaginate ? effectivePageSize : undefined,
@@ -382,9 +417,77 @@ function Tags() {
       <Card>
         <CardHeader className="w-full">
           <div className="flex items-center justify-between text-primary text-2xl md:text-4xl">
-            <div>
-              <CardTitle>{t("enums.ApplicationArea.Tags")}</CardTitle>
-            </div>
+            <CardTitle>{t("enums.ApplicationArea.Tags")}</CardTitle>
+            <Popover open={autoTagOpen} onOpenChange={setAutoTagOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="default"
+                  size="sm"
+                  data-testid="ai-auto-tag-button"
+                  disabled={!projects || projects.length === 0}
+                >
+                  <TagsIcon className="h-4 w-4" />
+                  {t("autoTag.actions.aiAutoTag")}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] px-0 py-2" align="end">
+                <Command className="py-0.5">
+                  <CommandInput placeholder={t("common.fields.projects")} />
+                  <CommandEmpty>
+                    {t("common.ui.search.noProjectsFound")}
+                  </CommandEmpty>
+                  <CommandGroup className="max-h-[600px] overflow-y-auto">
+                    {(projects || []).map((p) => {
+                      const hasLlm =
+                        p.projectLlmIntegrations &&
+                        p.projectLlmIntegrations.length > 0;
+                      return (
+                        <CommandItem
+                          key={p.id}
+                          value={p.name}
+                          disabled={!hasLlm}
+                          onSelect={() => {
+                            if (!hasLlm) return;
+                            setAutoTagOpen(false);
+                            router.push(`/projects/tags/${p.id}?autoTag=true`);
+                          }}
+                        >
+                          {p.iconUrl ? (
+                            <Image
+                              src={p.iconUrl}
+                              alt={`${p.name} icon`}
+                              width={16}
+                              height={16}
+                              className="shrink-0 object-contain"
+                            />
+                          ) : (
+                            <Boxes className="h-4 w-4 shrink-0" />
+                          )}
+                          <span
+                            className={cn(
+                              "truncate",
+                              (p.isCompleted || !hasLlm) && "opacity-60"
+                            )}
+                          >
+                            {p.name}
+                          </span>
+                          {p.isCompleted && (
+                            <span className="ml-2 text-xs text-muted-foreground">
+                              {"(Complete)"}
+                            </span>
+                          )}
+                          {!hasLlm && (
+                            <span className="ml-2 text-xs text-muted-foreground">
+                              {t("autoTag.wizard.noLlmConfigured")}
+                            </span>
+                          )}
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
           <CardDescription>{t("tags.description")}</CardDescription>
         </CardHeader>
