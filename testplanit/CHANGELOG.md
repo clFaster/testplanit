@@ -1,3 +1,9 @@
+## [0.16.0](https://github.com/TestPlanIt/testplanit/compare/v0.15.4...v0.16.0) (2026-03-12)
+
+### Features
+
+* **auto-tag:** add AI-powered auto-tagging for cases, runs, and sessions ([#127](https://github.com/TestPlanIt/testplanit/issues/127)) ([d01a8da](https://github.com/TestPlanIt/testplanit/commit/d01a8da))
+
 ## [0.15.4](https://github.com/TestPlanIt/testplanit/compare/v0.15.3...v0.15.4) (2026-03-11)
 
 ### Bug Fixes
