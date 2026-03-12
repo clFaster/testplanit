@@ -25,7 +25,6 @@ import {
   Compass,
   Bot,
   ListChecks,
-  AlertTriangle,
   Search,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -158,12 +157,6 @@ function getEntityIcon(entity: {
       return <Compass className={cn("h-3.5 w-3.5 shrink-0", colorClass)} />;
   }
 }
-
-const ENTITY_TYPE_ICONS: Record<EntityType, typeof ListTree> = {
-  repositoryCase: ListTree,
-  testRun: PlayCircle,
-  session: Compass,
-};
 
 /** DataTable-compatible row for the review step */
 interface AutoTagReviewRow {
