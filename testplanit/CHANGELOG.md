@@ -1,3 +1,9 @@
+## [0.16.5](https://github.com/TestPlanIt/testplanit/compare/v0.16.4...v0.16.5) (2026-03-13)
+
+### Bug Fixes
+
+* **workers:** pass tenant Prisma client to IntegrationManager.getAdapter ([9a97412](https://github.com/TestPlanIt/testplanit/commit/9a9741246ad16552fb5496c66ae07c9bb2425015))
+
 ## [0.16.4](https://github.com/TestPlanIt/testplanit/compare/v0.16.3...v0.16.4) (2026-03-13)
 
 ### Bug Fixes
