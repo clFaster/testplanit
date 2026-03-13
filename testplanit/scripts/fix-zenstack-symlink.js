@@ -70,6 +70,11 @@ try {
       const targetFile = path.join(runtimePath, fileName);
 
       if (fs.existsSync(sourceFile)) {
+        // Unlink first to break pnpm hard link — writing through a hard link
+        // corrupts the content-addressable store and breaks future clean installs
+        if (fs.existsSync(targetFile)) {
+          fs.unlinkSync(targetFile);
+        }
         fs.copyFileSync(sourceFile, targetFile);
         copiedCount++;
       }
