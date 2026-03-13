@@ -1,3 +1,9 @@
+## [0.16.2](https://github.com/TestPlanIt/testplanit/compare/v0.16.1...v0.16.2) (2026-03-13)
+
+### Bug Fixes
+
+* **workers:** add new background workers and update concurrency settings ([0327595](https://github.com/TestPlanIt/testplanit/commit/032759562d80cf5d8f954e020953728643b6c37f))
+
 ## [0.16.1](https://github.com/TestPlanIt/testplanit/compare/v0.16.0...v0.16.1) (2026-03-13)
 
 ### Bug Fixes
