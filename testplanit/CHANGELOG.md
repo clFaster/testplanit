@@ -1,3 +1,9 @@
+## [0.16.7](https://github.com/TestPlanIt/testplanit/compare/v0.16.6...v0.16.7) (2026-03-14)
+
+### Enhancements
+
+* **llm:** enhance LLM integration with updated provider configurations and connection testing ([fdbc5ab](https://github.com/TestPlanIt/testplanit/commit/fdbc5ab635f0fec7e0774d5de0dae07a596a1f3a))
+
 ## [0.16.6](https://github.com/TestPlanIt/testplanit/compare/v0.16.5...v0.16.6) (2026-03-13)
 
 ### Bug Fixes
