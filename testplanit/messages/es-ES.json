@@ -72,12 +72,12 @@
       "resultDetails": "Detalles del resultado",
       "actionsLabel": "Acciones",
       "assign": "Asignar",
-      "assignSelected": "Asignar casos {count}",
+      "assignSelected": "Asignar {count, plural, one {# caso} other {# casos}}",
       "refresh": "Refrescar",
-      "addResultSelected": "Añadir resultado a casos {count}",
-      "resultsAdded": "{count} resultados añadidos",
-      "resultsAddedDescription": "Los resultados se han añadido a los casos de prueba {count} con éxito",
-      "addingResultsToMultiple": "Añadiendo resultados a casos de prueba {count}",
+      "addResultSelected": "Agregar resultado a {count, plural, one {# caso} other {# casos}}",
+      "resultsAdded": "{count, plural, one {# Resultado} other {# Resultados}} Añadido",
+      "resultsAddedDescription": "{count, plural, one {El resultado se ha añadido al caso de prueba #} other {Los resultados se han añadido a los casos de prueba #}} correctamente",
+      "addingResultsToMultiple": "Añadiendo resultados a {count, plural, one {# caso de prueba} other {# casos de prueba}}",
       "addedToTestRun": "Añadido a Test Run",
       "addedToTestRunDescription": "El caso de prueba se ha añadido a la versión de prueba.",
       "noAvailableTestRuns": "Todas las ejecuciones de prueba activas ya incluyen este caso de prueba.",
@@ -169,7 +169,7 @@
           },
           "progress": {
             "parsing": "Analizando {format} resultados...",
-            "parseWarnings": "Analizado con {count} advertencia(s)",
+            "parseWarnings": "Analizado con {count, plural, one {# advertencia} other {# advertencias}}",
             "errorParsing": "Error al analizar archivos: {error}"
           },
           "error": {
@@ -438,7 +438,7 @@
       },
       "assignBulk": {
         "title": "Asignación masiva de casos de prueba",
-        "description": "Asignar {count} casos de prueba seleccionados a un usuario"
+        "description": "Asignar {count, plural, one {# caso de prueba seleccionado} other {# casos de prueba seleccionados}} a un usuario"
       },
       "complete": {
         "title": "Completar prueba",
@@ -861,8 +861,8 @@
     "success": {
       "assigned": "Caso de prueba asignado correctamente",
       "unassigned": "Caso de prueba no asignado correctamente",
-      "bulkAssigned": "{count} casos de prueba asignados exitosamente",
-      "bulkUnassigned": "{count} casos de prueba no asignados con éxito"
+      "bulkAssigned": "{count, plural, one {# caso de prueba} other {# casos de prueba}} asignados correctamente",
+      "bulkUnassigned": "{count, plural, one {# caso de prueba} other {# casos de prueba}} no asignado correctamente"
     },
     "tabs": {
       "general": "General",
@@ -1188,7 +1188,7 @@
           "addPath": "Agregar ruta",
           "previewFiles": "Vista previa de archivos",
           "scanningRepo": "Escaneando archivos del repositorio… ({seconds}s)",
-          "files": "{count} archivos",
+          "files": "{count, plural, one {# archivo} other {# archivos}}",
           "truncatedBadge": "Los resultados pueden estar incompletos (límite del proveedor)",
           "exceedsLimit": "El tamaño total supera el límite del contexto de IA en {overflow}. Durante la exportación, los archivos se clasifican según su relevancia para el caso de prueba que se exporta: los archivos más relevantes se incluyen primero y los de menor rango se omiten al alcanzar el límite. Reduzca los patrones de ruta si desea tener más control sobre los archivos incluidos."
         },
@@ -1766,7 +1766,7 @@
           "column": "Columna {number}"
         },
         "success": {
-          "description": "{count} casos de prueba importados exitosamente"
+          "description": "{count, plural, one {# caso de prueba} other {# casos de prueba}} importado correctamente"
         },
         "errors": {
           "templateRequired": "La selección de plantillas es necesaria",
@@ -1805,7 +1805,7 @@
           "title": "Mapear columnas CSV a campos",
           "description": "Mapear cada columna CSV a un campo en la plantilla o elegir ignorarlo.",
           "ignoreColumn": "Ignorar Columna",
-          "requiredFieldsWarning": "{count} campos obligatorios no están mapeados"
+          "requiredFieldsWarning": "{count, plural, one {# el campo requerido es} other {# los campos requeridos son}} no están mapeados"
         },
         "page3": {
           "title": "Resumen de mapeo de campos",
@@ -1997,16 +1997,16 @@
       "outputModeLabel": "Modo de salida",
       "outputModeSingle": "Archivo único ({count, plural, one {# caso} other {todos # casos}})",
       "outputModeIndividual": "{count, plural, one {Archivo individual (.zip)} other {Archivos individuales (.zip)}}",
-      "casesToExport": "{count} casos para exportar",
+      "casesToExport": "{count, plural, one {# caso} other {# casos}} para exportar",
       "exportSuccess": "Exportación completada exitosamente."
     },
     "aiExport": {
       "toggleLabel": "Generar con IA",
       "generating": "Generando...",
       "generatingProgress": "Generando caso {current} de {total}...",
-      "generatingBatch": "Generando {count} casos en un archivo...",
+      "generatingBatch": "Generando {count, plural, one {# caso} other {# casos}} en un solo archivo...",
       "previewTitle": "Vista previa de exportación",
-      "previewDescription": "{count} archivos generados",
+      "previewDescription": "{count, plural, one {# archivo} other {# archivos}} generados",
       "copySuccess": "Copiado al portapapeles",
       "fallbackBadge": "Generado usando plantilla (IA no disponible)",
       "retryButton": "Reintentar la generación de IA",
@@ -2085,9 +2085,9 @@
         "title": "Revisar casos de prueba generados",
         "description": "Revise los casos de prueba generados por AI, haga cualquier edición necesaria y seleccione cuáles para importar.",
         "selected": "{count} de {total} seleccionados",
-        "moreSteps": "... y {count} pasos más",
+        "moreSteps": "... y {count, plural, one {# más pasos} other {# más pasos}}",
         "templateFields": "Campos de Plantilla:",
-        "moreFields": "... y {count} campos más"
+        "moreFields": "... y {count, plural, one {# más campos} other {# más campos}}"
       },
       "generating": "Generando casos de prueba con AI...",
       "import": "{count, plural, =0 {Importar casos de prueba} =1 {Importar 1 caso de prueba} other {Importar # casos de prueba}}",
@@ -2224,7 +2224,7 @@
       "success": {
         "title": "Prueba de ejecución añadida correctamente",
         "description": "La ejecución de la prueba ha sido añadida al proyecto",
-        "descriptionMultiple": "Se han creado {count} ejecuciones de prueba para '{name}'"
+        "descriptionMultiple": "{count, plural, one {# test run has} other {# test runs have}} been created for '{name}'"
       },
       "estimates": {
         "manual": "Tiempo manual estimado",
@@ -2276,7 +2276,7 @@
       },
       "actions": {
         "start": "Analizar casos de prueba",
-        "startBatched": "Analizar casos de prueba (lotes{count} )",
+        "startBatched": "Analizar casos de prueba ({count, plural, one {# lote} other {# lotes}})",
         "accept": "Añadir a la selección"
       },
       "errors": {
@@ -2821,7 +2821,7 @@
         "defaultAccessUpdateFailed": "No se pudo actualizar el nivel de acceso predeterminado",
         "emailVerificationEnabled": "Ahora se requiere verificación de correo electrónico para nuevos usuarios",
         "emailVerificationDisabled": "La verificación de correo electrónico ya no es necesaria para los nuevos usuarios",
-        "emailVerificationDisabledAndVerified": "La verificación de correo electrónico está deshabilitada y {count} cuenta(s) de usuario están verificadas",
+        "emailVerificationDisabledAndVerified": "Verificación de correo electrónico deshabilitada y {count, plural, one {# cuenta de usuario} other {# cuentas de usuario}} verificada",
         "emailVerificationUpdateFailed": "No se pudo actualizar la configuración de verificación de correo electrónico",
         "emailServerNotConfigured": "No se puede habilitar la verificación de correo electrónico: el servidor de correo electrónico no está configurado"
       },
@@ -3616,7 +3616,7 @@
         "send": "Enviar notificación",
         "success": {
           "title": "Notificación enviada",
-          "description": "Notificación de sistema enviada a usuarios de {count}"
+          "description": "Notificación del sistema enviada a {count, plural, one {# usuario} other {# usuarios}}"
         },
         "error": {
           "description": "Error al enviar la notificación del sistema",
@@ -3832,6 +3832,7 @@
         "endpoint": "Endpoint URL",
         "endpointPlaceholder": "https://api.provider.com/v1",
         "endpointDescription": "La URL base para las solicitudes de API. Para proveedores estándar (OpenAI, Anthropic, Gemini), solo se aceptan URL oficiales. Para proveedores alojados en servidores propios, las direcciones privadas/internas (localhost, 127.0.0.1, IP privadas) están bloqueadas por seguridad.",
+        "endpointV1Hint": "Consejo: Si utiliza un proxy (por ejemplo, LiteLLM), intente agregar /v1 al final de la URL de su punto final.",
         "deploymentName": "Nombre de despliegue",
         "deploymentNamePlaceholder": "Introduce el nombre de implementación...",
         "deploymentNameDescription": "Nombre del despliegue Azure OpenAI",
@@ -3926,7 +3927,7 @@
       "addPromptConfig": "Agregar configuración de solicitud",
       "filterPlaceholder": "Configuraciones de solicitud de filtro...",
       "features": "Características",
-      "featureCount": "{count} características",
+      "featureCount": "{count, plural, one {# característica} other {# características}}",
       "systemPrompt": "Indicador del sistema",
       "userPrompt": "Aviso al usuario",
       "temperature": "Temperatura",
@@ -4008,7 +4009,7 @@
         },
         "success": {
           "title": "Reindexación exitosa",
-          "description": "{count} documentos indexados exitosamente"
+          "description": "{count, plural, one {# documento} other {# documentos}} indexados correctamente"
         },
         "error": {
           "title": "Reindexación fallida",
@@ -4178,7 +4179,7 @@
         "commentMentionTitle": "Te mencionaron en un comentario",
         "systemAnnouncementTitle": "Anuncio del sistema",
         "assignedTestCase": "le ha asignado al caso de prueba",
-        "assignedMultipleTestCases": "le ha asignado {count} casos de prueba",
+        "assignedMultipleTestCases": "Te asigné {count, plural, one {# caso de prueba} other {# casos de prueba}}",
         "assignedSession": "asignado a la sesión",
         "mentionedYouInComment": "Te mencioné en un comentario en",
         "inProject": "en proyecto",
@@ -4239,7 +4240,7 @@
         "searching": "Buscando...",
         "searchError": "Error al buscar problemas",
         "linkButton": "Enlace",
-        "linkedCount": "{count} incidencias vinculadas"
+        "linkedCount": "{count, plural, one {# problema} other {# problemas}} vinculado"
       }
     }
   },
@@ -5147,7 +5148,7 @@
         "flipThreshold": "Volteos mínimos",
         "flipThresholdHelp": "Se requiere un número mínimo de transiciones de aprobado/reprobado para que se considere inestable.",
         "flips": "volteretas",
-        "lastNResults": "Últimos {count} resultados",
+        "lastNResults": "Último {count, plural, one {# Resultado} other {# Resultados}}",
         "newest": "Nuevo",
         "oldest": "Viejo",
         "noFlakyTests": "No se encontraron pruebas inconsistentes que coincidan con los criterios",
@@ -5163,7 +5164,7 @@
           "failureRate": "Porcentaje de averías",
           "recency": "Puntuación de actualidad",
           "backlogTitle": "Pruebas de menor prioridad",
-          "backlogDescription": "{count} No se muestran pruebas adicionales"
+          "backlogDescription": "{count, plural, one {# prueba adicional inestable} other {# pruebas adicionales inestables}} no se muestra"
         }
       },
       "testCaseHealth": {
@@ -5627,12 +5628,12 @@
         "stepsData": "Datos de pasos"
       },
       "success": {
-        "description": "pasos compartidos actualizados correctamente"
+        "description": "{count, plural, one {# paso compartido} other {# pasos compartidos}} importado correctamente"
       },
       "errors": {
         "parseFailed": "Error al analizar el archivo CSV",
         "validationFailed": "Error de validación",
-        "validationDescription": "Se encontraron errores de validación {count}",
+        "validationDescription": "{count, plural, one {# error de validación} other {# errores de validación}} encontrado",
         "importFailed": "Error al importar",
         "fileRequired": "Se requiere un archivo CSV"
       },
@@ -5656,7 +5657,7 @@
         "title": "Mapear columnas CSV a campos de pasos compartidos",
         "description": "Mapee sus columnas CSV a campos de pasos compartidos. Los campos requeridos deben ser mapeados.",
         "ignoreColumn": "Ignorar esta columna",
-        "requiredFieldsWarning": "{count} campos obligatorios no están mapeados. Por favor, asigne todos los campos requeridos para continuar."
+        "requiredFieldsWarning": "{count, plural, one {# El campo obligatorio es} other {# Los campos obligatorios son}} no están mapeados. Por favor, mapee todos los campos obligatorios para continuar."
       },
       "page3": {
         "title": "Previsualizar datos de importación",
@@ -5701,7 +5702,7 @@
       "tryAgain": "Inténtalo de nuevo"
     },
     "startTyping": "Empezar a escribir para buscar",
-    "typesSelected": "Tipos {count}",
+    "typesSelected": "{count, plural, one {# tipo} other {# tipos}}",
     "customFieldFilters": "Filtros de Campo Personalizados",
     "customFiltersApplied": "filtros personalizados",
     "customFields": "Campos personalizados",

@@ -340,14 +340,26 @@ export function AddLlmIntegration({
           description: t("connectionSuccessfulDescription"),
         });
       } else {
+        const errorMsg = data.error || t("failedToConnect");
+        const endpointVal = values.endpoint?.replace(/\/+$/, "");
+        const hint =
+          endpointVal && !endpointVal.endsWith("/v1")
+            ? " " + t("endpointV1Hint")
+            : "";
         toast.error(tIntegrations("testFailed"), {
-          description: data.error || t("failedToConnect"),
+          description: errorMsg + hint,
         });
       }
     } catch (error) {
+      const errorMsg =
+        error instanceof Error ? error.message : t("failedToConnect");
+      const endpointVal = values.endpoint?.replace(/\/+$/, "");
+      const hint =
+        endpointVal && !endpointVal.endsWith("/v1")
+          ? " " + t("endpointV1Hint")
+          : "";
       toast.error(tIntegrations("testFailed"), {
-        description:
-          error instanceof Error ? error.message : t("failedToConnect"),
+        description: errorMsg + hint,
       });
     } finally {
       setTestingConnection(false);

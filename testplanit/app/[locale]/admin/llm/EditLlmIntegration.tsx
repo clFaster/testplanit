@@ -291,14 +291,26 @@ export function EditLlmIntegration({
           description: tAdd("connectionSuccessfulDescription"),
         });
       } else {
+        const errorMsg = data.error || tAdd("failedToConnect");
+        const endpointVal = values.endpoint?.replace(/\/+$/, "");
+        const hint =
+          endpointVal && !endpointVal.endsWith("/v1")
+            ? " " + tAdd("endpointV1Hint")
+            : "";
         toast.error(tIntegrations("testFailed"), {
-          description: data.error || tAdd("failedToConnect"),
+          description: errorMsg + hint,
         });
       }
     } catch (error) {
+      const errorMsg =
+        error instanceof Error ? error.message : tAdd("failedToConnect");
+      const endpointVal = values.endpoint?.replace(/\/+$/, "");
+      const hint =
+        endpointVal && !endpointVal.endsWith("/v1")
+          ? " " + tAdd("endpointV1Hint")
+          : "";
       toast.error(tIntegrations("testFailed"), {
-        description:
-          error instanceof Error ? error.message : tAdd("failedToConnect"),
+        description: errorMsg + hint,
       });
     } finally {
       setTestingConnection(false);

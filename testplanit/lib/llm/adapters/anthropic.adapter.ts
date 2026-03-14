@@ -237,18 +237,8 @@ export class AnthropicAdapter extends BaseLlmAdapter {
 
   async testConnection(): Promise<boolean> {
     try {
-      if (this.isCustomEndpoint()) {
-        // For proxies (LiteLLM, etc.), test with the /models endpoint
-        // which doesn't require a valid model name
-        const response = await this.safeFetch(`${this.baseUrl}/models`, {
-          method: "GET",
-          headers: this.getAnthropicHeaders(),
-          signal: AbortSignal.timeout(10000),
-        });
-        return response.ok;
-      }
-
-      // Direct Anthropic API — send a minimal chat request
+      // Send a minimal chat request to the same endpoint used by actual calls.
+      // This catches misconfigurations like a missing /v1 path segment.
       const response = await this.safeFetch(`${this.baseUrl}/messages`, {
         method: "POST",
         headers: this.getAnthropicHeaders(),
@@ -260,6 +250,7 @@ export class AnthropicAdapter extends BaseLlmAdapter {
         signal: AbortSignal.timeout(10000),
       });
 
+      // 200 = success, 400 = bad request (but endpoint is reachable and authenticated)
       return response.status === 200 || response.status === 400;
     } catch {
       return false;

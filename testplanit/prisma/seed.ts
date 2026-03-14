@@ -2088,6 +2088,40 @@ export default function () {
 }
 `;
 
+  // --- k6 TypeScript ---
+  const k6TsHeader = `import http, { RefinedResponse, ResponseType } from "k6/http";
+import { check, sleep } from "k6";
+import { Options } from "k6/options";`;
+
+  const k6TsBody = `/**
+ * Test Case: {{{name}}}
+ * ID: {{{id}}}
+ * State: {{{state}}}
+ * Tags: {{{tags}}}
+ * Created by: {{{createdBy}}}
+ */
+
+export const options: Options = {
+  vus: 10,
+  duration: "30s",
+};
+
+export default function (): void {
+{{#steps}}
+  // Step {{{order}}}: {{{step}}}
+  // Expected: {{{expectedResult}}}
+  {
+    const res: RefinedResponse<ResponseType> = http.get("http://localhost:3000/api/endpoint");
+    check(res, {
+      "Step {{order}} - status is 200": (r) => r.status === 200,
+    });
+  }
+
+{{/steps}}
+  sleep(1);
+}
+`;
+
   const robotFrameworkBody = `*** Settings ***
 Documentation    Test Case: {{{name}}}
 ...              ID: {{{id}}}
@@ -2517,6 +2551,49 @@ class Test{{{id}}}:
  */
 describe("{{name}}", () => {
   let driver;
+
+  before(async () => {
+    driver = await remote({
+      hostname: "127.0.0.1",
+      port: 4723,
+      capabilities: {
+        platformName: "Android",
+        "appium:automationName": "UiAutomator2",
+        "appium:deviceName": "emulator-5554",
+        "appium:app": "/path/to/app.apk",
+      },
+    });
+  });
+
+  after(async () => {
+    if (driver) {
+      await driver.deleteSession();
+    }
+  });
+
+{{#steps}}
+  // Step {{{order}}}: {{{step}}}
+  // Expected: {{{expectedResult}}}
+  it("Step {{order}} - {{step}}", async () => {
+    // TODO: Implement test logic
+  });
+
+{{/steps}}
+});
+`;
+
+  // --- Appium TypeScript ---
+  const appiumTsHeader = `import { remote, Browser } from "webdriverio";`;
+
+  const appiumTsBody = `/**
+ * Test Case: {{{name}}}
+ * ID: {{{id}}}
+ * State: {{{state}}}
+ * Tags: {{{tags}}}
+ * Created by: {{{createdBy}}}
+ */
+describe("{{name}}", () => {
+  let driver: Browser;
 
   before(async () => {
     driver = await remote({
@@ -3142,6 +3219,19 @@ class Test{{{id}}}: XCTestCase {
       language: "javascript",
       isDefault: false,
     },
+    {
+      name: "k6 (TypeScript)",
+      description:
+        "Generates k6 performance test scripts in TypeScript with typed options and configurable VUs.",
+      category: "Performance",
+      framework: "k6",
+      headerBody: k6TsHeader,
+      templateBody: k6TsBody,
+      footerBody: null as string | null,
+      fileExtension: ".ts",
+      language: "typescript",
+      isDefault: false,
+    },
     // --- Robot Framework ---
     {
       name: "Robot Framework",
@@ -3332,6 +3422,19 @@ class Test{{{id}}}: XCTestCase {
       footerBody: null as string | null,
       fileExtension: ".test.js",
       language: "javascript",
+      isDefault: false,
+    },
+    {
+      name: "Appium (TypeScript)",
+      description:
+        "Generates Appium test stubs in TypeScript with WebdriverIO remote driver setup.",
+      category: "Mobile Testing",
+      framework: "Appium",
+      headerBody: appiumTsHeader,
+      templateBody: appiumTsBody,
+      footerBody: null as string | null,
+      fileExtension: ".test.ts",
+      language: "typescript",
       isDefault: false,
     },
     {

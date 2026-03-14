@@ -166,7 +166,7 @@ export function QuickScriptModal({
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const [comboboxOpen, setComboboxOpen] = useState(false);
   const [outputMode, setOutputMode] = useState<"single" | "individual">(
-    "individual"
+    selectedCaseIds.length === 1 ? "single" : "individual"
   );
   const [isExporting, setIsExporting] = useState(false);
 
@@ -284,8 +284,11 @@ export function QuickScriptModal({
       casesDataRef.current = [];
       isBatchModeRef.current = false;
       abortControllerRef.current = null;
+    } else {
+      // When modal opens, set output mode based on selection count
+      setOutputMode(selectedCaseIds.length === 1 ? "single" : "individual");
     }
-  }, [isOpen]);
+  }, [isOpen, selectedCaseIds.length]);
 
   // Download handler for preview pane
   const handlePreviewDownload = useCallback(async () => {
@@ -685,7 +688,7 @@ export function QuickScriptModal({
       <DialogContent
         className={cn(
           showPreview ? "sm:max-w-225 max-h-[95vh]" : "sm:max-w-125",
-          "transition-all"
+          "transition-all overflow-hidden"
         )}
         data-testid="quickscript-dialog"
       >
@@ -821,8 +824,18 @@ export function QuickScriptModal({
                   data-testid="quickscript-output-mode"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="individual" id="individual" />
-                    <Label htmlFor="individual">
+                    <RadioGroupItem
+                      value="individual"
+                      id="individual"
+                      disabled={selectedCaseIds.length === 1}
+                    />
+                    <Label
+                      htmlFor="individual"
+                      className={cn(
+                        selectedCaseIds.length === 1 &&
+                          "text-muted-foreground"
+                      )}
+                    >
                       {t("outputModeIndividual", {
                         count: selectedCaseIds.length,
                       })}

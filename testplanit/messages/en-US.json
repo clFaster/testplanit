@@ -72,12 +72,12 @@
       "resultDetails": "Result Details",
       "actionsLabel": "Actions",
       "assign": "Assign",
-      "assignSelected": "Assign {count} cases",
+      "assignSelected": "Assign {count, plural, one {# case} other {# cases}}",
       "refresh": "Refresh",
-      "addResultSelected": "Add Result to {count} cases",
-      "resultsAdded": "{count} Results Added",
-      "resultsAddedDescription": "Results have been added to {count} test cases successfully",
-      "addingResultsToMultiple": "Adding results to {count} test cases",
+      "addResultSelected": "Add Result to {count, plural, one {# case} other {# cases}}",
+      "resultsAdded": "{count, plural, one {# Result} other {# Results}} Added",
+      "resultsAddedDescription": "{count, plural, one {Result has been added to # test case} other {Results have been added to # test cases}} successfully",
+      "addingResultsToMultiple": "Adding results to {count, plural, one {# test case} other {# test cases}}",
       "addedToTestRun": "Added to Test Run",
       "addedToTestRunDescription": "The test case has been added to the Test Run.",
       "noAvailableTestRuns": "All active Test Runs already include this Test Case.",
@@ -169,7 +169,7 @@
           },
           "progress": {
             "parsing": "Parsing {format} results...",
-            "parseWarnings": "Parsed with {count} warning(s)",
+            "parseWarnings": "Parsed with {count, plural, one {# warning} other {# warnings}}",
             "errorParsing": "Error parsing files: {error}"
           },
           "error": {
@@ -438,7 +438,7 @@
       },
       "assignBulk": {
         "title": "Bulk Assign Test Cases",
-        "description": "Assign {count} selected test cases to a user"
+        "description": "Assign {count, plural, one {# selected test case} other {# selected test cases}} to a user"
       },
       "complete": {
         "title": "Complete Test Run",
@@ -861,8 +861,8 @@
     "success": {
       "assigned": "Test case assigned successfully",
       "unassigned": "Test case unassigned successfully",
-      "bulkAssigned": "{count} test cases assigned successfully",
-      "bulkUnassigned": "{count} test cases unassigned successfully"
+      "bulkAssigned": "{count, plural, one {# test case} other {# test cases}} assigned successfully",
+      "bulkUnassigned": "{count, plural, one {# test case} other {# test cases}} unassigned successfully"
     },
     "tabs": {
       "general": "General",
@@ -1188,7 +1188,7 @@
           "addPath": "Add Path",
           "previewFiles": "Preview Files",
           "scanningRepo": "Scanning repository files… ({seconds}s)",
-          "files": "{count} files",
+          "files": "{count, plural, one {# file} other {# files}}",
           "truncatedBadge": "Results may be incomplete (provider limit)",
           "exceedsLimit": "Total size exceeds the AI context limit by {overflow}. During export, files are ranked by relevance to the test case being exported — the most relevant files are included first and lower-ranked files are skipped when the budget is reached. Narrow your path patterns if you want more control over which files are included."
         },
@@ -1766,7 +1766,7 @@
           "column": "Column {number}"
         },
         "success": {
-          "description": "{count} test cases imported successfully"
+          "description": "{count, plural, one {# test case} other {# test cases}} imported successfully"
         },
         "errors": {
           "templateRequired": "Template selection is required",
@@ -1805,7 +1805,7 @@
           "title": "Map CSV Columns to Fields",
           "description": "Map each CSV column to a field in the template or choose to ignore it.",
           "ignoreColumn": "Ignore Column",
-          "requiredFieldsWarning": "{count} required fields are not mapped"
+          "requiredFieldsWarning": "{count, plural, one {# required field is} other {# required fields are}} not mapped"
         },
         "page3": {
           "title": "Field Mapping Summary",
@@ -1997,16 +1997,16 @@
       "outputModeLabel": "Output Mode",
       "outputModeSingle": "Single file ({count, plural, one {# case} other {all # cases}})",
       "outputModeIndividual": "{count, plural, one {Individual file (.zip)} other {Individual files (.zip)}}",
-      "casesToExport": "{count} cases to export",
+      "casesToExport": "{count, plural, one {# case} other {# cases}} to export",
       "exportSuccess": "Export completed successfully."
     },
     "aiExport": {
       "toggleLabel": "Generate with AI",
       "generating": "Generating...",
       "generatingProgress": "Generating case {current} of {total}...",
-      "generatingBatch": "Generating {count} cases in one file...",
+      "generatingBatch": "Generating {count, plural, one {# case} other {# cases}} in one file...",
       "previewTitle": "Export Preview",
-      "previewDescription": "{count} files generated",
+      "previewDescription": "{count, plural, one {# file} other {# files}} generated",
       "copySuccess": "Copied to clipboard",
       "fallbackBadge": "Generated using template (AI unavailable)",
       "retryButton": "Retry AI generation",
@@ -2085,9 +2085,9 @@
         "title": "Review Generated Test Cases",
         "description": "Review the AI-generated test cases, make any necessary edits, and select which ones to import.",
         "selected": "{count} of {total} selected",
-        "moreSteps": "... and {count} more steps",
+        "moreSteps": "... and {count, plural, one {# more step} other {# more steps}}",
         "templateFields": "Template Fields:",
-        "moreFields": "... and {count} more fields"
+        "moreFields": "... and {count, plural, one {# more field} other {# more fields}}"
       },
       "generating": "Generating test cases with AI...",
       "import": "{count, plural, =0 {Import Test Cases} =1 {Import 1 Test Case} other {Import # Test Cases}}",
@@ -2224,7 +2224,7 @@
       "success": {
         "title": "Test run added successfully",
         "description": "The test run has been added to the project",
-        "descriptionMultiple": "{count} test runs have been created for '{name}'"
+        "descriptionMultiple": "{count, plural, one {# test run has} other {# test runs have}} been created for '{name}'"
       },
       "estimates": {
         "manual": "Estimated Manual Time",
@@ -2276,7 +2276,7 @@
       },
       "actions": {
         "start": "Analyze Test Cases",
-        "startBatched": "Analyze Test Cases ({count} batches)",
+        "startBatched": "Analyze Test Cases ({count, plural, one {# batch} other {# batches}})",
         "accept": "Add to Selection"
       },
       "errors": {
@@ -2821,7 +2821,7 @@
         "defaultAccessUpdateFailed": "Failed to update default access level",
         "emailVerificationEnabled": "Email verification is now required for new users",
         "emailVerificationDisabled": "Email verification is no longer required for new users",
-        "emailVerificationDisabledAndVerified": "Email verification disabled and {count} user account(s) verified",
+        "emailVerificationDisabledAndVerified": "Email verification disabled and {count, plural, one {# user account} other {# user accounts}} verified",
         "emailVerificationUpdateFailed": "Failed to update email verification setting",
         "emailServerNotConfigured": "Cannot enable email verification: Email server is not configured"
       },
@@ -3616,7 +3616,7 @@
         "send": "Send Notification",
         "success": {
           "title": "Notification Sent",
-          "description": "System notification sent to {count} users"
+          "description": "System notification sent to {count, plural, one {# user} other {# users}}"
         },
         "error": {
           "description": "Failed to send system notification",
@@ -3832,6 +3832,7 @@
         "endpoint": "Endpoint URL",
         "endpointPlaceholder": "https://api.provider.com/v1",
         "endpointDescription": "The base URL for API requests. For standard providers (OpenAI, Anthropic, Gemini), only official URLs are accepted. For self-hosted providers, private/internal addresses (localhost, 127.0.0.1, private IPs) are blocked for security.",
+        "endpointV1Hint": "Tip: If using a proxy (e.g. LiteLLM), try adding /v1 to the end of your endpoint URL.",
         "deploymentName": "Deployment Name",
         "deploymentNamePlaceholder": "Enter deployment name...",
         "deploymentNameDescription": "Azure OpenAI deployment name",
@@ -3926,7 +3927,7 @@
       "addPromptConfig": "Add Prompt Configuration",
       "filterPlaceholder": "Filter prompt configurations...",
       "features": "Features",
-      "featureCount": "{count} features",
+      "featureCount": "{count, plural, one {# feature} other {# features}}",
       "systemPrompt": "System Prompt",
       "userPrompt": "User Prompt",
       "temperature": "Temperature",
@@ -4008,7 +4009,7 @@
         },
         "success": {
           "title": "Reindex Successful",
-          "description": "{count} documents indexed successfully"
+          "description": "{count, plural, one {# document} other {# documents}} indexed successfully"
         },
         "error": {
           "title": "Reindex Failed",
@@ -4178,7 +4179,7 @@
         "commentMentionTitle": "You were mentioned in a comment",
         "systemAnnouncementTitle": "System Announcement",
         "assignedTestCase": "assigned you to test case",
-        "assignedMultipleTestCases": "assigned you {count} test cases",
+        "assignedMultipleTestCases": "assigned you {count, plural, one {# test case} other {# test cases}}",
         "assignedSession": "assigned you to session",
         "mentionedYouInComment": "mentioned you in a comment on",
         "inProject": "in project",
@@ -4239,7 +4240,7 @@
         "searching": "Searching...",
         "searchError": "Failed to search issues",
         "linkButton": "Link",
-        "linkedCount": "{count} issues linked"
+        "linkedCount": "{count, plural, one {# issue} other {# issues}} linked"
       }
     }
   },
@@ -5147,7 +5148,7 @@
         "flipThreshold": "Minimum Flips",
         "flipThresholdHelp": "Minimum number of pass/fail transitions required to be considered flaky.",
         "flips": "Flips",
-        "lastNResults": "Last {count} Results",
+        "lastNResults": "Last {count, plural, one {# Result} other {# Results}}",
         "newest": "New",
         "oldest": "Old",
         "noFlakyTests": "No flaky tests found matching the criteria",
@@ -5163,7 +5164,7 @@
           "failureRate": "Failure rate",
           "recency": "Recency score",
           "backlogTitle": "Lower Priority Tests",
-          "backlogDescription": "{count} additional flaky tests not shown"
+          "backlogDescription": "{count, plural, one {# additional flaky test} other {# additional flaky tests}} not shown"
         }
       },
       "testCaseHealth": {
@@ -5627,12 +5628,12 @@
         "stepsData": "Steps Data"
       },
       "success": {
-        "description": "{count} shared steps imported successfully"
+        "description": "{count, plural, one {# shared step} other {# shared steps}} imported successfully"
       },
       "errors": {
         "parseFailed": "Failed to parse CSV file",
         "validationFailed": "Validation failed",
-        "validationDescription": "{count} validation errors found",
+        "validationDescription": "{count, plural, one {# validation error} other {# validation errors}} found",
         "importFailed": "Import failed",
         "fileRequired": "A CSV file is required"
       },
@@ -5656,7 +5657,7 @@
         "title": "Map CSV Columns to Shared Step Fields",
         "description": "Map your CSV columns to shared step fields. Required fields must be mapped.",
         "ignoreColumn": "Ignore this column",
-        "requiredFieldsWarning": "{count} required fields are not mapped. Please map all required fields to continue."
+        "requiredFieldsWarning": "{count, plural, one {# required field is} other {# required fields are}} not mapped. Please map all required fields to continue."
       },
       "page3": {
         "title": "Preview Import Data",
@@ -5701,7 +5702,7 @@
       "tryAgain": "Try again"
     },
     "startTyping": "Start typing to search",
-    "typesSelected": "{count} types",
+    "typesSelected": "{count, plural, one {# type} other {# types}}",
     "customFieldFilters": "Custom Field Filters",
     "customFiltersApplied": "custom filters",
     "customFields": "Custom Fields",

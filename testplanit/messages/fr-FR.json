@@ -72,12 +72,12 @@
       "resultDetails": "Détails des résultats",
       "actionsLabel": "Actes",
       "assign": "Attribuer",
-      "assignSelected": "Affecter les cas {count}",
+      "assignSelected": "Affecter {count, plural, one {# cas} other {# cas}}",
       "refresh": "Rafraîchir",
-      "addResultSelected": "Ajouter le résultat aux cas {count}",
-      "resultsAdded": "{count} Résultats ajoutés",
-      "resultsAddedDescription": "Les résultats ont été ajoutés avec succès aux cas de test {count}",
-      "addingResultsToMultiple": "Ajout des résultats aux cas de test {count}",
+      "addResultSelected": "Ajouter le résultat à {count, plural, one {# cas} other {# cas}}",
+      "resultsAdded": "{count, plural, one {# Résultat} other {# Résultats}} Ajouté",
+      "resultsAddedDescription": "{count, plural, one {Le résultat a été ajouté au cas de test n°} other {Les résultats ont été ajoutés aux cas de test n°}} avec succès",
+      "addingResultsToMultiple": "Ajout des résultats à {count, plural, one {# cas de test} other {# cas de test}}",
       "addedToTestRun": "Ajouté à l'exécution de test",
       "addedToTestRunDescription": "Le cas de test a été ajouté à l'exécution des tests.",
       "noAvailableTestRuns": "Tous les tests en cours incluent déjà ce cas de test.",
@@ -169,7 +169,7 @@
           },
           "progress": {
             "parsing": "Analyse des résultats {format} ...",
-            "parseWarnings": "Analyse effectuée avec {count} avertissement(s)",
+            "parseWarnings": "Analyse effectuée avec {count, plural, one {# avertissement} other {# avertissements}}",
             "errorParsing": "Erreur d'analyse des fichiers : {error}"
           },
           "error": {
@@ -438,7 +438,7 @@
       },
       "assignBulk": {
         "title": "Affectation en masse des cas de test",
-        "description": "Attribuer {count} cas de test sélectionnés à un utilisateur"
+        "description": "Attribuer {count, plural, one {# cas de test sélectionné} other {# cas de test sélectionnés}} à un utilisateur"
       },
       "complete": {
         "title": "Essai complet",
@@ -861,8 +861,8 @@
     "success": {
       "assigned": "Cas de test attribué avec succès",
       "unassigned": "Cas de test non attribué avec succès",
-      "bulkAssigned": "{count} cas de test attribués avec succès",
-      "bulkUnassigned": "{count} cas de test non attribués avec succès"
+      "bulkAssigned": "{count, plural, one {# cas de test} other {# cas de test}} attribués avec succès",
+      "bulkUnassigned": "{count, plural, one {# cas de test} other {# cas de test}} non assigné avec succès"
     },
     "tabs": {
       "general": "Général",
@@ -1188,7 +1188,7 @@
           "addPath": "Ajouter un chemin",
           "previewFiles": "Aperçu des fichiers",
           "scanningRepo": "Analyse des fichiers du dépôt… ({seconds}s)",
-          "files": "{count} fichiers",
+          "files": "{count, plural, one {# fichier} other {# fichiers}}",
           "truncatedBadge": "Les résultats peuvent être incomplets (limite du fournisseur).",
           "exceedsLimit": "La taille totale dépasse la limite du contexte IA de {overflow}. Lors de l'exportation, les fichiers sont classés par ordre de pertinence pour le cas de test exporté : les fichiers les plus pertinents sont inclus en premier et les fichiers moins pertinents sont ignorés lorsque le budget est atteint. Affinez vos modèles de chemin si vous souhaitez un contrôle plus précis sur les fichiers inclus."
         },
@@ -1766,7 +1766,7 @@
           "column": "Colonne {number}"
         },
         "success": {
-          "description": "{count} cas de test importés avec succès"
+          "description": "{count, plural, one {# cas de test} other {# cas de test}} importé avec succès"
         },
         "errors": {
           "templateRequired": "La sélection du modèle est requise.",
@@ -1805,7 +1805,7 @@
           "title": "Associer les colonnes CSV aux champs",
           "description": "Associez chaque colonne CSV à un champ du modèle ou choisissez de l'ignorer.",
           "ignoreColumn": "Ignorer la colonne",
-          "requiredFieldsWarning": "{count} required fields are not mapped"
+          "requiredFieldsWarning": "{count, plural, one {# champ obligatoire est} other {# champs obligatoires sont}} non mappés"
         },
         "page3": {
           "title": "Résumé de la cartographie des champs",
@@ -1997,16 +1997,16 @@
       "outputModeLabel": "Mode de sortie",
       "outputModeSingle": "Fichier unique ({count, plural, one {# cas} other {tous les # cas}})",
       "outputModeIndividual": "{count, plural, one {Fichier individuel (.zip)} other {Fichiers individuels (.zip)}}",
-      "casesToExport": "{count} cas à exporter",
+      "casesToExport": "{count, plural, one {# cas} other {# cas}} à exporter",
       "exportSuccess": "Exportation réussie."
     },
     "aiExport": {
       "toggleLabel": "Générer avec l'IA",
       "generating": "Générateur...",
       "generatingProgress": "Génération du cas {current} de {total}...",
-      "generatingBatch": "Génération de cas {count} dans un seul fichier...",
+      "generatingBatch": "Génération de {count, plural, one {# cas} other {# cas}} dans un seul fichier...",
       "previewTitle": "Aperçu de l'exportation",
-      "previewDescription": "{count} fichiers générés",
+      "previewDescription": "{count, plural, one {# fichier} other {# fichiers}} générés",
       "copySuccess": "Copié dans le presse-papiers",
       "fallbackBadge": "Généré à partir d'un modèle (IA indisponible)",
       "retryButton": "Réessayer la génération d'IA",
@@ -2085,9 +2085,9 @@
         "title": "Examiner les cas de test générés",
         "description": "Examinez les cas de test générés par l'IA, apportez les modifications nécessaires et sélectionnez ceux à importer.",
         "selected": "{count} de {total} sélectionné",
-        "moreSteps": "... et {count} autres étapes",
+        "moreSteps": "... et {count, plural, one {# étape supplémentaire} other {# étapes supplémentaires}}",
         "templateFields": "Champs du modèle :",
-        "moreFields": "... et {count} d'autres champs"
+        "moreFields": "... et {count, plural, one {# champ supplémentaire} other {# champs supplémentaires}}"
       },
       "generating": "Générer des cas de test avec l'IA...",
       "import": "{count, plural, =0 {Importer les cas de test} =1 {Importer 1 cas de test} other {Importer # cas de test}}",
@@ -2224,7 +2224,7 @@
       "success": {
         "title": "Test effectué avec succès",
         "description": "L'essai a été ajouté au projet.",
-        "descriptionMultiple": "{count} test runs have been created for '{name}'"
+        "descriptionMultiple": "{count, plural, one {# exécution de test} other {# exécutions de test}} ont été créées pour '{name}'"
       },
       "estimates": {
         "manual": "Temps manuel estimé",
@@ -2276,7 +2276,7 @@
       },
       "actions": {
         "start": "Analyser les cas de test",
-        "startBatched": "Analyser les cas de test ({count} lots)",
+        "startBatched": "Analyser les cas de test ({count, plural, one {# lot} other {# lots}})",
         "accept": "Ajouter à la sélection"
       },
       "errors": {
@@ -2821,7 +2821,7 @@
         "defaultAccessUpdateFailed": "Échec de la mise à jour du niveau d'accès par défaut",
         "emailVerificationEnabled": "La vérification de l'adresse électronique est désormais requise pour les nouveaux utilisateurs.",
         "emailVerificationDisabled": "La vérification par e-mail n'est plus requise pour les nouveaux utilisateurs.",
-        "emailVerificationDisabledAndVerified": "La vérification par e-mail est désactivée et {count} compte(s) utilisateur(s) vérifié(s)",
+        "emailVerificationDisabledAndVerified": "La vérification par e-mail est désactivée et {count, plural, one {# compte utilisateur} other {# comptes utilisateurs}} vérifiés",
         "emailVerificationUpdateFailed": "Échec de la mise à jour des paramètres de vérification de l'e-mail",
         "emailServerNotConfigured": "Impossible d'activer la vérification des e-mails : le serveur de messagerie n'est pas configuré."
       },
@@ -3616,7 +3616,7 @@
         "send": "Envoyer une notification",
         "success": {
           "title": "Notification envoyée",
-          "description": "Notification système envoyée aux utilisateurs {count}"
+          "description": "Notification système envoyée à {count, plural, one {# utilisateur} other {# utilisateurs}}"
         },
         "error": {
           "description": "Échec de l'envoi de la notification système",
@@ -3832,6 +3832,7 @@
         "endpoint": "URL du point de terminaison",
         "endpointPlaceholder": "https://api.provider.com/v1",
         "endpointDescription": "L'URL de base pour les requêtes API. Pour les fournisseurs standards (OpenAI, Anthropic, Gemini), seules les URL officielles sont acceptées. Pour les fournisseurs auto-hébergés, les adresses privées/internes (localhost, 127.0.0.1, adresses IP privées) sont bloquées pour des raisons de sécurité.",
+        "endpointV1Hint": "Conseil : Si vous utilisez un proxy (par exemple LiteLLM), essayez d’ajouter /v1 à la fin de l’URL de votre point de terminaison.",
         "deploymentName": "Nom du déploiement",
         "deploymentNamePlaceholder": "Saisissez le nom du déploiement...",
         "deploymentNameDescription": "Nom du déploiement Azure OpenAI",
@@ -3926,7 +3927,7 @@
       "addPromptConfig": "Ajouter une configuration d'invite",
       "filterPlaceholder": "Configurations des invites de filtre...",
       "features": "Caractéristiques",
-      "featureCount": "{count} fonctionnalités",
+      "featureCount": "{count, plural, one {# fonctionnalité} other {# fonctionnalités}}",
       "systemPrompt": "Invite système",
       "userPrompt": "Invite de l'utilisateur",
       "temperature": "Température",
@@ -4008,7 +4009,7 @@
         },
         "success": {
           "title": "Réindexation réussie",
-          "description": "{count} documents indexés avec succès"
+          "description": "{count, plural, one {# document} other {# documents}} indexés avec succès"
         },
         "error": {
           "title": "Échec de la réindexation",
@@ -4178,7 +4179,7 @@
         "commentMentionTitle": "Vous avez été mentionné dans un commentaire",
         "systemAnnouncementTitle": "Annonce système",
         "assignedTestCase": "Vous avez été affecté au cas de test",
-        "assignedMultipleTestCases": "vous a attribué {count} cas de test",
+        "assignedMultipleTestCases": "Vous avez été assigné à {count, plural, one {# cas de test} other {# cas de test}}",
         "assignedSession": "vous a été assigné à la session",
         "mentionedYouInComment": "je vous ai mentionné dans un commentaire sur",
         "inProject": "dans le projet",
@@ -4239,7 +4240,7 @@
         "searching": "Recherche...",
         "searchError": "Échec de la recherche des problèmes",
         "linkButton": "Lien",
-        "linkedCount": "{count} problèmes liés"
+        "linkedCount": "{count, plural, one {# problème} other {# problèmes}} lié"
       }
     }
   },
@@ -5147,7 +5148,7 @@
         "flipThreshold": "Retournements minimums",
         "flipThresholdHelp": "Nombre minimal de transitions réussite/échec requis pour être considéré comme instable.",
         "flips": "Flips",
-        "lastNResults": "Derniers résultats {count}",
+        "lastNResults": "Dernier {count, plural, one {# Résultat} other {# Résultats}}",
         "newest": "Nouveau",
         "oldest": "Vieux",
         "noFlakyTests": "Aucun test non concluant correspondant aux critères n'a été trouvé.",
@@ -5163,7 +5164,7 @@
           "failureRate": "taux d'échec",
           "recency": "score de récence",
           "backlogTitle": "Tests de priorité inférieure",
-          "backlogDescription": "{count} tests supplémentaires instables non affichés"
+          "backlogDescription": "{count, plural, one {# test instable supplémentaire} other {# tests instables supplémentaires}} non affiché"
         }
       },
       "testCaseHealth": {
@@ -5627,12 +5628,12 @@
         "stepsData": "Données des étapes"
       },
       "success": {
-        "description": "{count} Étapes partagées importées avec succès"
+        "description": "{count, plural, one {# étape partagée} other {# étapes partagées}} importées avec succès"
       },
       "errors": {
         "parseFailed": "Impossible d'analyser le fichier CSV",
         "validationFailed": "La validation a échoué",
-        "validationDescription": "{count} Erreurs de validation détectées",
+        "validationDescription": "{count, plural, one {# erreur de validation} other {# erreurs de validation}} trouvées",
         "importFailed": "L'importation a échoué",
         "fileRequired": "Un fichier CSV est requis."
       },
@@ -5656,7 +5657,7 @@
         "title": "Associer les colonnes CSV aux champs d'étape partagés",
         "description": "Associez vos colonnes CSV aux champs d'étape partagés. Les champs obligatoires doivent être associés.",
         "ignoreColumn": "Ignorez cette colonne",
-        "requiredFieldsWarning": "{count} required fields are not mapped. Please map all required fields to continue."
+        "requiredFieldsWarning": "{count, plural, one {# Champ obligatoire} other {# Champs obligatoires}} non associés. Veuillez associer tous les champs obligatoires pour continuer."
       },
       "page3": {
         "title": "Aperçu des données importées",
@@ -5701,7 +5702,7 @@
       "tryAgain": "Essayer à nouveau"
     },
     "startTyping": "Commencez à saisir du texte pour effectuer une recherche",
-    "typesSelected": "{count} types",
+    "typesSelected": "{count, plural, one {# type} other {# types}}",
     "customFieldFilters": "Filtres de champs personnalisés",
     "customFiltersApplied": "filtres personnalisés",
     "customFields": "Champs personnalisés",

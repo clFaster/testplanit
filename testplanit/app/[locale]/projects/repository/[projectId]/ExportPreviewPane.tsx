@@ -71,6 +71,7 @@ export function ExportPreviewPane({
   const tCommon = useTranslations("common");
   const [copied, setCopied] = useState(false);
   const [retryingCaseId, setRetryingCaseId] = useState<number | null>(null);
+  const [copiedCaseId, setCopiedCaseId] = useState<number | null>(null);
 
   const prismLanguage = useMemo(() => mapLanguageToPrism(language), [language]);
 
@@ -127,7 +128,7 @@ export function ExportPreviewPane({
     const totalCount = parallelProgress.length;
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 overflow-hidden w-full">
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             {t("generatingParallelProgress", {
@@ -142,7 +143,7 @@ export function ExportPreviewPane({
           )}
         </div>
 
-        <div className="space-y-1.5 overflow-y-auto">
+        <div className="space-y-1.5 overflow-y-auto overflow-x-hidden">
           {parallelProgress.map((file) => {
             const snippet = fileStreamingSnippets?.[file.caseId];
             return (
@@ -150,7 +151,7 @@ export function ExportPreviewPane({
                 key={file.caseId}
                 className="rounded-md border overflow-hidden"
               >
-                <div className="flex items-center gap-3 px-3 py-2">
+                <div className="flex items-center gap-3 px-3 py-2 min-w-0">
                   {file.status === "pending" && (
                     <Circle className="h-4 w-4 text-muted-foreground/40 shrink-0" />
                   )}
@@ -164,7 +165,7 @@ export function ExportPreviewPane({
                     <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
                   )}
                   <FileCode className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <span className="text-sm truncate flex-1">
+                  <span className="text-sm truncate flex-1 min-w-0">
                     {file.caseName}
                   </span>
                   {file.status === "error" && file.error && (
@@ -274,19 +275,19 @@ export function ExportPreviewPane({
           <div className="space-y-4">
             {results.map((result, index) => (
               <div key={result.caseId}>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <FileCode className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">
+                <div className="flex items-center justify-between mb-2 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <FileCode className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="text-sm font-medium truncate">
                       {result.caseName}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     <Badge
                       variant={
                         result.generatedBy === "ai" ? "default" : "secondary"
                       }
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 ml-2"
                     >
                       {result.generatedBy === "ai"
                         ? t("aiGenerated")
@@ -304,6 +305,29 @@ export function ExportPreviewPane({
                         </TooltipProvider>
                       )}
                     </Badge>
+                    {results.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(result.code);
+                            setCopiedCaseId(result.caseId);
+                            toast.success(t("copySuccess"));
+                            setTimeout(() => setCopiedCaseId(null), 2000);
+                          } catch {
+                            toast.error("Failed to copy to clipboard");
+                          }
+                        }}
+                      >
+                        {copiedCaseId === result.caseId ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </Button>
+                    )}
                     {result.generatedBy === "template" && onRetry && (
                       <Button
                         variant="ghost"
@@ -380,14 +404,16 @@ export function ExportPreviewPane({
             {t("backButton")}
           </Button>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleCopy}>
-              {copied ? (
-                <Check className="h-4 w-4" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
-              {t("copyButton")}
-            </Button>
+            {results.length <= 1 && (
+              <Button variant="outline" size="sm" onClick={handleCopy}>
+                {copied ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+                {t("copyButton")}
+              </Button>
+            )}
             <Button size="sm" onClick={onDownload}>
               <Download className="h-4 w-4" />
               {t("downloadButton")}
