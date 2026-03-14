@@ -1,3 +1,9 @@
+## [0.16.8](https://github.com/TestPlanIt/testplanit/compare/v0.16.7...v0.16.8) (2026-03-14)
+
+### Bug Fixes
+
+* **llm:** enhance error handling in LLM integration connection tests ([a4e75e2](https://github.com/TestPlanIt/testplanit/commit/a4e75e2b64f156328f6e44c6ba7c7a5b0662b51b))
+
 ## [0.16.7](https://github.com/TestPlanIt/testplanit/compare/v0.16.6...v0.16.7) (2026-03-14)
 
 ### Enhancements
