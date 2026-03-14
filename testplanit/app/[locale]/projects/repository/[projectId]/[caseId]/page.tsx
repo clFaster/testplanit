@@ -19,7 +19,6 @@ import {
   useDeleteManyCaseFieldValues,
   useFindManyTags,
   useFindManyRepositoryFolders,
-  useFindManyIssue,
   useFindFirstProjects,
   useFindUniqueProjects,
   useFindManyJUnitTestSuite,
@@ -366,14 +365,10 @@ export default function TestCaseDetails() {
   const [isCollapsedLeft, setIsCollapsedLeft] = useState<boolean>(false);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const [folderHierarchy, setFolderHierarchy] = useState<FolderNode[]>([]);
   const [breadcrumbItems, setBreadcrumbItems] = useState<FolderNode[]>([]);
-
-  const { data: allIssues } = useFindManyIssue({
-    where: { isDeleted: false },
-    select: { id: true, name: true, externalId: true },
-  });
 
   const isFormInitialized = useRef(false);
 
@@ -669,14 +664,17 @@ export default function TestCaseDetails() {
     },
   });
 
-  const { data: tags } = useFindManyTags({
-    where: {
-      isDeleted: false,
+  const { data: tags } = useFindManyTags(
+    {
+      where: {
+        isDeleted: false,
+      },
+      orderBy: {
+        name: "asc",
+      },
     },
-    orderBy: {
-      name: "asc",
-    },
-  });
+    { enabled: isEditMode }
+  );
 
   const testcase = data as any as ExtendedCases;
 
@@ -690,8 +688,6 @@ export default function TestCaseDetails() {
         optimisticUpdate: true,
       }
     );
-
-  const [isEditMode, setIsEditMode] = useState(false);
 
   // Correct placement for useFindManySharedStepGroup hook
   const {
@@ -723,24 +719,27 @@ export default function TestCaseDetails() {
     createFormSchema(testcase?.template?.caseFields || [])
   );
 
-  const { data: workflows } = useFindManyWorkflows({
-    where: {
-      isDeleted: false,
-      scope: "CASES",
-      projects: {
-        some: {
-          projectId: Number(projectId),
+  const { data: workflows } = useFindManyWorkflows(
+    {
+      where: {
+        isDeleted: false,
+        scope: "CASES",
+        projects: {
+          some: {
+            projectId: Number(projectId),
+          },
         },
       },
+      include: {
+        icon: true,
+        color: true,
+      },
+      orderBy: {
+        order: "asc",
+      },
     },
-    include: {
-      icon: true,
-      color: true,
-    },
-    orderBy: {
-      order: "asc",
-    },
-  });
+    { enabled: isEditMode }
+  );
 
   const workflowOptions =
     workflows?.map((workflow) => ({
@@ -1356,10 +1355,38 @@ export default function TestCaseDetails() {
               ?.name
         )
         .filter((name: string | undefined): name is string => !!name);
+      // Resolve issue details for version snapshot
+      // First check existing case issues, then fetch any newly linked ones
+      const knownIssues = testcase.issues || [];
+      const newIssueIds = issuesArray
+        .filter((id: any) => id != null)
+        .filter((id: number) => !knownIssues.some((iss: any) => iss.id === id));
+
+      let fetchedNewIssues: { id: number; name: string; externalId: string | null }[] = [];
+      if (newIssueIds.length > 0) {
+        try {
+          const res = await fetch(
+            `/api/model/issue/findMany?q=${encodeURIComponent(
+              JSON.stringify({
+                where: { id: { in: newIssueIds } },
+                select: { id: true, name: true, externalId: true },
+              })
+            )}`
+          );
+          if (res.ok) {
+            const json = await res.json();
+            fetchedNewIssues = json.data ?? json;
+          }
+        } catch (e) {
+          console.error("Failed to fetch newly linked issues for version:", e);
+        }
+      }
+
+      const allAvailableIssues = [...knownIssues, ...fetchedNewIssues];
       const issuesDataForVersion = issuesArray
         .filter((id: any) => id != null)
         .map((issueId: number) => {
-          const issue = allIssues?.find((iss) => iss.id === issueId);
+          const issue = allAvailableIssues.find((iss: any) => iss.id === issueId);
           return issue
             ? { id: issue.id, name: issue.name, externalId: issue.externalId }
             : null;
@@ -1597,16 +1624,20 @@ export default function TestCaseDetails() {
   const { data: junitSuites } = useFindManyJUnitTestSuite(
     isJUnitCase
       ? { where: { results: { some: { repositoryCaseId: testcase.id } } } }
-      : undefined
+      : undefined,
+    { enabled: isJUnitCase }
   );
   const { data: junitSteps } = useFindManyJUnitTestStep(
-    isJUnitCase ? { where: { repositoryCaseId: testcase.id } } : undefined
+    isJUnitCase ? { where: { repositoryCaseId: testcase.id } } : undefined,
+    { enabled: isJUnitCase }
   );
   const { data: junitAttachments } = useFindManyJUnitAttachment(
-    isJUnitCase ? { where: { repositoryCaseId: testcase.id } } : undefined
+    isJUnitCase ? { where: { repositoryCaseId: testcase.id } } : undefined,
+    { enabled: isJUnitCase }
   );
   const { data: junitProperties } = useFindManyJUnitProperty(
-    isJUnitCase ? { where: { repositoryCaseId: testcase.id } } : undefined
+    isJUnitCase ? { where: { repositoryCaseId: testcase.id } } : undefined,
+    { enabled: isJUnitCase }
   );
 
   const testcaseForModal: ExtendedCases | undefined = data
