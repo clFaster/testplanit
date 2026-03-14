@@ -13,7 +13,6 @@ import {
   useCreateAttachments,
   useCreateSteps,
   useFindManyTags,
-  useFindManyIssue,
   useFindManySharedStepGroup,
 } from "~/lib/hooks";
 import { useProjectPermissions } from "~/hooks/useProjectPermissions";
@@ -467,10 +466,7 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
     },
   });
 
-  const { data: allIssues } = useFindManyIssue({
-    where: { isDeleted: false },
-    select: { id: true, name: true, externalId: true },
-  });
+  // allIssues removed - fetched on demand during save to avoid loading all issues
 
   // Fetch Tags permission
   const { permissions: tagsPermissions, isLoading: isLoadingTagsPermissions } =
@@ -991,14 +987,26 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
           (tagId) => tags?.find((tag) => tag.id === tagId)?.name || ""
         );
 
-        const issuesDataForVersion = linkedIssueIds
-          .map((issueId: number) => {
-            const issue = allIssues?.find((iss) => iss.id === issueId);
-            return issue
-              ? { id: issue.id, name: issue.name, externalId: issue.externalId }
-              : null;
-          })
-          .filter(Boolean);
+        // Fetch issue details on demand for the version snapshot
+        let issuesDataForVersion: { id: number; name: string; externalId: string | null }[] = [];
+        if (linkedIssueIds.length > 0) {
+          try {
+            const res = await fetch(
+              `/api/model/issue/findMany?q=${encodeURIComponent(
+                JSON.stringify({
+                  where: { id: { in: linkedIssueIds } },
+                  select: { id: true, name: true, externalId: true },
+                })
+              )}`
+            );
+            if (res.ok) {
+              const json = await res.json();
+              issuesDataForVersion = (json.data ?? json) || [];
+            }
+          } catch (e) {
+            console.error("Failed to fetch linked issues for version:", e);
+          }
+        }
 
         // Invalidate and refetch the case to ensure we have the committed data from the database
         // This prevents race conditions where version creation tries to use stale currentVersion

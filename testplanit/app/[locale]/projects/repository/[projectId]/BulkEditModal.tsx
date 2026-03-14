@@ -5,7 +5,6 @@ import {
   useUpdateRepositoryCases,
   useFindManyWorkflows,
   useFindManyTags,
-  useFindManyIssue,
   useUpdateCaseFieldValues,
   useCreateCaseFieldValues,
   useCreateSteps,
@@ -300,15 +299,7 @@ export function BulkEditModal({
     { enabled: isOpen }
   );
 
-  const { data: availableIssuesData, isLoading: isLoadingAvailableIssues } =
-    useFindManyIssue(
-      {
-        where: { isDeleted: false },
-        orderBy: { name: "asc" },
-        select: { id: true, name: true, externalId: true },
-      },
-      { enabled: isOpen }
-    );
+  // Issue names are resolved from casesData (which includes issues: true) instead of fetching all issues
 
   const { mutateAsync: updateCasesMutation, isPending: isUpdating } =
     useUpdateRepositoryCases();
@@ -844,11 +835,13 @@ export function BulkEditModal({
         );
       } else if (fieldKey === "issues") {
         if (!Array.isArray(firstValue) || firstValue.length === 0) return "-";
+        // Look up issue names from the already-loaded case data
+        const allCaseIssues = casesData?.flatMap((c) => c.issues || []) || [];
         return (
           firstValue
             .map(
               (issueId) =>
-                availableIssuesData?.find((i) => i.id === issueId)?.name
+                allCaseIssues.find((i) => i.id === issueId)?.name
             )
             .filter(Boolean)
             .join(", ") || "-"
@@ -862,7 +855,6 @@ export function BulkEditModal({
       getSingleCaseValue,
       workflowsData,
       availableTagsData,
-      availableIssuesData,
       allFieldDefinitions,
       session,
     ]
@@ -1875,7 +1867,6 @@ export function BulkEditModal({
           projectId={projectId}
           workflowsData={workflowsData}
           availableTagsData={availableTagsData}
-          availableIssuesData={availableIssuesData}
           canCreateTags={canCreateTagsPerm} // Pass the permission prop
           canEditRestricted={canEditRestrictedPerm} // Pass general permission
           fieldIsRestricted={isRestricted} // Pass specific field restriction
@@ -1889,7 +1880,6 @@ export function BulkEditModal({
     isLoadingCases ||
     isLoadingWorkflows ||
     isLoadingTags ||
-    isLoadingAvailableIssues ||
     isLoadingTagsPermissions ||
     isLoadingRestrictedPermissions ||
     isDeleting;

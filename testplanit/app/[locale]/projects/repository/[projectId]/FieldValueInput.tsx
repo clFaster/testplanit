@@ -20,7 +20,6 @@ import {
   CaseFields as PrismaCaseField,
   Tags as PrismaTag,
   Workflows as PrismaWorkflow,
-  Issue as PrismaIssue,
 } from "@prisma/client";
 import { useTranslations, useLocale } from "next-intl";
 import DynamicIcon from "@/components/DynamicIcon";
@@ -68,7 +67,6 @@ interface FieldValueInputProps {
   })[]; // Correct shape based on schema
   availableTagsData?: Pick<PrismaTag, "id" | "name">[];
   canCreateTags?: boolean; // Add permission prop
-  availableIssuesData?: Pick<PrismaIssue, "id" | "name" | "externalId">[];
   canEditRestricted?: boolean; // Add prop
   fieldIsRestricted?: boolean; // Add prop
   // Add other necessary props like template info if needed for complex types
