@@ -1,11 +1,21 @@
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { div as MotionDiv } from "motion/react-client";
 import { Separator } from "@/components/ui/separator";
 import svgIcon from "~/public/tpi_logo.svg";
 import { useTranslations } from "next-intl";
 
-export function Loading() {
+export function Loading({ delay = 300 }: { delay?: number }) {
   const tGlobal = useTranslations();
+  const [show, setShow] = useState(delay === 0);
+
+  useEffect(() => {
+    if (delay === 0) return;
+    const timer = setTimeout(() => setShow(true), delay);
+    return () => clearTimeout(timer);
+  }, [delay]);
+
+  if (!show) return null;
 
   return (
     <div

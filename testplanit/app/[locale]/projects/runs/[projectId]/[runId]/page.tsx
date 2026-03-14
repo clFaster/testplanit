@@ -485,9 +485,10 @@ export default function TestRunPage() {
   };
 
   // Fetch JUnit test suites if this is a JUNIT run
+  const isJUnitRun = isAutomatedTestRunType(testRunData?.testRunType);
   const { data: jUnitSuites, isLoading: isJUnitLoading } =
     useFindManyJUnitTestSuite(
-      isAutomatedTestRunType(testRunData?.testRunType)
+      isJUnitRun
         ? {
             where: { testRunId: Number(runId) },
             include: {
@@ -527,7 +528,8 @@ export default function TestRunPage() {
             },
             orderBy: { createdAt: "asc" },
           }
-        : undefined
+        : undefined,
+      { enabled: isJUnitRun }
     );
 
   const canEdit =
@@ -637,14 +639,13 @@ export default function TestRunPage() {
   }, [searchParams, isEditMode]);
 
   // Update loading state when data changes
+  // Note: configurations and workflows are not required for initial render (only needed in edit mode)
   useEffect(() => {
     setIsLoading(
       isLoadingPermissions ||
         isLoadingClosedPermissions ||
         isLoadingTagsPermissions ||
         !testRunData ||
-        !configurations ||
-        !workflows ||
         !isFormInitialized
     );
   }, [
@@ -652,8 +653,6 @@ export default function TestRunPage() {
     isLoadingClosedPermissions,
     isLoadingTagsPermissions,
     testRunData,
-    configurations,
-    workflows,
     isFormInitialized,
   ]);
 
