@@ -317,7 +317,7 @@ describe("AnthropicAdapter", () => {
 
       expect(models.length).toBeGreaterThan(0);
       expect(models.map((m) => m.id)).toContain("claude-3-5-sonnet-20241022");
-      expect(models.map((m) => m.id)).toContain("claude-3-haiku-20240307");
+      expect(models.map((m) => m.id)).toContain("claude-haiku-4-5-20251001");
     });
 
     it("should return correct model info for Claude 3.5 Sonnet", async () => {
