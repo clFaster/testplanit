@@ -1,3 +1,9 @@
+## [0.16.9](https://github.com/TestPlanIt/testplanit/compare/v0.16.8...v0.16.9) (2026-03-14)
+
+### Enhancements
+
+* **workers:** Enhancement/add code cache worker ([#129](https://github.com/TestPlanIt/testplanit/issues/129)) ([45b4ba9](https://github.com/TestPlanIt/testplanit/commit/45b4ba925abec6c8069e80cab044d89b709ed002))
+
 ## [0.16.8](https://github.com/TestPlanIt/testplanit/compare/v0.16.7...v0.16.8) (2026-03-14)
 
 ### Bug Fixes
