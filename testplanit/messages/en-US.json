@@ -5844,6 +5844,13 @@
     "expired": "{count, plural, =1 {Trial expired 1 day ago} other {Trial expired # days ago}}",
     "contactSales": "Contact Sales"
   },
+  "feedback": {
+    "sheetTitle": "Share Your Feedback",
+    "sheetDescription": "Help us improve TestPlanIt by sharing your experience.",
+    "bannerMessage": "How's your trial going? We'd love to hear your thoughts.",
+    "takeSurvey": "Share Feedback",
+    "menuItem": "Share Feedback"
+  },
   "autoTag": {
     "actions": {
       "aiTag": "AI Tag",

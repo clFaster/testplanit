@@ -5844,6 +5844,13 @@
     "expired": "{count, plural, =1 {Essai expiré il y a 1 jour} other {Essai expiré il y a # jours}}",
     "contactSales": "Contactez le service commercial"
   },
+  "feedback": {
+    "sheetTitle": "Partagez vos commentaires",
+    "sheetDescription": "Aidez-nous à améliorer TestPlanIt en partageant votre expérience.",
+    "bannerMessage": "Comment se déroule votre procès ? Nous aimerions connaître votre avis.",
+    "takeSurvey": "Partager vos commentaires",
+    "menuItem": "Partager vos commentaires"
+  },
   "autoTag": {
     "actions": {
       "aiTag": "Étiquette IA",

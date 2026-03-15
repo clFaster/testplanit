@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 /* Import Tailwind plugins */
 @plugin "@tailwindcss/forms";

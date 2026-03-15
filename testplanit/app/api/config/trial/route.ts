@@ -10,11 +10,13 @@ export async function GET() {
   const trialEndDate = process.env.TRIAL_END_DATE || null;
   const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL || "https://testplanit.com";
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "sales@testplanit.com";
+  const feedbackSurveyUrl = process.env.FEEDBACK_SURVEY_URL || null;
 
   return NextResponse.json({
     isTrialInstance,
     trialEndDate,
     websiteUrl,
     contactEmail,
+    feedbackSurveyUrl,
   });
 }

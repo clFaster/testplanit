@@ -18,6 +18,7 @@ import {
   Waypoints,
   LucideWaypoints,
   Clock,
+  MessageSquareHeart,
 } from "lucide-react";
 
 import { UserDropdownMenu } from "@/components/UserDropdownMenu";
@@ -27,6 +28,10 @@ import { buttonVariants } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GlobalSearchSheet } from "@/components/GlobalSearchSheet";
+import {
+  FeedbackBanner,
+  FeedbackSurveySheet,
+} from "@/components/FeedbackSurveySheet";
 import { ProjectQuickSelector } from "@/components/ProjectQuickSelector";
 import { getVersionString } from "~/lib/version";
 import {
@@ -51,6 +56,11 @@ export const Header = () => {
   const [trialContactEmail, setTrialContactEmail] = useState<string>(
     "sales@testplanit.com"
   );
+  const [feedbackSurveyUrl, setFeedbackSurveyUrl] = useState<string | null>(
+    null
+  );
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [trialTotalDays, setTrialTotalDays] = useState<number>(0);
   const versionString = getVersionString();
   const params = useParams();
   const projectId = params?.projectId as string | undefined;
@@ -81,6 +91,9 @@ export const Header = () => {
         const response = await fetch("/api/config/trial");
         if (response.ok) {
           const data = await response.json();
+          if (data.feedbackSurveyUrl) {
+            setFeedbackSurveyUrl(data.feedbackSurveyUrl);
+          }
           if (data.isTrialInstance && data.trialEndDate) {
             const end = new Date(data.trialEndDate);
             const now = new Date();
@@ -91,6 +104,9 @@ export const Header = () => {
             if (data.contactEmail) {
               setTrialContactEmail(data.contactEmail);
             }
+            // Estimate days into trial (assume 30-day trial if we can't calculate)
+            const totalDays = 30;
+            setTrialTotalDays(totalDays - diff);
           }
         }
       } catch {
@@ -372,6 +388,15 @@ export const Header = () => {
                     <BookOpen className="mr-2 h-4 w-4" />
                     {t("common.fields.documentation")}
                   </DropdownMenuItem>
+                  {feedbackSurveyUrl && (
+                    <DropdownMenuItem
+                      onClick={() => setIsFeedbackOpen(true)}
+                      className="cursor-pointer"
+                    >
+                      <MessageSquareHeart className="mr-2 h-4 w-4" />
+                      {t("feedback.menuItem")}
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
               <NotificationBell />
@@ -382,10 +407,26 @@ export const Header = () => {
         <div className="mb-2" />
       </div>
 
+      {feedbackSurveyUrl && (
+        <FeedbackBanner
+          trialStartDaysAgo={trialTotalDays}
+          onOpenSurvey={() => setIsFeedbackOpen(true)}
+        />
+      )}
+
       <GlobalSearchSheet
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
       />
+
+      {feedbackSurveyUrl && (
+        <FeedbackSurveySheet
+          isOpen={isFeedbackOpen}
+          onClose={() => setIsFeedbackOpen(false)}
+          surveyUrl={feedbackSurveyUrl}
+          user={session?.user}
+        />
+      )}
     </div>
   );
 };
