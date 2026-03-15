@@ -272,41 +272,6 @@ async function handler(
   return apiAuthStorage.run(apiAuthContext, async () => {
     const params = await context.params;
     const parsedPath = parseZenStackPath(params.path);
-
-    // Handle POST-based read queries sent by the client to avoid 414 URI Too Long errors.
-    // The client sets the x-zenstack-query-post header when converting a GET request
-    // with a long URL to a POST. We transform it back to GET with query params in the URL
-    // so ZenStack's RPC handler (which only accepts GET for reads) processes it correctly.
-    const READ_OPERATIONS = new Set([
-      "findMany",
-      "findFirst",
-      "findUnique",
-      "aggregate",
-      "groupBy",
-      "count",
-      "check",
-    ]);
-
-    if (
-      req.method === "POST" &&
-      req.headers.get("x-zenstack-query-post") === "1" &&
-      parsedPath &&
-      READ_OPERATIONS.has(parsedPath.operation)
-    ) {
-      try {
-        const body = await req.json();
-        const url = new URL(req.url);
-        if (body.q) url.searchParams.set("q", body.q);
-        if (body.meta) url.searchParams.set("meta", body.meta);
-        req = new NextRequest(url, {
-          method: "GET",
-          headers: req.headers,
-        });
-      } catch {
-        // If body parsing fails, let the request proceed as-is
-      }
-    }
-
     const isMutation = ["POST", "PUT", "PATCH", "DELETE"].includes(req.method);
 
     // Get the authenticated user ID (from session or API token)

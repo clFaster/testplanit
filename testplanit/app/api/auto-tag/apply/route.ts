@@ -16,75 +16,6 @@ const applySchema = z.object({
     .min(1),
 });
 
-// Process entity tag connections in batches to avoid transaction timeouts
-// and reduce lock contention for large datasets (6500+ entities)
-const BATCH_SIZE = 500;
-const BATCH_TIMEOUT = 60000; // 60 seconds per batch
-const MAX_RETRIES = 3;
-
-async function connectTagsToEntity(
-  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
-  entityType: string,
-  entityId: number,
-  connectData: { id: number }[],
-) {
-  switch (entityType) {
-    case "repositoryCase":
-      await tx.repositoryCases.update({
-        where: { id: entityId },
-        data: { tags: { connect: connectData } },
-      });
-      break;
-    case "testRun":
-      await tx.testRuns.update({
-        where: { id: entityId },
-        data: { tags: { connect: connectData } },
-      });
-      break;
-    case "session":
-      await tx.sessions.update({
-        where: { id: entityId },
-        data: { tags: { connect: connectData } },
-      });
-      break;
-  }
-}
-
-async function processBatchWithRetry(
-  entries: [string, number[]][],
-  attempt = 1,
-): Promise<void> {
-  try {
-    await prisma.$transaction(
-      async (tx) => {
-        for (const [key, tagIds] of entries) {
-          const [entityType, entityIdStr] = key.split(":");
-          const entityId = Number(entityIdStr);
-          const connectData = tagIds.map((id) => ({ id }));
-          await connectTagsToEntity(tx, entityType!, entityId, connectData);
-        }
-      },
-      { timeout: BATCH_TIMEOUT },
-    );
-  } catch (error: any) {
-    const message = error?.message || "";
-    const isDeadlock =
-      message.includes("deadlock") || message.includes("40P01");
-    const isTimeout =
-      message.includes("Transaction already closed") ||
-      message.includes("timeout");
-
-    if ((isDeadlock || isTimeout) && attempt < MAX_RETRIES) {
-      // Exponential backoff before retry
-      await new Promise((resolve) =>
-        setTimeout(resolve, 100 * Math.pow(2, attempt)),
-      );
-      return processBatchWithRetry(entries, attempt + 1);
-    }
-    throw error;
-  }
-}
-
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
 
@@ -140,13 +71,38 @@ export async function POST(request: Request) {
       entityOps.set(key, ids);
     }
 
-    // Process in batches to avoid transaction timeouts with large datasets
-    const entries = Array.from(entityOps.entries());
+    // Connect tags to entities in a single transaction with extended timeout
+    await prisma.$transaction(
+      async (tx) => {
+        for (const [key, tagIds] of entityOps) {
+          const [entityType, entityIdStr] = key.split(":");
+          const entityId = Number(entityIdStr);
+          const connectData = tagIds.map((id) => ({ id }));
 
-    for (let i = 0; i < entries.length; i += BATCH_SIZE) {
-      const batch = entries.slice(i, i + BATCH_SIZE);
-      await processBatchWithRetry(batch);
-    }
+          switch (entityType) {
+            case "repositoryCase":
+              await tx.repositoryCases.update({
+                where: { id: entityId },
+                data: { tags: { connect: connectData } },
+              });
+              break;
+            case "testRun":
+              await tx.testRuns.update({
+                where: { id: entityId },
+                data: { tags: { connect: connectData } },
+              });
+              break;
+            case "session":
+              await tx.sessions.update({
+                where: { id: entityId },
+                data: { tags: { connect: connectData } },
+              });
+              break;
+          }
+        }
+      },
+      { timeout: 30000 },
+    );
 
     const tagsCreated = uniqueTagNames.filter(
       (name) => !existingTagNames.has(name),

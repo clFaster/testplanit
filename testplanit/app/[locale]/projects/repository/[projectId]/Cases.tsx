@@ -249,24 +249,23 @@ export default function Cases({
       },
       {
         // Correctly pass boolean for enabled option
-        // Skip in run mode — pagination uses testRunCasesCountData instead
-        enabled: !!(isValidProjectId && session?.user && !isRunMode),
+        enabled: !!(isValidProjectId && session?.user),
         refetchOnWindowFocus: false,
       }
     );
   const totalProjectCases = totalProjectCasesCountData ?? 0;
 
-  // QuickScript feature flag (not used in run mode)
+  // QuickScript feature flag
   const { data: projectSettings } = useFindUniqueProjects(
     { where: { id: projectId }, select: { quickScriptEnabled: true } },
-    { enabled: isValidProjectId && !isRunMode }
+    { enabled: isValidProjectId }
   );
   const quickScriptEnabled = projectSettings?.quickScriptEnabled ?? false;
 
-  // Check if project has an active LLM integration (for auto-tag, not used in run mode)
+  // Check if project has an active LLM integration (for auto-tag)
   const { data: projectLlmIntegrations } = useFindManyProjectLlmIntegration({
     where: { projectId },
-  }, { enabled: isValidProjectId && !isRunMode });
+  }, { enabled: isValidProjectId });
   const hasLlmIntegration = projectLlmIntegrations && projectLlmIntegrations.length > 0;
 
   // Lightweight project-wide template field discovery
