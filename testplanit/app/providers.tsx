@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "~/components/theme-provider";
 import { Provider as ZenStackProvider } from "@zenstackhq/tanstack-query/runtime-v5/react";
-import { useState, useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 import { SearchStateProvider } from "~/lib/contexts/SearchStateContext";
 const queryClient = new QueryClient({
@@ -59,32 +58,18 @@ const zenStackFetch = async (
 };
 
 export default function Providers({ children }: { children: ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-
-  const content = mounted ? (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      themes={["light", "dark", "green", "orange", "purple"]}
-    >
-      <SearchStateProvider>{children}</SearchStateProvider>
-    </ThemeProvider>
-  ) : (
-    <SearchStateProvider>{children}</SearchStateProvider>
-  );
-
-
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
         <ZenStackProvider value={{ endpoint: "/api/model", fetch: zenStackFetch }}>
-          {content}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            themes={["light", "dark", "green", "orange", "purple"]}
+          >
+            <SearchStateProvider>{children}</SearchStateProvider>
+          </ThemeProvider>
         </ZenStackProvider>
       </SessionProvider>
     </QueryClientProvider>

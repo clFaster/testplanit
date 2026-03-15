@@ -122,8 +122,16 @@ type TestRunWithRelations = {
         value: string;
       };
     } | null;
-    repositoryCase: RepositoryCases & {
-      state: WorkflowStateWithRelations;
+    repositoryCase: {
+      id: number;
+      name: string;
+      source?: string;
+      state: {
+        id: number;
+        name: string;
+        icon: { name: string } | null;
+        color: { value: string } | null;
+      };
     };
   }>;
   tags: Tags[];

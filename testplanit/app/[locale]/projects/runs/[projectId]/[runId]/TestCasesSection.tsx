@@ -60,7 +60,12 @@ type TestRunWithRelations = {
     repositoryCase: {
       id: number;
       name: string;
-      state: WorkflowStateWithRelations;
+      state: {
+        id: number;
+        name: string;
+        icon: { name: string } | null;
+        color: { value: string } | null;
+      };
       source?: RepositoryCaseSource;
     };
   }>;

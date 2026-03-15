@@ -652,6 +652,7 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
           executedAt: { gte: sevenDaysBeforeLatestManual },
         },
         orderBy: { executedAt: "desc" },
+        take: 50000, // Safety limit to prevent OOM on large projects
         select: {
           id: true,
           executedAt: true,
@@ -760,16 +761,22 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
   );
 
   // Calculate 7 days before the latest automated result
-  const sevenDaysBeforeLatestAutomated = useMemo(() => {
+  // Use executedAt when available (the actual test execution time),
+  // falling back to createdAt (when the result was imported).
+  const automatedDateRange = useMemo(() => {
     if (!latestAutomatedResult) return undefined;
+    const hasExecutedAt = !!latestAutomatedResult.executedAt;
     const latestDate = latestAutomatedResult.executedAt
       ? new Date(latestAutomatedResult.executedAt)
       : new Date(latestAutomatedResult.createdAt);
     const sevenDaysInMillis = 7 * 24 * 60 * 60 * 1000;
-    return new Date(latestDate.getTime() - sevenDaysInMillis);
+    return {
+      field: hasExecutedAt ? ("executedAt" as const) : ("createdAt" as const),
+      cutoff: new Date(latestDate.getTime() - sevenDaysInMillis),
+    };
   }, [latestAutomatedResult]);
 
-  // Query 2: Get all automated results within 7 days of the latest result
+  // Query 2: Get automated results within 7 days of the latest result
   const { data: rawAutomatedResults, isLoading: isLoadingAutomatedResults } =
     useFindManyJUnitTestResult(
       {
@@ -777,9 +784,15 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
           testSuite: {
             testRun: { projectId: numericProjectId ?? undefined },
           },
-          createdAt: { gte: sevenDaysBeforeLatestAutomated },
+          // Filter on the same date field used to compute the window
+          ...(automatedDateRange?.field === "executedAt"
+            ? { executedAt: { gte: automatedDateRange.cutoff } }
+            : { createdAt: { gte: automatedDateRange?.cutoff } }),
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: automatedDateRange?.field === "executedAt"
+          ? { executedAt: "desc" }
+          : { createdAt: "desc" },
+        take: 50000, // Safety limit to prevent OOM on large projects
         select: {
           id: true,
           executedAt: true,
@@ -795,7 +808,7 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
         },
       },
       {
-        enabled: !!sevenDaysBeforeLatestAutomated,
+        enabled: !!automatedDateRange,
         staleTime: 30000, // Cache for 30 seconds
       }
     );

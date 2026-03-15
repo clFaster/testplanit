@@ -242,8 +242,16 @@ type TestRunWithRelations = {
         value: string;
       };
     } | null;
-    repositoryCase: RepositoryCases & {
-      state: WorkflowStateWithRelations;
+    repositoryCase: {
+      id: number;
+      name: string;
+      source?: RepositoryCases["source"];
+      state: {
+        id: number;
+        name: string;
+        icon: { name: string } | null;
+        color: { value: string } | null;
+      };
     };
   }>;
   tags: Tags[];
@@ -439,11 +447,16 @@ export default function TestRunPage() {
               },
             },
             repositoryCase: {
-              include: {
+              select: {
+                id: true,
+                name: true,
+                source: true,
                 state: {
-                  include: {
-                    icon: true,
-                    color: true,
+                  select: {
+                    id: true,
+                    name: true,
+                    icon: { select: { name: true } },
+                    color: { select: { value: true } },
                   },
                 },
               },
