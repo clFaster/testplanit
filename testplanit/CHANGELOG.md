@@ -1,3 +1,9 @@
+## [0.16.16](https://github.com/TestPlanIt/testplanit/compare/v0.16.15...v0.16.16) (2026-03-15)
+
+### Enhancements
+
+* add feedback survey functionality and integrate tw-animate-css ([073e4cb](https://github.com/TestPlanIt/testplanit/commit/073e4cb4908075aa86641c8a6ddc6013616effb2))
+
 ## [0.16.15](https://github.com/TestPlanIt/testplanit/compare/v0.16.14...v0.16.15) (2026-03-15)
 
 ### Bug Fixes
