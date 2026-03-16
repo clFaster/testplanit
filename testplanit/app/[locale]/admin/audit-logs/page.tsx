@@ -217,7 +217,7 @@ function AuditLogsContent({ session }: { session: Session }) {
   }, []);
 
   // Fetch all logs for export (no pagination)
-  const { data: allLogsForExport, refetch: refetchAllLogs } =
+  const { refetch: refetchAllLogs } =
     useFindManyAuditLog(
       {
         orderBy: sortConfig

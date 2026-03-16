@@ -65,7 +65,7 @@ import { useProjectPermissions } from "~/hooks/useProjectPermissions";
 import { useFindFirstRepositoryCasesFiltered } from "~/hooks/useRepositoryCasesWithFilteredFields";
 import { useRequireAuth } from "~/hooks/useRequireAuth";
 import {
-  useCreateAttachments, useCreateCaseFieldValues, useCreateCaseFieldVersionValues, useCreateSteps, useDeleteManyCaseFieldValues, useFindFirstProjects, useFindManyJUnitAttachment,
+  useCreateAttachments, useCreateCaseFieldValues, useCreateCaseFieldVersionValues, useCreateSteps, useFindFirstProjects, useFindManyJUnitAttachment,
   useFindManyJUnitProperty, useFindManyJUnitTestStep, useFindManyRepositoryCaseVersions, useFindManyRepositoryFolders, useFindManySharedStepGroup, useFindManyTags, useFindManyTemplates, useFindManyWorkflows, useFindUniqueProjects, useUpdateAttachments, useUpdateCaseFieldValues, useUpdateManySteps, useUpdateRepositoryCases
 } from "~/lib/hooks";
 import { Link, useRouter } from "~/lib/navigation";
@@ -305,7 +305,7 @@ export default function TestCaseDetails() {
   const canAddEdit = projectPermissions?.canAddEdit ?? false;
 
   // Fetch Tags permissions (ADDED)
-  const { permissions: tagsPermissions, isLoading: isLoadingTagsPermissions } =
+  const { permissions: tagsPermissions } =
     useProjectPermissions(
       isValidProjectId ? numericProjectId : -1,
       ApplicationArea.Tags
@@ -317,7 +317,6 @@ export default function TestCaseDetails() {
   // Fetch Restricted Fields permission (NEW)
   const {
     permissions: restrictedFieldsPermissions,
-    isLoading: isLoadingRestrictedPermissions,
   } = useProjectPermissions(
     isValidProjectId ? numericProjectId : -1,
     ApplicationArea.TestCaseRestrictedFields
@@ -892,8 +891,6 @@ export default function TestCaseDetails() {
   const { mutateAsync: createSteps } = useCreateSteps();
   const { mutateAsync: updateManySteps } = useUpdateManySteps();
   const { mutateAsync: createCaseFieldValues } = useCreateCaseFieldValues();
-  const { mutateAsync: deleteManyCaseFieldValues } =
-    useDeleteManyCaseFieldValues();
 
   // Restore handleEditModeToggle
   const handleEditModeToggle = () => {

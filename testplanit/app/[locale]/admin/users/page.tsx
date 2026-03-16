@@ -93,7 +93,7 @@ function UserList() {
     [queryClient]
   );
 
-  const { data: totalFilteredUsers, isLoading: isTotalLoading } =
+  const { data: totalFilteredUsers } =
     useFindManyUser(
       {
         orderBy: sortConfig

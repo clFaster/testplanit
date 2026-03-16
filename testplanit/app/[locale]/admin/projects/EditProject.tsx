@@ -151,7 +151,7 @@ export function EditProjectModal({
       },
       { enabled: isOpen }
     );
-  const { data: groupPermissionsData, isLoading: groupPermsLoading } =
+  const { data: groupPermissionsData } =
     useFindManyGroupProjectPermission(
       {
         where: { projectId: project.id },

@@ -81,7 +81,7 @@ export function AddStatusModal() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [systemNameFocused, setSystemNameFocused] = useState(false);
   const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
-  const { data: defaultColorData, isLoading: isDefaultColorLoading } =
+  const { data: defaultColorData } =
     useFindFirstColor();
 
   const { mutateAsync: createStatus } = useCreateStatus();

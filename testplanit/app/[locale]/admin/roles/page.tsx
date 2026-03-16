@@ -67,7 +67,7 @@ function RoleList() {
     typeof pageSize === "number" ? pageSize : totalItems;
   const skip = (currentPage - 1) * effectivePageSize;
 
-  const { data: totalFilteredRoles, isLoading: isTotalLoading } =
+  const { data: totalFilteredRoles } =
     useFindManyRoles(
       {
         orderBy: sortConfig

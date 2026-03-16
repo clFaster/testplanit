@@ -522,7 +522,7 @@ const ProjectSessions: React.FC<ProjectSessionsProps> = ({ params }) => {
     useState<{ first?: Date; last?: Date }>({});
 
   // Query 1: Get the most recent session result to determine the date range
-  const { data: latestSessionResult, isLoading: isLoadingLatestSessionResult } =
+  const { data: latestSessionResult } =
     useFindFirstSessionResults(
       {
         where: {

@@ -209,8 +209,7 @@ function JunitTableSection({
 
   // Fetch all JUnit results for this run (only if automated test run type)
   const isJUnitRun = isAutomatedTestRunType(testRunData?.testRunType);
-  const { data: junitResults = [], isLoading: isJunitResultsLoading } =
-    useFindManyJUnitTestResult(
+  useFindManyJUnitTestResult(
       isJUnitRun
         ? {
             where: { testSuiteId: Number(runId) },

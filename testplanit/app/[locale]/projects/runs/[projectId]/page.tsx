@@ -504,7 +504,6 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
   const {
     data: completedRunsData,
     isLoading: isLoadingCompletedRuns,
-    refetch: refetchCompletedRuns,
   } = useQuery<CompletedTestRunsResponse | null>({
     queryKey: [
       "completedTestRuns",
@@ -612,7 +611,7 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
 
   // --- Fetch Recent Manual Test Run Results (two-query approach) ---
   // Query 1: Get the most recent result to determine the date range
-  const { data: latestManualResult, isLoading: isLoadingLatestManualResult } =
+  const { data: latestManualResult } =
     useFindFirstTestRunResults(
       {
         where: {
@@ -739,7 +738,6 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
   // Query 1: Get the most recent automated result to determine the date range
   const {
     data: latestAutomatedResult,
-    isLoading: isLoadingLatestAutomatedResult,
   } = useFindFirstJUnitTestResult(
     {
       where: {

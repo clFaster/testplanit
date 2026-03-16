@@ -110,7 +110,7 @@ function ApiTokensList() {
   const updateApiTokenRef = useRef(updateApiToken);
   updateApiTokenRef.current = updateApiToken;
 
-  const { data: totalFilteredTokens, isLoading: isTotalLoading } =
+  const { data: totalFilteredTokens } =
     useFindManyApiToken(
       {
         orderBy: { [sortField]: sortConfig?.direction || "desc" },

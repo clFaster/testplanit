@@ -141,7 +141,7 @@ export default function SharedStepsPage() {
     groups.find((g: any) => g.id === selectedGroupId) || null;
 
   // Fetch items for selected group
-  const { data: items = [], isLoading: itemsLoading } =
+  const { data: items = [] } =
     useFindManySharedStepItem(
       selectedGroupId
         ? {

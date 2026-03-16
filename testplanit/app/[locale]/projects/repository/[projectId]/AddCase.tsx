@@ -458,14 +458,13 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
   // allIssues removed - fetched on demand during save to avoid loading all issues
 
   // Fetch Tags permission
-  const { permissions: tagsPermissions, isLoading: isLoadingTagsPermissions } =
+  const { permissions: tagsPermissions } =
     useProjectPermissions(numericProjectId, ApplicationArea.Tags);
   const canAddEditTags = tagsPermissions?.canAddEdit ?? false;
 
   // Fetch Restricted Fields permission (NEW)
   const {
     permissions: restrictedFieldsPermissions,
-    isLoading: isLoadingRestrictedPermissions,
   } = useProjectPermissions(
     numericProjectId,
     ApplicationArea.TestCaseRestrictedFields

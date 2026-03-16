@@ -306,7 +306,6 @@ export function EditResultModal({
   // Fetch Restricted Fields permission (NEW)
   const {
     permissions: restrictedFieldsPermissions,
-    isLoading: isLoadingRestrictedPermissions,
   } = useProjectPermissions(
     projectId,
     ApplicationArea.TestRunResultRestrictedFields

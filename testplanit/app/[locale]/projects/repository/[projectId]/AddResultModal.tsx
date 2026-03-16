@@ -498,7 +498,6 @@ export function AddResultModal({
   // Fetch permissions
   const {
     permissions: restrictedFieldsPermissions,
-    isLoading: isLoadingRestrictedPermissions,
   } = useProjectPermissions(
     projectId,
     ApplicationArea.TestRunResultRestrictedFields

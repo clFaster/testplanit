@@ -105,7 +105,7 @@ export function CreateIssueDialog({
   const createIssue = useCreateIssue();
 
   // Fetch project integrations
-  const { data: projectIntegrations, isLoading: loadingIntegrations } =
+  const { data: projectIntegrations } =
     useFindManyProjectIntegration({
       where: {
         projectId,

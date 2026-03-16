@@ -125,7 +125,7 @@ export default function ProjectsMenu({
 
   // Permission check for Shared Steps
   const safeProjectId = projectId ? String(projectId) : "";
-  const { permissions: sharedStepsPerms, isLoading: sharedStepsPermsLoading } =
+  const { permissions: sharedStepsPerms } =
     useProjectPermissions(safeProjectId, ApplicationArea.SharedSteps);
   const canSeeSharedSteps =
     sharedStepsPerms &&
@@ -134,7 +134,7 @@ export default function ProjectsMenu({
   // Issues are accessible to all users - no permission check needed
 
   // Permission check for Reporting
-  const { permissions: reportingPerms, isLoading: reportingPermsLoading } =
+  const { permissions: reportingPerms } =
     useProjectPermissions(safeProjectId, ApplicationArea.Reporting);
   const canSeeReports =
     reportingPerms && (reportingPerms.canAddEdit || reportingPerms.canDelete);
@@ -144,7 +144,7 @@ export default function ProjectsMenu({
   // 1. System ADMIN users (always have access to all projects)
   // 2. System PROJECTADMIN users (have access to settings for any project they can access)
   // 3. Users with Settings area permissions (Project Admin role)
-  const { permissions: settingsPerms, isLoading: settingsPermsLoading } =
+  const { permissions: settingsPerms } =
     useProjectPermissions(safeProjectId, ApplicationArea.Settings);
   const canSeeSettings =
     session?.user?.access === "ADMIN" || // System admins always have access

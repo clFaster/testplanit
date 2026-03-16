@@ -29,7 +29,6 @@ const Projects = () => {
 
   const {
     data: projectsRaw,
-    isLoading: isProjectsLoading,
     isFetched,
   } = useFindManyProjects(
     {

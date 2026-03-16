@@ -38,7 +38,7 @@ import { z } from "zod/v4";
 import { emptyEditorContent, MAX_DURATION } from "~/app/constants";
 import { useProjectPermissions } from "~/hooks/useProjectPermissions";
 import {
-  useCreateCaseFieldVersionValues, useCreateRepositoryCaseVersions, useFindManyTags, useFindManyWorkflows, useUpdateManyRepositoryCases, useUpdateRepositoryCases
+  useFindManyTags, useFindManyWorkflows, useUpdateManyRepositoryCases, useUpdateRepositoryCases
 } from "~/lib/hooks";
 import { IconName } from "~/types/globals";
 import { extractTextFromNode } from "~/utils/extractTextFromJson";
@@ -282,14 +282,10 @@ export function BulkEditModal({
 
   // Issue names are resolved from casesData (which includes issues: true) instead of fetching all issues
 
-  const { mutateAsync: updateCasesMutation, isPending: isUpdating } =
+  const { isPending: isUpdating } =
     useUpdateRepositoryCases();
   const { mutateAsync: updateManyRepositoryCases, isPending: isDeleting } =
     useUpdateManyRepositoryCases();
-  const { mutateAsync: createRepositoryCaseVersions } =
-    useCreateRepositoryCaseVersions();
-  const { mutateAsync: createCaseFieldVersionValues } =
-    useCreateCaseFieldVersionValues();
 
   // --- Memos and State Calculations ---
 

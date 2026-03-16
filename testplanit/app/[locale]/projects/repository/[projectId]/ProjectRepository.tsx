@@ -359,7 +359,6 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
   // Fetch permissions specifically for Test Runs
   const {
     permissions: testRunPermissions,
-    isLoading: isLoadingTestRunPermissions,
   } = useProjectPermissions(numericProjectId, "TestRuns");
 
   const ALL_VALUES_FILTER = "__ALL__"; // Special value for All Values filter
@@ -491,7 +490,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
     return folder?.text ?? null;
   }, [selectedFolderId, folderHierarchy]);
 
-  const { data: testRunCasesWithLoading, isLoading: isLoadingTestRunCases } =
+  const { data: testRunCasesWithLoading } =
     useFindManyTestRunCases(
       {
         where: {
@@ -538,7 +537,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
     );
   const testRunCases = testRunCasesWithLoading as TestRunCase[] | undefined;
 
-  const { data: caseFoldersWithLoading, isLoading: isLoadingCaseFolders } =
+  const { data: caseFoldersWithLoading } =
     useFindManyRepositoryCases(
       {
         where: {

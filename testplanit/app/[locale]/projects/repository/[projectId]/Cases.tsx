@@ -215,12 +215,11 @@ export default function Cases({
   // Fetch permissions
   const {
     permissions: testRunResultPermissions,
-    isLoading: isLoadingPermissions,
   } = useProjectPermissions(projectId, "TestRunResults");
   const canAddEditResults = testRunResultPermissions?.canAddEdit ?? false;
 
   // *** NEW: Fetch total project case count ***
-  const { data: totalProjectCasesCountData, isLoading: isLoadingTotalCount } =
+  const { data: totalProjectCasesCountData } =
     useCountRepositoryCases(
       {
         where: {

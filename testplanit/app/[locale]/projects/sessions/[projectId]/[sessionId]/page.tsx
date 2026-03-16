@@ -992,7 +992,7 @@ export default function SessionPage() {
   });
 
   // Fetch versions
-  const { data: versions, isLoading: isLoadingVersions } =
+  const { data: versions } =
     useFindManySessionVersions({
       where: { sessionId: Number(sessionId) },
       orderBy: { version: "desc" },

@@ -126,7 +126,7 @@ function LlmIntegrationList() {
   );
 
   // Query for total filtered integrations (for pagination)
-  const { data: totalFilteredIntegrations, isLoading: isTotalLoading } =
+  const { data: totalFilteredIntegrations } =
     useFindManyLlmIntegration(
       {
         orderBy: sortConfig

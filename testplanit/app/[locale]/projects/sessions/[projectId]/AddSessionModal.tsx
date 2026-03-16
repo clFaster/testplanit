@@ -455,7 +455,7 @@ export function AddSessionModal({
   };
 
   // --- Fetch Permissions ---
-  const { permissions: tagsPermissions, isLoading: isLoadingTagsPermissions } =
+  const { permissions: tagsPermissions } =
     useProjectPermissions(numericProjectId, ApplicationArea.Tags);
   const canAddEditTags = tagsPermissions?.canAddEdit ?? false;
   const isSuperAdmin = session?.user?.access === "ADMIN";

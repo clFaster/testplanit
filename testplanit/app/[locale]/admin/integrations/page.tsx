@@ -90,7 +90,7 @@ function IntegrationList() {
   const skip = (currentPage - 1) * effectivePageSize;
 
   // Query for total filtered integrations (for pagination)
-  const { data: totalFilteredIntegrations, isLoading: isTotalLoading } =
+  const { data: totalFilteredIntegrations } =
     useFindManyIntegration(
       {
         orderBy: sortConfig
