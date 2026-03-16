@@ -1692,7 +1692,7 @@ export class TestPlanItClient {
     const formData = new FormData();
 
     if (file instanceof Buffer) {
-      formData.append("file", new Blob([file], { type: mimeType }), fileName);
+      formData.append("file", new Blob([new Uint8Array(file)], { type: mimeType }), fileName);
     } else {
       formData.append("file", file, fileName);
     }
