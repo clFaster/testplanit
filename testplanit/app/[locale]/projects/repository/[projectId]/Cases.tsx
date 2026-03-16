@@ -554,6 +554,26 @@ export default function Cases({
                     },
                   ],
                 });
+              } else if (
+                typeof singleFilterId === "string" &&
+                singleFilterId.includes("|")
+              ) {
+                // Operator-based link filtering
+                const parts = singleFilterId.split("|");
+                const searchValue = parts[1];
+
+                if (searchValue) {
+                  // For link operators, we fetch all non-null values and filter in application logic
+                  filterConditions.push({
+                    caseFieldValues: {
+                      some: {
+                        fieldId: numericFieldId,
+                        value: { not: Prisma.JsonNull },
+                      },
+                    },
+                  });
+                  // Note: Actual URL filtering will happen after fetch in application logic
+                }
               }
             } else if (fieldType === "Dropdown") {
               // Handle special "none" value to filter for cases without this field
@@ -1118,100 +1138,6 @@ export default function Cases({
                   });
                   // Note: Actual text filtering will happen after fetch in application logic
                 }
-              }
-            } else if (fieldType === "Link") {
-              // Handle hasValue/none special filters
-              if (singleFilterId === "hasValue") {
-                // Has link - filter for non-null, non-empty string values
-                filterConditions.push({
-                  caseFieldValues: {
-                    some: {
-                      fieldId: numericFieldId,
-                      AND: [
-                        { value: { not: Prisma.JsonNull } },
-                        { value: { not: { equals: "" } } },
-                      ],
-                    },
-                  },
-                });
-              } else if (singleFilterId === "none") {
-                // No link - filter for null, empty, or non-existent
-                filterConditions.push({
-                  OR: [
-                    { caseFieldValues: { none: { fieldId: numericFieldId } } },
-                    {
-                      caseFieldValues: {
-                        some: {
-                          fieldId: numericFieldId,
-                          OR: [
-                            { value: { equals: Prisma.JsonNull } },
-                            { value: { equals: "" } },
-                          ],
-                        },
-                      },
-                    },
-                  ],
-                });
-              } else if (
-                typeof singleFilterId === "string" &&
-                singleFilterId.includes("|")
-              ) {
-                // Operator-based link filtering
-                const parts = singleFilterId.split("|");
-                const operator = parts[0];
-                const searchValue = parts[1];
-
-                if (searchValue) {
-                  // For link operators, we fetch all non-null values and filter in application logic
-                  filterConditions.push({
-                    caseFieldValues: {
-                      some: {
-                        fieldId: numericFieldId,
-                        value: { not: Prisma.JsonNull },
-                      },
-                    },
-                  });
-                  // Note: Actual URL filtering will happen after fetch in application logic
-                }
-              }
-            } else if (fieldType === "Steps") {
-              // Handle hasValue/none special filters
-              if (singleFilterId === "hasValue") {
-                // Has steps - filter for non-null, non-empty array values
-                filterConditions.push({
-                  caseFieldValues: {
-                    some: {
-                      fieldId: numericFieldId,
-                      AND: [
-                        { value: { not: Prisma.JsonNull } },
-                        // Steps are stored as JSON arrays, so we need to check for non-empty arrays
-                        // This will match any non-null value; empty array filtering happens in application logic
-                      ],
-                    },
-                  },
-                });
-              } else if (singleFilterId === "none") {
-                // No steps - filter for null or non-existent
-                filterConditions.push({
-                  OR: [
-                    { caseFieldValues: { none: { fieldId: numericFieldId } } },
-                    {
-                      caseFieldValues: {
-                        some: {
-                          fieldId: numericFieldId,
-                          value: { equals: Prisma.JsonNull },
-                        },
-                      },
-                    },
-                  ],
-                });
-              } else if (
-                typeof singleFilterId === "string" &&
-                singleFilterId.includes("|")
-              ) {
-                // Operator-based steps count filtering
-                // Note: Actual step count filtering will happen after fetch in application logic
-                // We don't filter at database level, just ensure we fetch cases with steps
               }
             }
           } else {
