@@ -1,3 +1,9 @@
+## [0.16.18](https://github.com/TestPlanIt/testplanit/compare/v0.16.17...v0.16.18) (2026-03-16)
+
+### Bug Fixes
+
+* **charts:** Limit automated result in chart plus more code cleanup ([#132](https://github.com/TestPlanIt/testplanit/issues/132)) ([bf0071c](https://github.com/TestPlanIt/testplanit/commit/bf0071cec57d06c9774d79c7146a33c6db68da5a)), closes [#130](https://github.com/TestPlanIt/testplanit/issues/130)
+
 ## [0.16.17](https://github.com/TestPlanIt/testplanit/compare/v0.16.16...v0.16.17) (2026-03-15)
 
 ### Enhancements
