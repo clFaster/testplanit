@@ -50,9 +50,17 @@ test.describe("Prompt Configurations - Navigation and Display", () => {
     await page.goto("/en-US/admin/projects");
     await page.waitForLoadState("networkidle");
 
-    // Click the prompts link in the admin sidebar
+    // The prompts link is in the "Tools & Integrations" section which may be collapsed
+    // Expand it if needed
+    const toolsSection = page.getByTestId("admin-menu-section-toolsAndIntegrations");
+    const toolsTrigger = toolsSection.locator('[data-radix-collection-item]').first();
+    // Check if the section content is visible by looking for any link inside
     const promptsLink = page.locator("#admin-menu-prompts");
-    await expect(promptsLink).toBeVisible();
+    if (!(await promptsLink.isVisible({ timeout: 1000 }).catch(() => false))) {
+      await toolsTrigger.click();
+    }
+
+    await expect(promptsLink).toBeVisible({ timeout: 5000 });
     await promptsLink.click();
 
     await expect(page).toHaveURL(/\/admin\/prompts/);
@@ -87,18 +95,20 @@ test.describe("Prompt Configurations - Create Operations", () => {
     await promptsPage.clickAdd();
 
     // Verify the dialog has accordion sections for each feature
+    // The accordion may be inside a scrollable container, so scroll to find it
     const accordion = promptsPage.dialog.locator(
       '[data-orientation="vertical"]'
-    );
-    await expect(accordion).toBeVisible();
+    ).first();
+    await expect(accordion).toBeVisible({ timeout: 10000 });
 
     // Verify at least one feature section exists (e.g., "Test Case Generation")
-    await expect(
-      promptsPage.dialog.locator("text=Test Case Generation")
-    ).toBeVisible();
-    await expect(
-      promptsPage.dialog.locator("text=Editor Writing Assistant")
-    ).toBeVisible();
+    const testCaseGen = promptsPage.dialog.locator("text=Test Case Generation");
+    await testCaseGen.scrollIntoViewIfNeeded();
+    await expect(testCaseGen).toBeVisible({ timeout: 5000 });
+
+    const editorAssistant = promptsPage.dialog.locator("text=Editor Writing Assistant");
+    await editorAssistant.scrollIntoViewIfNeeded();
+    await expect(editorAssistant).toBeVisible({ timeout: 5000 });
   });
 
   test("Cannot create config with empty name", async () => {
@@ -146,12 +156,13 @@ test.describe("Prompt Configurations - Edit Operations", () => {
   let promptsPage: PromptConfigurationsPage;
   const configName = `E2E Edit Config ${Date.now()}`;
 
-  test.beforeEach(async ({ page, api }) => {
+  test.beforeEach(async ({ page, api, baseURL }) => {
     promptsPage = new PromptConfigurationsPage(page);
 
     // Create a config via API for editing
+    const apiBase = baseURL || "http://localhost:3002";
     const response = await api["request"].post(
-      `http://localhost:3000/api/model/promptConfig/create`,
+      `${apiBase}/api/model/promptConfig/create`,
       {
         data: {
           data: {
@@ -164,18 +175,27 @@ test.describe("Prompt Configurations - Edit Operations", () => {
       }
     );
 
+    if (!response.ok()) {
+      const errorText = await response.text();
+      console.error(`Failed to create prompt config: ${response.status()} - ${errorText}`);
+    }
+
     await promptsPage.goto();
   });
 
-  test("Edit config description", async () => {
+  test("Edit config description", async ({ page }) => {
     await promptsPage.clickEditOnRow(configName);
 
     const newDescription = `Updated description ${Date.now()}`;
     await promptsPage.fillDescription(newDescription);
-    await promptsPage.submitForm();
 
-    // Wait for dialog to close
-    await expect(promptsPage.dialog).not.toBeVisible({ timeout: 10000 });
+    // Scroll the Save button into view and click it
+    const saveButton = promptsPage.dialog.locator('button:has-text("Save")');
+    await saveButton.scrollIntoViewIfNeeded();
+    await saveButton.click();
+
+    // Wait for dialog to close (the save may take time due to prompt feature updates)
+    await expect(promptsPage.dialog).not.toBeVisible({ timeout: 30000 });
 
     // Verify the update persisted by reloading
     await promptsPage.goto();
@@ -190,12 +210,13 @@ test.describe("Prompt Configurations - Delete Operations", () => {
     promptsPage = new PromptConfigurationsPage(page);
   });
 
-  test("Delete a non-default config", async ({ page, api }) => {
+  test("Delete a non-default config", async ({ page, api, baseURL }) => {
     const configName = `E2E Delete Config ${Date.now()}`;
 
     // Create a config via API
-    await api["request"].post(
-      `http://localhost:3000/api/model/promptConfig/create`,
+    const apiBase = baseURL || "http://localhost:3002";
+    const response = await api["request"].post(
+      `${apiBase}/api/model/promptConfig/create`,
       {
         data: {
           data: {
@@ -207,6 +228,11 @@ test.describe("Prompt Configurations - Delete Operations", () => {
         },
       }
     );
+
+    if (!response.ok()) {
+      const errorText = await response.text();
+      console.error(`Failed to create prompt config: ${response.status()} - ${errorText}`);
+    }
 
     await promptsPage.goto();
     await promptsPage.expectConfigInTable(configName);

@@ -84,14 +84,35 @@ export class PromptConfigurationsPage extends BasePage {
   async filterByText(text: string): Promise<void> {
     await this.filterInput.clear();
     await this.filterInput.fill(text);
-    // Wait for debounce
-    await this.page.waitForTimeout(600);
+    // The Filter component has a 300ms debounce, and the page adds another 500ms debounce
+    // on the search string before it hits the API query. Wait for both plus network time.
+    await this.page.waitForTimeout(1200);
+    // Wait for any in-flight network requests to settle
+    await this.page.waitForLoadState("networkidle");
   }
 
   async getTableRowCount(): Promise<number> {
-    await this.page.waitForTimeout(500);
+    // Wait for the pagination info to appear, indicating data has loaded
+    const paginationInfo = this.page.locator(
+      'text=/Showing \\d+-\\d+ of \\d+ item|No items found/i'
+    );
+    await paginationInfo.first().waitFor({ state: "visible", timeout: 10000 }).catch(() => {});
+
+    // Wait for any loading skeletons to disappear
+    const skeleton = this.dataTable.locator('[data-slot="skeleton"]');
+    await skeleton.first().waitFor({ state: "hidden", timeout: 5000 }).catch(() => {});
+
     const rows = this.dataTable.locator("tbody tr");
-    return rows.count();
+    const count = await rows.count();
+
+    // If the single row contains "No results" or similar empty state, return 0
+    if (count === 1) {
+      const text = await rows.first().textContent();
+      if (text && /no.*results|no.*items|no.*data/i.test(text)) {
+        return 0;
+      }
+    }
+    return count;
   }
 
   async expectConfigInTable(name: string): Promise<void> {
@@ -106,7 +127,7 @@ export class PromptConfigurationsPage extends BasePage {
 
   async clickEditOnRow(name: string): Promise<void> {
     const row = this.dataTable.locator("tbody tr", { hasText: name });
-    const editButton = row.locator('button:has([class*="lucide-pencil"])');
+    const editButton = row.locator('button:has(svg.lucide-square-pen), button:has(svg[class*="lucide-pencil"]), button:has(svg[class*="edit"])').first();
     await editButton.click();
     await expect(this.dialog).toBeVisible();
   }
