@@ -48,6 +48,82 @@ function isRateLimitError(err: unknown): boolean {
   return msg.includes("rate limit") || msg.includes("429");
 }
 
+const MAX_RATE_LIMIT_RETRIES = 3;
+const DEFAULT_RETRY_SECONDS = 60;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Fetch file contents with rate-limit retry. On 429, waits for the
+ * Retry-After period, drops to sequential fetching, and continues.
+ * Gives up after MAX_RATE_LIMIT_RETRIES consecutive rate-limit hits.
+ */
+async function fetchContentsBatched(
+  files: RepoFileEntry[],
+  adapter: { getFileContent(path: string, branch: string): Promise<string>; retryAfterSeconds: number },
+  branch: string,
+  initialConcurrency: number,
+): Promise<{ contentMap: Map<string, string>; contentRateLimited: boolean }> {
+  const contentMap = new Map<string, string>();
+  let concurrency = initialConcurrency;
+  let consecutiveRateLimits = 0;
+  let i = 0;
+
+  while (i < files.length) {
+    if (consecutiveRateLimits >= MAX_RATE_LIMIT_RETRIES) {
+      console.warn(
+        `[repoCacheRefresh] Giving up after ${MAX_RATE_LIMIT_RETRIES} consecutive rate limits — ${contentMap.size}/${files.length} files cached`
+      );
+      return { contentMap, contentRateLimited: true };
+    }
+
+    const batch = files.slice(i, i + concurrency);
+    const results = await Promise.allSettled(
+      batch.map(async (file) => {
+        const content = await adapter.getFileContent(file.path, branch);
+        return { path: file.path, content };
+      })
+    );
+
+    let batchRateLimited = false;
+
+    for (const result of results) {
+      if (result.status === "fulfilled") {
+        contentMap.set(result.value.path, result.value.content);
+      } else if (isRateLimitError(result.reason)) {
+        batchRateLimited = true;
+      } else {
+        console.warn(
+          `[repoCacheRefresh] Skipping content for a file:`,
+          result.reason
+        );
+      }
+    }
+
+    if (batchRateLimited) {
+      consecutiveRateLimits++;
+      // Drop to sequential and wait before retrying
+      concurrency = 1;
+      const waitSeconds = adapter.retryAfterSeconds || DEFAULT_RETRY_SECONDS;
+      console.warn(
+        `[repoCacheRefresh] Rate limited (attempt ${consecutiveRateLimits}/${MAX_RATE_LIMIT_RETRIES}) — waiting ${waitSeconds}s, then continuing sequentially (${contentMap.size}/${files.length} cached so far)`
+      );
+      await sleep(waitSeconds * 1000);
+      // Don't advance i — retry the files that failed in this batch
+      // (successful ones are already in contentMap and will be skipped by the adapter's cache or deduped by Map.set)
+      continue;
+    }
+
+    // Batch succeeded — reset rate-limit counter and advance
+    consecutiveRateLimits = 0;
+    i += concurrency;
+  }
+
+  return { contentMap, contentRateLimited: false };
+}
+
 export interface RefreshResult {
   success: boolean;
   fileCount: number;
@@ -145,38 +221,10 @@ export async function refreshRepoCache(
       },
     });
 
-    // Fetch and cache file contents
-    const CONTENT_FETCH_CONCURRENCY = 10;
-    const contentMap = new Map<string, string>();
-    let contentRateLimited = false;
-
-    for (let i = 0; i < files.length; i += CONTENT_FETCH_CONCURRENCY) {
-      if (contentRateLimited) break;
-
-      const batch = files.slice(i, i + CONTENT_FETCH_CONCURRENCY);
-      const results = await Promise.allSettled(
-        batch.map(async (file) => {
-          const content = await adapter.getFileContent(file.path, branch);
-          return { path: file.path, content };
-        })
-      );
-
-      for (const result of results) {
-        if (result.status === "fulfilled") {
-          contentMap.set(result.value.path, result.value.content);
-        } else if (isRateLimitError(result.reason)) {
-          contentRateLimited = true;
-          console.warn(
-            `[repoCacheRefresh] Rate limited — stopping content fetch after ${contentMap.size}/${files.length} files cached`
-          );
-        } else {
-          console.warn(
-            `[repoCacheRefresh] Skipping content for a file:`,
-            result.reason
-          );
-        }
-      }
-    }
+    // Fetch and cache file contents (with rate-limit retry)
+    const { contentMap, contentRateLimited } = await fetchContentsBatched(
+      files, adapter, branch, 10,
+    );
 
     if (contentMap.size > 0) {
       await repoFileCache.setFileContents(
@@ -269,37 +317,9 @@ export async function refreshRepoCacheContentsOnly(
   );
   const branch = config.branch || (await adapter.getDefaultBranch());
 
-  const CONTENT_FETCH_CONCURRENCY = 10;
-  const contentMap = new Map<string, string>();
-  let contentRateLimited = false;
-
-  for (let i = 0; i < cachedFiles.length; i += CONTENT_FETCH_CONCURRENCY) {
-    if (contentRateLimited) break;
-
-    const batch = cachedFiles.slice(i, i + CONTENT_FETCH_CONCURRENCY);
-    const results = await Promise.allSettled(
-      batch.map(async (file) => {
-        const content = await adapter.getFileContent(file.path, branch);
-        return { path: file.path, content };
-      })
-    );
-
-    for (const result of results) {
-      if (result.status === "fulfilled") {
-        contentMap.set(result.value.path, result.value.content);
-      } else if (isRateLimitError(result.reason)) {
-        contentRateLimited = true;
-        console.warn(
-          `[repoCacheRefresh] Rate limited — stopping content fetch after ${contentMap.size}/${cachedFiles.length} files cached`
-        );
-      } else {
-        console.warn(
-          `[repoCacheRefresh] Skipping content for a file:`,
-          result.reason
-        );
-      }
-    }
-  }
+  const { contentMap, contentRateLimited } = await fetchContentsBatched(
+    cachedFiles, adapter, branch, 10,
+  );
 
   if (contentMap.size > 0) {
     await repoFileCache.setFileContents(

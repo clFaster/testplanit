@@ -35,6 +35,15 @@ export abstract class GitRepoAdapter {
   private rateLimitResetAt: number | null = null; // Unix seconds
 
   /**
+   * Seconds until the rate-limit window resets (from server headers).
+   * Returns 0 if unknown or already reset.
+   */
+  get retryAfterSeconds(): number {
+    if (!this.rateLimitResetAt) return 0;
+    return Math.max(0, this.rateLimitResetAt - Math.floor(Date.now() / 1000));
+  }
+
+  /**
    * List all files in the repository for a given branch.
    * Returns paths and sizes only — no file content.
    */
