@@ -51,7 +51,7 @@ const startWorker = async () => {
       concurrency: parseInt(process.env.BUDGET_ALERT_CONCURRENCY || '2', 10),
     });
 
-    worker.on("completed", (job) => {
+    worker.on("completed", (_job) => {
       // Debug level - budget checks are frequent, don't log every completion
     });
 

@@ -371,7 +371,7 @@ export async function parseTestResults(
  */
 function normalizeDurations(
   result: ITestResult,
-  format: TestResultFormat
+  _format: TestResultFormat
 ): void {
   // The test-results-parser library converts ALL formats to milliseconds internally,
   // including JUnit (which has seconds in XML). We always need to convert back to seconds.

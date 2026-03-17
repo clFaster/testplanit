@@ -154,7 +154,7 @@ export default function SharedStepsPage() {
 
   // Update group name
   const updateGroupMutation = useUpdateSharedStepGroup();
-  const handleGroupNameSave = async () => {
+  const _handleGroupNameSave = async () => {
     if (!selectedGroup || !editGroupName.trim()) return;
     await updateGroupMutation.mutateAsync({
       where: { id: selectedGroup.id },

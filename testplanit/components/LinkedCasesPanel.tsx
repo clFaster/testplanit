@@ -226,7 +226,7 @@ const LinkedCasesPanel: React.FC<LinkedCasesPanelProps> = ({
     link.caseAId === caseId ? link.caseB : link.caseA;
 
   // Helper to get the direction of the link
-  const getLinkDirection = (link: any) =>
+  const _getLinkDirection = (link: any) =>
     link.caseAId === caseId ? "outgoing" : "incoming";
 
   // State to control which popover is open for link removal

@@ -24,8 +24,6 @@ export function DeleteUserModal({ user }: DeleteUserModalProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleCancel = () => setOpen(false);
-
   const form = useForm();
   const {
     formState: { errors },

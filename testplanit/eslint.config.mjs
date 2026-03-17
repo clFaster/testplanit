@@ -1,4 +1,5 @@
 import nextConfig from "eslint-config-next";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
 
 const eslintConfig = [{
   ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "dist/**", "next-env.d.ts", "playwright-report/**", "coverage/**"]
@@ -18,6 +19,9 @@ const eslintConfig = [{
     "@typescript-eslint/no-require-imports": "off",
   },
 }, {
+  plugins: {
+    "@typescript-eslint": tsPlugin,
+  },
   settings: {
     next: {
       rootDir: "testplanit/",
@@ -29,7 +33,14 @@ const eslintConfig = [{
   rules: {
     // Add any custom rules here
     "@next/next/no-html-link-for-pages": "off",
-    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error", {
+      "vars": "all",
+      "args": "after-used",
+      "ignoreRestSiblings": true,
+      "varsIgnorePattern": "^_",
+      "argsIgnorePattern": "^_",
+      "caughtErrorsIgnorePattern": "^_",
+    }],
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-empty-object-type": "off",
     "@typescript-eslint/no-unused-expressions": "off",

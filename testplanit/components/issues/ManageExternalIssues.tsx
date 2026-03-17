@@ -334,7 +334,7 @@ function LinkedIssueBadge({
 export function ManageExternalIssues({
   testCaseId,
   projectId,
-  projectIntegrationId,
+  projectIntegrationId: _projectIntegrationId,
   integrationId,
   provider,
   linkedIssueIds,

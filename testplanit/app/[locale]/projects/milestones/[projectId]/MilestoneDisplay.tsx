@@ -1,6 +1,5 @@
 import { Loading } from "@/components/Loading";
 import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import React, { useEffect, useState } from "react";
 import { useFindManyColor, useUpdateMilestones } from "~/lib/hooks";
@@ -32,7 +31,6 @@ const MilestoneDisplay: React.FC<MilestoneDisplayProps> = ({
 }) => {
   const { data: session } = useSession();
   const { resolvedTheme } = useTheme();
-  const t = useTranslations();
   const { data: colors, isLoading: isColorsLoading } = useFindManyColor({
     include: { colorFamily: true },
     orderBy: { colorFamily: { order: "asc" } },

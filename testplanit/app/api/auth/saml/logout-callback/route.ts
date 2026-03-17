@@ -4,11 +4,11 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const samlResponse = searchParams.get('SAMLResponse');
-    const relayState = searchParams.get('RelayState');
+    const _relayState = searchParams.get('RelayState');
 
     if (samlResponse) {
       // Decode and validate the SAML logout response
-      const decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf-8');
+      const _decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf-8');
       // SAML logout response received
 
       // In a production environment, you would:
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     if (samlRequest) {
       // Decode and process the SAML logout request
-      const decodedRequest = Buffer.from(samlRequest, 'base64').toString('utf-8');
+      const _decodedRequest = Buffer.from(samlRequest, 'base64').toString('utf-8');
       // SAML logout request received from IdP
 
       // In a production environment, you would:

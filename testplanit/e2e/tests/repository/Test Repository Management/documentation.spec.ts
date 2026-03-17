@@ -83,7 +83,7 @@ test.describe("Documentation", () => {
       .first();
 
     // Only proceed if edit button is visible (user has permissions)
-    const canEdit = await editButton
+    const _canEdit = await editButton
       .isVisible({ timeout: 3000 })
       .catch(() => false);
 
@@ -122,7 +122,7 @@ test.describe("Documentation", () => {
       .locator("button")
       .filter({ hasText: /edit.*documentation/i })
       .first();
-    const canEdit = await editButton
+    const _canEdit = await editButton
       .isVisible({ timeout: 3000 })
       .catch(() => false);
 
@@ -179,7 +179,7 @@ test.describe("Documentation", () => {
       .locator("button")
       .filter({ hasText: /edit.*documentation/i })
       .first();
-    const canEdit = await editButton
+    const _canEdit = await editButton
       .isVisible({ timeout: 3000 })
       .catch(() => false);
 
@@ -231,7 +231,7 @@ test.describe("Documentation", () => {
       .locator("button")
       .filter({ hasText: /edit.*documentation/i })
       .first();
-    const canEdit = await editButton
+    const _canEdit = await editButton
       .isVisible({ timeout: 3000 })
       .catch(() => false);
 
@@ -277,7 +277,7 @@ test.describe("Documentation", () => {
       .locator("button")
       .filter({ hasText: /edit.*documentation/i })
       .first();
-    const canEdit = await editButton
+    const _canEdit = await editButton
       .isVisible({ timeout: 3000 })
       .catch(() => false);
 
@@ -332,7 +332,7 @@ test.describe("Documentation", () => {
       .locator("button")
       .filter({ hasText: /edit.*documentation/i })
       .first();
-    const canEdit = await editButton
+    const _canEdit = await editButton
       .isVisible({ timeout: 3000 })
       .catch(() => false);
 
@@ -372,7 +372,7 @@ test.describe("Documentation", () => {
       .locator("button")
       .filter({ hasText: /edit.*documentation/i })
       .first();
-    const canEdit = await editButton
+    const _canEdit = await editButton
       .isVisible({ timeout: 3000 })
       .catch(() => false);
 
@@ -405,7 +405,7 @@ test.describe("Documentation", () => {
     await page.keyboard.type("const test = 'code';");
 
     // Verify code block exists (either pre or code element)
-    const codeBlock = editor.locator("pre, code").first();
+    const _codeBlock = editor.locator("pre, code").first();
     // Code block may or may not be visible depending on implementation
     // Just verify we can type in the editor
     await expect(editor).toBeVisible();
@@ -442,7 +442,7 @@ test.describe("Documentation", () => {
       .locator("button")
       .filter({ hasText: /edit.*documentation/i })
       .first();
-    const canEdit = await editButton
+    const _canEdit = await editButton
       .isVisible({ timeout: 3000 })
       .catch(() => false);
 

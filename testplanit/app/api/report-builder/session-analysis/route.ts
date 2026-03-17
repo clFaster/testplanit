@@ -255,7 +255,7 @@ const METRIC_REGISTRY: Record<
   sessionCount: {
     id: "sessionCount",
     label: "Session Count",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, filters, _dims) => {
       // Handle date grouping or assignedToId grouping specially (need to include related data)
       if (groupBy.includes("createdAt") || groupBy.includes("assignedToId")) {
         const sessions = await prisma.sessions.findMany({
@@ -363,7 +363,7 @@ const METRIC_REGISTRY: Record<
   activeSessions: {
     id: "activeSessions",
     label: "Active Sessions",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, filters, _dims) => {
       // Always use manual aggregation since we need to count boolean values
       // which cannot be aggregated with _sum in Prisma
       // Manual aggregation - get all sessions and group manually
@@ -459,7 +459,7 @@ const METRIC_REGISTRY: Record<
   averageDuration: {
     id: "averageDuration",
     label: "Average Duration",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, filters, _dims) => {
       // Handle manual aggregation for complex grouping
       const needsManualAggregation =
         groupBy.some(
@@ -588,7 +588,7 @@ const METRIC_REGISTRY: Record<
   totalDuration: {
     id: "totalDuration",
     label: "Total Duration",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, filters, _dims) => {
       // Handle manual aggregation for complex grouping
       const needsManualAggregation =
         groupBy.some(
@@ -710,7 +710,7 @@ const METRIC_REGISTRY: Record<
 };
 
 // Cartesian product utility function
-function cartesianProduct(arrays: any[][]): any[][] {
+function _cartesianProduct(arrays: any[][]): any[][] {
   return arrays.reduce(
     (acc, curr) => {
       return acc.flatMap((d) => curr.map((e) => [...d, e]));

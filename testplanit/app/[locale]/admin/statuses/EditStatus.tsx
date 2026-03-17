@@ -183,9 +183,6 @@ export function EditStatusModal({ status }: EditStatusModalProps) {
   }, [open, defaultFormValues, form, status.colorId]);
 
   const {
-    watch,
-    setValue,
-    handleSubmit,
     control,
     formState: { errors },
   } = form;
@@ -469,7 +466,7 @@ export function EditStatusModal({ status }: EditStatusModalProps) {
                 <FormField
                   control={form.control}
                   name="scope"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex justify-between items-center">
                         <span className="flex items-center">
@@ -517,7 +514,7 @@ export function EditStatusModal({ status }: EditStatusModalProps) {
                 <FormField
                   control={form.control}
                   name="projects"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex justify-between items-center">
                         <span className="flex items-center">

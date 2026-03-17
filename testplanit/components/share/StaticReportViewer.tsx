@@ -16,7 +16,7 @@ interface StaticReportViewerProps {
   isAuthenticatedUser?: boolean;
 }
 
-export function StaticReportViewer({ shareData, shareMode, isAuthenticatedUser = false }: StaticReportViewerProps) {
+export function StaticReportViewer({ shareData, shareMode: _shareMode, isAuthenticatedUser = false }: StaticReportViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [reportData, setReportData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);

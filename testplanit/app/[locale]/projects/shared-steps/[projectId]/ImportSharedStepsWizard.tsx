@@ -717,7 +717,7 @@ export function ImportSharedStepsWizard({
     );
   };
 
-  const canProceedToNextPage = () => {
+  const _canProceedToNextPage = () => {
     // Always return true to keep the button enabled
     return true;
   };

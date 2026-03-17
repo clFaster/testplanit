@@ -371,7 +371,7 @@ const Signin: NextPage = () => {
       // Get callback URL from search params, default to "/"
       const callbackUrl = searchParams.get("callbackUrl") || "/";
 
-      const result = await signIn("email", {
+      await signIn("email", {
         email: data.email,
         redirect: false,
         callbackUrl,

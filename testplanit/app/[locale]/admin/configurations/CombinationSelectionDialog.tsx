@@ -38,7 +38,7 @@ const CombinationSelectionDialog: React.FC<CombinationSelectionDialogProps> = ({
   onNext,
   categories,
 }) => {
-  const [selectedCombinations, setSelectedCombinations] = useState<number[][]>(
+  const [selectedCombinations] = useState<number[][]>(
     []
   );
   const [allCombinations, setAllCombinations] = useState<

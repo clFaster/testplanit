@@ -83,7 +83,6 @@ export function EditVariantModal({
   }, [open, defaultFormValues, form, form.reset]);
 
   const {
-    handleSubmit,
     formState: { errors },
   } = form;
 

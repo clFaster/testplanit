@@ -24,7 +24,7 @@ import svgIcon from "~/public/tpi_logo.svg";
 
 export default function TwoFactorVerifyPage() {
   const router = useRouter();
-  const { data: session, update: updateSession } = useSession();
+  const { data: _session, update: updateSession } = useSession();
   const t = useTranslations();
 
   const [isLoading, setIsLoading] = useState(false);

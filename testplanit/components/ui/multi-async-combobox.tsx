@@ -54,7 +54,7 @@ export function MultiAsyncCombobox<T>({
   className,
   dropdownClassName,
   pageSize = 10,
-  showTotal = false,
+  showTotal: _showTotal = false,
   hideSelected = false,
 }: MultiAsyncComboboxProps<T>) {
   const tCommon = useTranslations("common");
@@ -62,7 +62,7 @@ export function MultiAsyncCombobox<T>({
   const [search, setSearch] = useState("");
   const [options, setOptions] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
-  const [touched, setTouched] = useState(false);
+  const [touched, _setTouched] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [width, setWidth] = useState<number>(200);
   const [page, setPage] = useState(0);

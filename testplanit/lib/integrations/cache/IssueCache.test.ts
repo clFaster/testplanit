@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Create mock implementations that can be referenced in the hoisted mock
-const mockPipelineInstance = {
+const _mockPipelineInstance = {
   setex: vi.fn().mockReturnThis(),
   del: vi.fn().mockReturnThis(),
   exec: vi.fn().mockResolvedValue([]),

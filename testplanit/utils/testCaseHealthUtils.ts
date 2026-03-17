@@ -159,8 +159,8 @@ export async function handleTestCaseHealthPOST(
       staleDaysThreshold = 30,
       minExecutionsForRate = 5,
       lookbackDays = 90,
-      startDate,
-      endDate,
+      startDate: _startDate,
+      endDate: _endDate,
       automatedFilter, // "all" | "automated" | "manual"
       dimensions = [],
     } = body;
@@ -235,7 +235,7 @@ export async function handleTestCaseHealthPOST(
     const projectJoin = includeProject
       ? Prisma.sql`INNER JOIN "Projects" p ON p.id = rc."projectId"`
       : Prisma.empty;
-    const projectGroupBy = includeProject
+    const _projectGroupBy = includeProject
       ? Prisma.sql`, p.id, p.name`
       : Prisma.empty;
 

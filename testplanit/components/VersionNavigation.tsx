@@ -20,7 +20,7 @@ interface VersionNavigationProps {
 
 export function VersionNavigation({
   versions,
-  currentVersion,
+  currentVersion: _currentVersion,
   currentVersionIndex,
   onPrevVersion,
   onNextVersion,

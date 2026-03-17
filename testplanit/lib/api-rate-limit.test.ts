@@ -201,7 +201,7 @@ describe("api-rate-limit", () => {
   describe("checkApiRateLimit (with Valkey)", () => {
     it("should use Valkey INCR for counting", async () => {
       vi.stubEnv("TIER", "essentials");
-      let callCount = 0;
+      let _callCount = 0;
 
       await withValkeyMock(async () => {
         mockIncr.mockResolvedValue(1);

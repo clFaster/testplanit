@@ -56,8 +56,6 @@ const VerifyEmail = () => {
 
   const {
     watch,
-    handleSubmit,
-    formState: { errors },
   } = form;
 
   const email = watch("email");

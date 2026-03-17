@@ -137,8 +137,8 @@ describe("TipTapEditor", () => {
       // Mock useEditor to return null
       vi.doMock("@tiptap/react", () => ({
         useEditor: () => null,
-        EditorContent: ({ editor }: { editor: any }) =>
-          editor ? <div data-testid="editor-content">{"Editor"}</div> : null,
+        EditorContent: ({ editor: _editor }: { editor: any }) =>
+          _editor ? <div data-testid="editor-content">{"Editor"}</div> : null,
       }));
 
       // Clear module cache to pick up the new mock
@@ -157,9 +157,9 @@ describe("TipTapEditor", () => {
       // Mock useEditor to return our mock editor
       vi.doMock("@tiptap/react", () => ({
         useEditor: () => mockEditor,
-        EditorContent: ({ editor }: { editor: any }) => (
+        EditorContent: ({ editor: _editor }: { editor: any }) => (
           <div data-testid="editor-content" contentEditable>
-            {editor ? "Editor initialized" : "No editor"}
+            {_editor ? "Editor initialized" : "No editor"}
           </div>
         ),
       }));
@@ -182,7 +182,7 @@ describe("TipTapEditor", () => {
       // Mock useEditor to return our mock editor for these tests
       vi.doMock("@tiptap/react", () => ({
         useEditor: () => mockEditor,
-        EditorContent: ({ editor }: { editor: any }) => (
+        EditorContent: ({ editor: _editor }: { editor: any }) => (
           <div data-testid="editor-content" contentEditable>
             {"Editor Content"}
           </div>
@@ -252,7 +252,7 @@ describe("TipTapEditor", () => {
     beforeEach(async () => {
       vi.doMock("@tiptap/react", () => ({
         useEditor: () => mockEditor,
-        EditorContent: ({ editor }: { editor: any }) => (
+        EditorContent: ({ editor: _editor }: { editor: any }) => (
           <div data-testid="editor-content" contentEditable>
             {"Editor Content"}
           </div>
@@ -307,7 +307,7 @@ describe("TipTapEditor", () => {
     beforeEach(async () => {
       vi.doMock("@tiptap/react", () => ({
         useEditor: () => mockEditor,
-        EditorContent: ({ editor }: { editor: any }) => (
+        EditorContent: ({ editor: _editor }: { editor: any }) => (
           <div data-testid="editor-content" contentEditable>
             {"Editor Content"}
           </div>
@@ -386,7 +386,7 @@ describe("TipTapEditor", () => {
     beforeEach(async () => {
       vi.doMock("@tiptap/react", () => ({
         useEditor: () => mockEditor,
-        EditorContent: ({ editor }: { editor: any }) => (
+        EditorContent: ({ editor: _editor }: { editor: any }) => (
           <div data-testid="editor-content">{"Editor"}</div>
         ),
       }));
@@ -425,7 +425,7 @@ describe("TipTapEditor", () => {
     beforeEach(async () => {
       vi.doMock("@tiptap/react", () => ({
         useEditor: () => mockEditor,
-        EditorContent: ({ editor }: { editor: any }) => (
+        EditorContent: ({ editor: _editor }: { editor: any }) => (
           <div data-testid="editor-content" contentEditable role="textbox">
             {"Editor Content"}
           </div>
@@ -478,7 +478,7 @@ describe("TipTapEditor", () => {
     beforeEach(async () => {
       vi.doMock("@tiptap/react", () => ({
         useEditor: () => mockEditor,
-        EditorContent: ({ editor }: { editor: any }) => (
+        EditorContent: ({ editor: _editor }: { editor: any }) => (
           <div data-testid="editor-content">{"Editor"}</div>
         ),
       }));
@@ -517,7 +517,7 @@ describe("TipTapEditor", () => {
     beforeEach(async () => {
       vi.doMock("@tiptap/react", () => ({
         useEditor: () => mockEditor,
-        EditorContent: ({ editor }: { editor: any }) => (
+        EditorContent: ({ editor: _editor }: { editor: any }) => (
           <div data-testid="editor-content">{"Editor"}</div>
         ),
       }));

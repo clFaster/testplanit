@@ -78,7 +78,7 @@ export function CreateIssueDialog({
   const { data: session } = useSession();
   const [isCreating, setIsCreating] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(false);
+  const [_isCheckingAuth, setIsCheckingAuth] = useState(false);
   const [selectedIssueType, setSelectedIssueType] = useState<{
     id: string;
     name: string;

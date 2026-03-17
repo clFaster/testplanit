@@ -66,17 +66,16 @@ export function AsyncCombobox<T>({
   renderTrigger,
 }: AsyncComboboxProps<T>) {
   const tCommon = useTranslations("common");
-  const tRepository = useTranslations("repository.columns");
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [options, setOptions] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
-  const [touched, setTouched] = useState(false);
+  const [touched, _setTouched] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [width, setWidth] = useState<number>(200);
   const [page, setPage] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+  const _inputRef = useRef<HTMLInputElement>(null);
+  const [_focusedIndex, _setFocusedIndex] = useState<number | null>(null);
   const [total, setTotal] = useState<number | null>(null);
 
   // Update width when trigger element changes size

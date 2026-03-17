@@ -798,7 +798,7 @@ export function EditResultFieldModal({
             <FormField
               control={form.control}
               name="typeId"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="whitespace-nowrap items-center flex space-x-2">
                     <div className="flex items-center">

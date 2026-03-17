@@ -24,7 +24,7 @@ async function deleteAllIndices(): Promise<void> {
     return;
   }
 
-  for (const [entityType, indexName] of Object.entries(ENTITY_INDICES)) {
+  for (const [_entityType, indexName] of Object.entries(ENTITY_INDICES)) {
     try {
       const indexExists = await client.indices.exists({ index: indexName });
       if (indexExists) {
@@ -205,7 +205,7 @@ async function reindexAllEntities() {
 
     // Step 5: Verify indices
     console.log("\n=== Verifying indices ===");
-    for (const [entityType, indexName] of Object.entries(ENTITY_INDICES)) {
+    for (const [_entityType, indexName] of Object.entries(ENTITY_INDICES)) {
       try {
         const stats = await client.indices.stats({ index: indexName });
         const docCount = stats._all?.primaries?.docs?.count || 0;

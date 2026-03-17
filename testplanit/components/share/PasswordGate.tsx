@@ -23,7 +23,7 @@ export function PasswordGate({ shareKey, onVerified, projectName }: PasswordGate
 
     if (stored) {
       try {
-        const { token, expiresAt } = JSON.parse(stored);
+        const { token: _token, expiresAt } = JSON.parse(stored);
         if (new Date(expiresAt) > new Date()) {
           // Token is still valid
           hasCalledOnVerified.current = true;

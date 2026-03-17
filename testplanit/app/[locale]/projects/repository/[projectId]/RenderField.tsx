@@ -37,8 +37,8 @@ interface RenderFieldProps {
 const RenderField: React.FC<RenderFieldProps> = ({
   field,
   control,
-  onFocus,
-  onBlur,
+  onFocus: _onFocus,
+  onBlur: _onBlur,
   canEditRestricted = true,
   projectId,
 }) => {
@@ -50,7 +50,7 @@ const RenderField: React.FC<RenderFieldProps> = ({
   const customStyles = getCustomStyles({ theme });
 
   // State and memoization logic for "Text Long" type
-  const [editorContent, setEditorContent] = useState("");
+  const [, setEditorContent] = useState("");
 
   // Determine if the field should be rendered/editable
   const isFieldRestricted = field.caseField.isRestricted;

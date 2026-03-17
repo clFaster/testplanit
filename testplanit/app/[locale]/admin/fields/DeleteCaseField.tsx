@@ -44,7 +44,6 @@ export function DeleteCaseFieldModal({ casefield }: DeleteCaseFieldModalProps) {
   const {
     formState: { errors },
     setError,
-    handleSubmit,
     reset,
   } = form;
 

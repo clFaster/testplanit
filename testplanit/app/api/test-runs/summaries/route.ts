@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
     // Separate JUnit runs from regular runs
     const junitRunIds: number[] = [];
     const regularRunIds: number[] = [];
-    const testRunMap = new Map(testRuns.map((tr) => [tr.id, tr]));
+    const _testRunMap = new Map(testRuns.map((tr) => [tr.id, tr]));
 
     testRuns.forEach((tr) => {
       if (isAutomatedTestRunType(tr.testRunType)) {

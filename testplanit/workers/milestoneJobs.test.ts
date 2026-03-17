@@ -98,7 +98,7 @@ describe("Milestone Auto-Completion Job", () => {
 
     it("should not auto-complete milestones without automaticCompletion flag", async () => {
       const now = new Date();
-      const pastDueDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      const _pastDueDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
       // Milestone without automaticCompletion should not be returned
       const mockMilestones: any[] = [];
@@ -111,7 +111,7 @@ describe("Milestone Auto-Completion Job", () => {
 
     it("should not auto-complete milestones with future due date", async () => {
       const now = new Date();
-      const futureDueDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // Next week
+      const _futureDueDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // Next week
 
       // Milestone with future due date should not be returned by the query
       const mockMilestones: any[] = [];

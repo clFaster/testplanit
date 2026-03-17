@@ -44,14 +44,10 @@ export function EditAvatarModal({ user }: EditAvatarModalProps) {
   });
 
   const {
-    watch,
-    setValue,
-    handleSubmit,
-    control,
     formState: { errors },
   } = form;
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
+  async function onSubmit(_data: z.infer<typeof FormSchema>) {
     setIsSubmitting(true);
     try {
       // Use dedicated update API endpoint instead of ZenStack

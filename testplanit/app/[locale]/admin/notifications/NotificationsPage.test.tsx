@@ -30,7 +30,7 @@ vi.mock("sonner", () => ({
   },
 }));
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string, values?: any) => {
+  useTranslations: () => (key: string, _values?: any) => {
     const translations: Record<string, string> = {
       title: "Notification Settings",
       description: "Configure default notification settings",
@@ -66,7 +66,7 @@ vi.mock("next-intl", () => ({
 }));
 vi.mock("@/components/tiptap/TipTapEditor", () => ({
   __esModule: true,
-  default: ({ content, onUpdate, placeholder, readOnly }: any) => (
+  default: ({ content: _content, onUpdate, placeholder, readOnly }: any) => (
     <div data-testid="tiptap-editor">
       <textarea
         placeholder={placeholder}
@@ -77,7 +77,7 @@ vi.mock("@/components/tiptap/TipTapEditor", () => ({
   ),
 }));
 vi.mock("@/components/tables/DataTable", () => ({
-  DataTable: ({ columns, data, isLoading }: any) => (
+  DataTable: ({ columns: _columns, data, isLoading }: any) => (
     <div data-testid="data-table">
       {isLoading ? "Loading..." : `${data.length} items`}
     </div>

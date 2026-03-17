@@ -530,7 +530,7 @@ export function GenerateTestCasesWizard({
     generatedTestCases.length,
   ]);
 
-  const stepStatusFor = useCallback(
+  const _stepStatusFor = useCallback(
     (step: WizardStep): StepStatus => {
       if (step === currentStep) {
         return "active";
@@ -1882,7 +1882,7 @@ export function GenerateTestCasesWizard({
     onCancelEdit,
     onSave,
     autoGenerateTags,
-    t,
+    t: _t,
     tCommon,
     session,
     projectId,
@@ -2235,7 +2235,7 @@ export function GenerateTestCasesWizard({
       );
     }, [selectedTemplateFields]);
 
-    const priorityValue = priorityField
+    const _priorityValue = priorityField
       ? testCase.fieldValues[priorityField.caseField.displayName]
       : null;
 

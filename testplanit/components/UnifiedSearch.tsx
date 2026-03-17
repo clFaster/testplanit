@@ -900,7 +900,7 @@ export function UnifiedSearch({
 function SearchResultCard({
   hit,
   onClick,
-  searchQuery,
+  searchQuery: _searchQuery,
 }: {
   hit: SearchHit;
   onClick?: () => void;

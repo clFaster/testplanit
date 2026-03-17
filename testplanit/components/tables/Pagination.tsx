@@ -30,7 +30,7 @@ const PaginationComponent: React.FC<PaginationProps> = ({
   totalPages,
   onPageChange,
 }) => {
-  const [selectedPage, setSelectedPage] = useState<string>("");
+  const [selectedPage, _setSelectedPage] = useState<string>("");
   const t = useTranslations("common.pagination");
 
   if (totalPages < 2) return null;
@@ -68,7 +68,7 @@ const PaginationComponent: React.FC<PaginationProps> = ({
     const isFirstPage = currentPage === 1;
     const isLastPage = currentPage === totalPages;
     const delta = 1; // Controls the number of pages around the current page
-    const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+    const _pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
     items.push(
       <PaginationItem key="prev">

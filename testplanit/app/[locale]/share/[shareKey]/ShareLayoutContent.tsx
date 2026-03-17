@@ -15,7 +15,7 @@ interface ShareLayoutContentProps {
 }
 
 export function ShareLayoutContent({ session, children }: ShareLayoutContentProps) {
-  const [mounted, setMounted] = useState(false);
+  const [, setMounted] = useState(false);
   const t = useTranslations("reports.shareDialog.footer");
   const tBranding = useTranslations("common.branding");
 

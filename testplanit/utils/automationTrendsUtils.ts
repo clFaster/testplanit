@@ -80,7 +80,7 @@ export async function handleAutomationTrendsPOST(
     const body = await req.json();
     const {
       projectId,
-      dimensions = [],
+      dimensions: _dimensions = [],
       startDate,
       endDate,
       page = 1,

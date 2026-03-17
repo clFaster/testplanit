@@ -905,19 +905,19 @@ export default function SSOAdminPage() {
     }
   };
 
-  const googleProvider = ssoProviders?.find(
+  const _googleProvider = ssoProviders?.find(
     (p) => p.type === SsoProviderType.GOOGLE
   );
-  const samlProvider = ssoProviders?.find(
+  const _samlProvider = ssoProviders?.find(
     (p) => p.type === SsoProviderType.SAML
   );
-  const appleProvider = ssoProviders?.find(
+  const _appleProvider = ssoProviders?.find(
     (p) => p.type === SsoProviderType.APPLE
   );
-  const microsoftProvider = ssoProviders?.find(
+  const _microsoftProvider = ssoProviders?.find(
     (p) => p.type === SsoProviderType.MICROSOFT
   );
-  const magicLinkProvider = ssoProviders?.find(
+  const _magicLinkProvider = ssoProviders?.find(
     (p) => p.type === SsoProviderType.MAGIC_LINK
   );
   // globalForceSso is now tracked in toggleState

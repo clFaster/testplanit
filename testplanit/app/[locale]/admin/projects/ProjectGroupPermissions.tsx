@@ -50,13 +50,13 @@ interface ProjectGroupPermissionsProps {
 }
 
 export function ProjectGroupPermissions({
-  projectId,
+  projectId: _projectId,
   allGroups,
   roles,
-  control,
+  control: _control,
   setValue,
   watch,
-  getValues,
+  getValues: _getValues,
   isLoading,
   defaultProjectAccessType,
   defaultProjectRoleId,

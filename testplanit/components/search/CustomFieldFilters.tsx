@@ -63,7 +63,7 @@ export function CustomFieldFilters({
   entityType,
   filters,
   onFiltersChange,
-  projectId,
+  projectId: _projectId,
   templateIds = [],
 }: CustomFieldFiltersProps) {
   const t = useTranslations();

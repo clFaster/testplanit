@@ -45,7 +45,6 @@ export function Combobox({
   showUnassigned = true,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
-  const t = useTranslations("repository.columns");
   const tGlobal = useTranslations();
   const [search, setSearch] = React.useState("");
   const triggerRef = React.useRef<HTMLButtonElement>(null);

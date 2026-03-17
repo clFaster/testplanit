@@ -94,7 +94,7 @@ export const MilestoneSelect: React.FC<MilestoneSelectProps> = ({
   onChange,
   milestones,
   isLoading = false,
-  placeholder = "Select Milestone",
+  placeholder: _placeholder = "Select Milestone",
   disabled = false,
 }) => {
   const tCommon = useTranslations("common");

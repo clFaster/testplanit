@@ -38,7 +38,7 @@ export async function notifyTestCaseAssignment(
     }
 
     // Get the assignee details
-    const assignee = await prisma.user.findUnique({
+    const _assignee = await prisma.user.findUnique({
       where: { id: newAssigneeId },
       select: { name: true },
     });
@@ -71,7 +71,7 @@ export async function notifyTestCaseAssignment(
 export async function notifyBulkTestCaseAssignment(
   testRunCaseIds: number[],
   newAssigneeId: string | null,
-  projectId: number
+  _projectId: number
 ) {
   const session = await getServerAuthSession();
   if (!session?.user?.id || !newAssigneeId) {

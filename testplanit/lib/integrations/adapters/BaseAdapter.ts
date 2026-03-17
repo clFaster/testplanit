@@ -115,7 +115,7 @@ export abstract class BaseAdapter implements IssueAdapter {
   /**
    * Add a comment to an issue (should be implemented by adapters that support it)
    */
-  protected async addComment(issueId: string, comment: string): Promise<void> {
+  protected async addComment(_issueId: string, _comment: string): Promise<void> {
     throw new Error("Adding comments is not supported by this adapter");
   }
 
@@ -275,9 +275,9 @@ export abstract class BaseAdapter implements IssueAdapter {
    * Default implementation for webhook registration (not supported by default)
    */
   async registerWebhook?(
-    url: string,
-    events: string[],
-    secret?: string
+    _url: string,
+    _events: string[],
+    _secret?: string
   ): Promise<WebhookData> {
     throw new Error("Webhook registration is not supported by this adapter");
   }
@@ -285,14 +285,14 @@ export abstract class BaseAdapter implements IssueAdapter {
   /**
    * Default implementation for webhook unregistration
    */
-  async unregisterWebhook?(webhookId: string): Promise<void> {
+  async unregisterWebhook?(_webhookId: string): Promise<void> {
     throw new Error("Webhook unregistration is not supported by this adapter");
   }
 
   /**
    * Default implementation for webhook processing
    */
-  async processWebhook?(payload: any, signature?: string): Promise<void> {
+  async processWebhook?(_payload: any, _signature?: string): Promise<void> {
     throw new Error("Webhook processing is not supported by this adapter");
   }
 

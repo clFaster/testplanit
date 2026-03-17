@@ -36,7 +36,7 @@ export const getColumns = (
   userPreferences: any,
   handleToggleDefault: (id: string, currentIsDefault: boolean) => void,
   tCommon: ReturnType<typeof useTranslations<"common">>,
-  t: ReturnType<typeof useTranslations<"admin.prompts">>
+  _t: ReturnType<typeof useTranslations<"admin.prompts">>
 ): ColumnDef<ExtendedPromptConfig>[] => [
   {
     id: "name",

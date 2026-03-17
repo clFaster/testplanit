@@ -85,10 +85,10 @@ export default function TestCaseVersions() {
   const [isCollapsedRight, setIsCollapsedRight] = useState<boolean>(false);
   const [isCollapsedLeft, setIsCollapsedLeft] = useState<boolean>(false);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
-  const [selectedAttachmentIndex, setSelectedAttachmentIndex] = useState<
+  const [, setSelectedAttachmentIndex] = useState<
     number | null
   >(null);
-  const [selectedAttachments, setSelectedAttachments] = useState<Attachments[]>(
+  const [, setSelectedAttachments] = useState<Attachments[]>(
     []
   );
   const locale = useLocale();
@@ -101,7 +101,7 @@ export default function TestCaseVersions() {
     setSelectedAttachmentIndex(index);
   };
 
-  const handleClose = () => {
+  const _handleClose = () => {
     setSelectedAttachmentIndex(null);
     setSelectedAttachments([]);
   };

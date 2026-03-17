@@ -332,7 +332,7 @@ export default function TestCaseDetails() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const [folderHierarchy, setFolderHierarchy] = useState<FolderNode[]>([]);
+  const [, setFolderHierarchy] = useState<FolderNode[]>([]);
   const [breadcrumbItems, setBreadcrumbItems] = useState<FolderNode[]>([]);
 
   const isFormInitialized = useRef(false);
@@ -680,7 +680,7 @@ export default function TestCaseDetails() {
     return transformFolders(folders || []);
   }, [folders]);
 
-  const [formSchema, setFormSchema] = useState(
+  const [, setFormSchema] = useState(
     createFormSchema(testcase?.template?.caseFields || [])
   );
 
@@ -759,8 +759,6 @@ export default function TestCaseDetails() {
     control,
     handleSubmit,
     formState: { errors },
-    watch,
-    setValue,
     getValues,
   } = methods;
 
@@ -1597,7 +1595,7 @@ export default function TestCaseDetails() {
     { enabled: isJUnitCase }
   );
 
-  const testcaseForModal: ExtendedCases | undefined = data
+  const _testcaseForModal: ExtendedCases | undefined = data
     ? (data as any as ExtendedCases)
     : undefined;
 
@@ -1814,7 +1812,7 @@ export default function TestCaseDetails() {
                     <FormField
                       control={control}
                       name="workflowId"
-                      render={({ field }) => (
+                      render={({ field: _field }) => (
                         <FormItem>
                           <FormLabel className="flex items-center">
                             {t("common.fields.state")}
@@ -1873,7 +1871,7 @@ export default function TestCaseDetails() {
                 {isEditMode ? (
                   <FormField
                     name="templateId"
-                    render={({ field }) => (
+                    render={({ field: _field }) => (
                       <FormItem>
                         <FormControl>
                           <Controller

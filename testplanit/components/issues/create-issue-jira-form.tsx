@@ -71,7 +71,7 @@ interface CreateIssueJiraFormProps {
 export function CreateIssueJiraForm({
   open,
   onOpenChange,
-  projectId,
+  projectId: _projectId,
   integrationId,
   projectKey: defaultProjectKey,
   issueTypeId: defaultIssueTypeId,

@@ -48,7 +48,7 @@ test.describe("Drag & Drop", () => {
 
     // Record initial Y positions to verify order change
     const folder1YBefore = box1Before!.y;
-    const folder2YBefore = box2Before!.y;
+    const _folder2YBefore = box2Before!.y;
 
     // Perform the drag: move folder1 below folder2
     await folder1.hover();

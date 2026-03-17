@@ -45,7 +45,6 @@ export function DeleteResultFieldModal({
   const {
     formState: { errors },
     setError,
-    handleSubmit,
     reset,
   } = form;
 

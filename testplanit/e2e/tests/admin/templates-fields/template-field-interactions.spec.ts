@@ -40,7 +40,7 @@ test.describe("Template-Field Relationships", () => {
     await templatesPage.cancelTemplate();
   });
 
-  test("Field order persists after page refresh", async ({ api, page }) => {
+  test("Field order persists after page refresh", async ({ api, page: _page }) => {
     // Create fields
     const field1 = `E2E Order A ${Date.now()}`;
     const field2 = `E2E Order B ${Date.now()}`;
@@ -266,7 +266,7 @@ test.describe("Project Assignments", () => {
     await templatesPage.goto();
   });
 
-  test("Select All projects", async ({ api, page }) => {
+  test("Select All projects", async ({ api: _api, page: _page }) => {
     // Create a template and open the dialog
     await templatesPage.clickAddTemplate();
     await templatesPage.fillTemplateName(`E2E Select All ${Date.now()}`);

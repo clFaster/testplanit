@@ -62,7 +62,7 @@ export default function SessionVersionPage() {
   const { projectId, sessionId, version } = useParams();
   const [isCollapsedRight, setIsCollapsedRight] = useState<boolean>(false);
   const [isCollapsedLeft, setIsCollapsedLeft] = useState<boolean>(false);
-  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
+  const [, setIsTransitioning] = useState<boolean>(false);
   const panelRightRef = useRef<React.ComponentRef<typeof ResizablePanel>>(null);
   const panelLeftRef = useRef<React.ComponentRef<typeof ResizablePanel>>(null);
   const t = useTranslations();

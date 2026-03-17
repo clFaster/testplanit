@@ -177,7 +177,7 @@ export function SessionResultForm({
   sessionId,
   projectId,
   onResultAdded,
-  alwaysShowForm = true,
+  alwaysShowForm: _alwaysShowForm = true,
   className = "mb-6",
   onStatusColorChange,
 }: SessionResultFormProps) {
@@ -191,7 +191,7 @@ export function SessionResultForm({
     useState<string>("#3b82f6"); // Default to blue
   const [editorKey, setEditorKey] = useState<number>(0);
   const [uploadAttachmentsKey, setUploadAttachmentsKey] = useState<number>(0);
-  const [trackedSeconds, setTrackedSeconds] = useState(0);
+  const [_trackedSeconds, setTrackedSeconds] = useState(0);
   const timeTrackerRef = useRef<TimeTrackerRef>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [selectedAttachmentIndex, setSelectedAttachmentIndex] = useState<
@@ -202,10 +202,10 @@ export function SessionResultForm({
   );
   const [templateFields, setTemplateFields] = useState<any[]>([]);
   const [selectedIssues, setSelectedIssues] = useState<number[]>([]);
-  const [stepFieldValues, setStepFieldValues] = useState<Record<number, any>>(
+  const [_stepFieldValues, _setStepFieldValues] = useState<Record<number, any>>(
     {}
   );
-  const [stepAttachments, setStepAttachments] = useState<
+  const [_stepAttachments, _setStepAttachments] = useState<
     Record<number, File[]>
   >({});
 
@@ -459,7 +459,7 @@ export function SessionResultForm({
     setSelectedFiles(files);
   };
 
-  const handleAttachmentSelect = (
+  const _handleAttachmentSelect = (
     attachments: Attachments[],
     index: number
   ) => {
@@ -660,7 +660,7 @@ export function SessionResultForm({
     const displayName = field.resultField.displayName;
     const hint = field.resultField.hint;
     const isRequired = field.resultField.isRequired;
-    const fieldOptions =
+    const _fieldOptions =
       field.resultField.fieldOptions?.map(
         (option: any) => option.fieldOption
       ) || [];
@@ -911,7 +911,7 @@ export function SessionResultForm({
                 <FormField
                   control={form.control}
                   name="statusId"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-1">
                         <CircleCheckBig className="h-4 w-4" />

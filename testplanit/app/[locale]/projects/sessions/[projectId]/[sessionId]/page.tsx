@@ -252,7 +252,7 @@ function SessionFormControls({
   isSubmitting,
   testSession,
   control,
-  errors,
+  errors: _errors,
   templates,
   configurations,
   workflows,
@@ -801,7 +801,7 @@ export default function SessionPage() {
   const panelRightRef = useRef<ImperativePanelHandle>(null);
   const [contentLoaded, setContentLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFormLoading, setIsFormLoading] = useState(false);
+  const [isFormLoading, _setIsFormLoading] = useState(false);
   const [initialValues, setInitialValues] = useState<FormValues | null>(null);
   const [isFormInitialized, setIsFormInitialized] = useState(false);
   const panelLeftRef = useRef<ImperativePanelHandle>(null);
@@ -816,13 +816,12 @@ export default function SessionPage() {
     useState<AttachmentChanges>({ edits: [], deletes: [] });
   const { mutateAsync: createAttachments } = useCreateAttachments();
   const { mutateAsync: updateAttachments } = useUpdateAttachments();
-  const version = searchParams.get("version");
+  const _version = searchParams.get("version");
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeletingSession, setIsDeletingSession] = useState(false);
   const t = useTranslations("sessions");
   const tGlobal = useTranslations();
-  const tProjects = useTranslations("projects");
   const tCommon = useTranslations("common");
   const locale = useLocale();
   const [refreshResults, setRefreshResults] = useState(0);
@@ -1347,7 +1346,7 @@ export default function SessionPage() {
       if (!updatedSession) throw new Error("Failed to update session");
 
       // Create new version
-      const issuesDataForVersion = (data.issueIds || [])
+      const _issuesDataForVersion = (data.issueIds || [])
         .map((issueId: number) => {
           // Need access to allIssues data here or pass it down
           const issue = sessionData?.issues?.find(
@@ -1787,7 +1786,7 @@ export default function SessionPage() {
                       <FormField
                         control={control}
                         name="note"
-                        render={({ field }) => (
+                        render={({ field: _field }) => (
                           <FormItem>
                             <FormLabel>
                               {tCommon("fields.description")}
@@ -1836,7 +1835,7 @@ export default function SessionPage() {
                       <FormField
                         control={control}
                         name="mission"
-                        render={({ field }) => (
+                        render={({ field: _field }) => (
                           <FormItem>
                             <FormLabel>
                               {tGlobal("common.fields.mission")}

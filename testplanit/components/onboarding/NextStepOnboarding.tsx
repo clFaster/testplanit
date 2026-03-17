@@ -994,7 +994,7 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
   const manualParam = searchParams.get("manual");
 
   // Parse current step from URL
-  const currentStep = stepParam ? parseInt(stepParam, 10) : 0;
+  const _currentStep = stepParam ? parseInt(stepParam, 10) : 0;
 
   // Memoize tour steps so they're only recreated when projectId or permissions change,
   // not on every searchParams update (which happens frequently on repository pages)
@@ -1057,7 +1057,7 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
   );
 
   const handleTourSkip = useCallback(
-    async (step: number, tourName: string | null) => {
+    async (_step: number, _tourName: string | null) => {
       (window as any).__activeTour = null;
       localStorage.setItem("hasSeenOnboardingTour", "true");
 

@@ -113,11 +113,11 @@ export function DataTable<TData extends DataRow, TValue>({
   renderExpandedRow,
   columnVisibility,
   onColumnVisibilityChange,
-  relatedFieldKey = "variants",
+  relatedFieldKey: _relatedFieldKey = "variants",
   isLoading = false,
   pageSize = 10,
   onTestCaseClick,
-  canEdit = false,
+  canEdit: _canEdit = false,
   rowSelection: externalRowSelection,
   onRowSelectionChange: externalOnRowSelectionChange,
   cellPinningStyleFn = getCommonPinningStyles,
@@ -128,7 +128,7 @@ export function DataTable<TData extends DataRow, TValue>({
   onExpandedChange,
   itemType,
   getSubRows,
-  subRowColumns,
+  subRowColumns: _subRowColumns,
 }: DataTableProps<TData, TValue>) {
   const t = useTranslations("common.table");
   const tLabels = useTranslations("common.labels");
@@ -528,7 +528,7 @@ export function DataTable<TData extends DataRow, TValue>({
   }, []);
 
   // Track leaf row IDs rendered as part of a flattened group (for grouped/expandable rendering)
-  const renderedLeafRowIds = new Set<string | number>();
+  const _renderedLeafRowIds = new Set<string | number>();
 
   if (showSkeleton) {
     const skeletonHeaders =
@@ -840,7 +840,7 @@ export function DataTable<TData extends DataRow, TValue>({
                   {row.getVisibleCells().map((cell, cellIndex) => {
                     const { column } = cell;
                     let cellContent: React.ReactNode = null;
-                    const shouldIndent = cellIndex === 0 && isSubRow;
+                    const _shouldIndent = cellIndex === 0 && isSubRow;
 
                     if (cell.getIsGrouped()) {
                       // If grouped, show group label and count

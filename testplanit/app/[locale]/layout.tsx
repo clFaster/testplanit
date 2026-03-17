@@ -1,19 +1,13 @@
 import { Header } from "@/components/Header";
 import { UpgradeNotificationChecker } from "@/components/UpgradeNotificationChecker";
 import { NextIntlClientProvider } from "next-intl";
-import { Noto_Sans } from "next/font/google";
+
 import { headers } from "next/headers";
 import { Toaster } from "sonner";
 import { NextStepOnboarding } from "~/components/onboarding/NextStepOnboarding";
 import "~/styles/globals.css";
 import "~/styles/tiptap-mentions.css";
 import Providers from "../providers";
-
-const notoSans = Noto_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-noto-sans",
-});
 
 // Force dynamic rendering to reduce memory usage during Docker builds
 // This prevents Next.js from attempting to statically generate pages at build time

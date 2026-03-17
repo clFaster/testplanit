@@ -144,11 +144,11 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
   // Calculate pagination for completed runs
   const effectiveCompletedPageSize =
     typeof completedRunsPageSize === "number" ? completedRunsPageSize : 999999; // Large number for "All"
-  const completedRunsSkip =
+  const _completedRunsSkip =
     (completedRunsPage - 1) * effectiveCompletedPageSize;
 
   // State for Sunburst Legend
-  const [sunburstLegendItems, setSunburstLegendItems] = useState<
+  const [, setSunburstLegendItems] = useState<
     SunburstLegendItem[]
   >([]);
 
@@ -483,22 +483,22 @@ const ProjectTestRuns: React.FC<ProjectTestRunsProps> = ({ params }) => {
     }
   );
 
-  const createTestRun = useCreateTestRuns();
+  const _createTestRun = useCreateTestRuns();
 
   // NOTE: Disabled due to performance optimization - results data is no longer fetched in the main query
-  const numNotStartedActiveTestRuns = 0;
+  const _numNotStartedActiveTestRuns = 0;
 
   // NOTE: Disabled due to performance optimization - testCases data is no longer fetched in the main query
-  const totalEstimatedTimeRemainingFirstCard = 0;
+  const _totalEstimatedTimeRemainingFirstCard = 0;
 
-  const totalEstimatedTime =
+  const _totalEstimatedTime =
     incompleteTestRuns?.reduce(
       (sum, run) => sum + (run.forecastManual || 0),
       0
     ) || 0;
 
   // NOTE: Disabled due to performance optimization - testCases data is no longer fetched in the main query
-  const responsibleUsers = new Set<string>();
+  const _responsibleUsers = new Set<string>();
 
   // Query for completed test runs with server-side pagination and filtering
   const {

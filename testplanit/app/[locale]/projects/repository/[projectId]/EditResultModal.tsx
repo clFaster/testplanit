@@ -275,11 +275,11 @@ export function EditResultModal({
   const { data: session } = useSession();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedStatusColor, setSelectedStatusColor] =
+  const [, setSelectedStatusColor] =
     useState<string>("#3b82f6");
-  const [editorKey, setEditorKey] = useState<number>(0);
-  const [uploadAttachmentsKey, setUploadAttachmentsKey] = useState<number>(0);
-  const [trackedSeconds, setTrackedSeconds] = useState(0);
+  const [editorKey] = useState<number>(0);
+  const [uploadAttachmentsKey] = useState<number>(0);
+  const [, setTrackedSeconds] = useState(0);
   const timeTrackerRef = useRef<TimeTrackerRef>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [selectedAttachmentIndex, setSelectedAttachmentIndex] = useState<
@@ -600,7 +600,7 @@ export function EditResultModal({
     useCreateTestRunStepResults();
   const { mutateAsync: updateResultFieldValues } = useUpdateResultFieldValues();
 
-  const handleStatusChange = (statusId: number) => {
+  const _handleStatusChange = (statusId: number) => {
     form.setValue("statusId", statusId);
     const status = statuses?.find((s) => s.id === statusId);
     if (status?.color?.value) {
@@ -634,11 +634,11 @@ export function EditResultModal({
     }
   };
 
-  const handleFileSelect = (files: File[]) => {
+  const _handleFileSelect = (files: File[]) => {
     setSelectedFiles(files);
   };
 
-  const handleAttachmentSelect = (
+  const _handleAttachmentSelect = (
     attachments: Attachments[],
     index: number
   ) => {
@@ -927,7 +927,7 @@ export function EditResultModal({
   }
 
   // Ensure we have a valid statusId
-  const currentStatusId =
+  const _currentStatusId =
     form.getValues("statusId") || (statuses.length > 0 ? statuses[0].id : 0);
   if (!form.getValues("statusId") && statuses.length > 0) {
     form.setValue("statusId", statuses[0].id);
@@ -1150,7 +1150,7 @@ export function EditResultModal({
             key={fieldId}
             control={form.control}
             name={fieldId}
-            render={({ field: formField }) => (
+            render={({ field: _formField }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-1">
                   {displayName}
@@ -1302,7 +1302,7 @@ export function EditResultModal({
   };
 
   // Update the step status change handler
-  const handleStepStatusChange = (stepId: number, statusId: number) => {
+  const _handleStepStatusChange = (stepId: number, statusId: number) => {
     const stepResults = form.getValues("stepResults") || [];
     const stepIndex = (stepResults as any[]).findIndex(
       (s: StepResult) => s.stepId === stepId
@@ -1485,7 +1485,7 @@ export function EditResultModal({
                 <div className="font-bold">{tCommon("fields.steps")}</div>
                 <ol className="space-y-4">
                   {steps.map((step, index) => {
-                    const stepId = step.id.toString();
+                    const _stepId = step.id.toString();
                     let stepContent;
                     try {
                       stepContent =

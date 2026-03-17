@@ -10,7 +10,7 @@ import { authOptions } from "~/server/auth";
  * GET /api/auth/two-factor/setup
  * Generate a new TOTP secret and QR code for 2FA setup
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 

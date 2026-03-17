@@ -78,7 +78,7 @@ export class NotificationService {
   /**
    * Mark notifications as read
    */
-  static async markNotificationsAsRead(notificationIds: string[], userId: string) {
+  static async markNotificationsAsRead(notificationIds: string[], _userId: string) {
     // This will be handled by the API endpoint using ZenStack hooks
     // The service method is here for consistency
     return notificationIds;
@@ -87,7 +87,7 @@ export class NotificationService {
   /**
    * Get unread notification count for a user
    */
-  static async getUnreadCount(userId: string): Promise<number> {
+  static async getUnreadCount(_userId: string): Promise<number> {
     // This will be handled by the API endpoint using ZenStack hooks
     // The service method is here for consistency
     return 0;

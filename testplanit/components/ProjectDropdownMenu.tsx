@@ -22,7 +22,7 @@ export const ProjectDropdownMenu = ({
   const { data: session } = useSession();
   const router = useRouter();
   const { projectId } = useParams();
-  const path = usePathname();
+  const _path = usePathname();
   const t = useTranslations();
 
   // ZenStack now handles all access control automatically based on the schema rules

@@ -223,7 +223,7 @@ const NameCell = React.memo(function NameCell({
   isRunMode,
   isSelectionMode,
   columnSize,
-  onTestCaseClick,
+  onTestCaseClick: _onTestCaseClick,
   folder,
   viewType,
   automated,
@@ -449,7 +449,7 @@ const TestRunStatusCell = React.memo(function TestRunStatusCell({
   const [isInitialRender, setIsInitialRender] = useState(true);
   const t = useTranslations();
 
-  const { mutateAsync: updateTestRunCase } = useUpdateTestRunCases();
+  const { mutateAsync: _updateTestRunCase } = useUpdateTestRunCases();
 
   useEffect(() => {
     setIsInitialRender(false);

@@ -17,7 +17,7 @@ interface UpdateSingleCaseJobData extends MultiTenantJobData {
   repositoryCaseId: number;
 }
 
-interface UpdateAllCasesJobData extends MultiTenantJobData {
+interface _UpdateAllCasesJobData extends MultiTenantJobData {
   // No additional fields required for this job type
 }
 

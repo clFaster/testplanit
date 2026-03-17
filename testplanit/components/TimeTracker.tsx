@@ -35,13 +35,13 @@ export const TimeTracker = React.forwardRef<TimeTrackerRef, TimeTrackerProps>(
         if (totalSeconds > 0) {
           const minutes = Math.floor(totalSeconds / 60);
           const remainingSeconds = totalSeconds % 60;
-          let timeString = "";
+          let _timeString = "";
 
           if (minutes > 0) {
-            timeString += `${minutes} ${tCommon("time.minutes", { count: minutes })} `;
+            _timeString += `${minutes} ${tCommon("time.minutes", { count: minutes })} `;
           }
           if (remainingSeconds > 0 || minutes === 0) {
-            timeString += `${remainingSeconds} ${tCommon("time.seconds", { count: remainingSeconds })}`;
+            _timeString += `${remainingSeconds} ${tCommon("time.seconds", { count: remainingSeconds })}`;
           }
 
           onTimeUpdate(totalSeconds);

@@ -1202,7 +1202,7 @@ export async function POST(request: Request) {
       };
     }
 
-    const elapsed = Date.now() - startTime;
+    const _elapsed = Date.now() - startTime;
 
     // Calculate automated counts for multi-config
     let automatedWithCounts: Array<{ value: boolean; count: number }>;

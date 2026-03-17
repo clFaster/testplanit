@@ -71,7 +71,6 @@ export function InitialPreferencesDialog() {
   const tNotificationsMode = useTranslations("users.profile.notifications.mode");
   const tNotificationDefaultMode = useTranslations("admin.notifications.defaultMode");
   const tUserMenu = useTranslations("userMenu");
-  const tProfileEdit = useTranslations("users.profile.edit");
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

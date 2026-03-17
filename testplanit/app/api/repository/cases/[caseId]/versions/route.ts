@@ -62,7 +62,7 @@ const createVersionSchema = z.object({
     .optional(),
 });
 
-type CreateVersionRequest = z.infer<typeof createVersionSchema>;
+type _CreateVersionRequest = z.infer<typeof createVersionSchema>;
 
 export async function POST(
   request: NextRequest,

@@ -34,7 +34,7 @@ export function MilestoneSummary({
   const tCommon = useTranslations("common");
   const tGlobal = useTranslations();
   const locale = useLocale();
-  const { data: session } = useSession();
+  const { data: _session } = useSession();
 
   // Fetch summary data from API
   const { data: summaryData, isLoading } = useQuery<MilestoneSummaryData>({
@@ -162,7 +162,7 @@ export function MilestoneSummary({
           className="flex h-2.5 w-full rounded-full overflow-hidden bg-muted"
           data-testid="milestone-summary-bar"
         >
-          {summaryData.segments.map((segment, index) => {
+          {summaryData.segments.map((segment, _index) => {
             const color = segment.colorValue || "#9ca3af";
 
             // Calculate segment width based on elapsed time or item count

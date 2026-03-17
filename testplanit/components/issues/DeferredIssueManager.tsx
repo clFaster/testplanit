@@ -29,7 +29,7 @@ interface DeferredIssueManagerProps {
  */
 export function DeferredIssueManager({
   projectId,
-  selectedIssues, // Not used anymore
+  selectedIssues: _selectedIssues, // Not used anymore
   onIssuesChange,
   disabled = false,
   label,

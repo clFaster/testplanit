@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       validatedData.sessionId
     ) {
       // Use upsert to handle cases where the issue already exists
-      const issue = await prisma.issue.upsert({
+      await prisma.issue.upsert({
         where: {
           externalId_integrationId: {
             externalId: createdIssue.key || createdIssue.id,

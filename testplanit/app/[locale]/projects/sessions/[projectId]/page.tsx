@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApplicationArea } from "@prisma/client";
-import { useQueryClient } from "@tanstack/react-query";
 import { CirclePlus, Maximize2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
@@ -92,7 +91,6 @@ const ProjectSessions: React.FC<ProjectSessionsProps> = ({ params }) => {
 
   // Tab State - persisted in URL
   const [activeTab, setActiveTab] = useTabState("tab", "active");
-  const queryClient = useQueryClient();
 
   // Dialog State
   const [isChartDialogOpen, setIsChartDialogOpen] = useState(false);
@@ -404,7 +402,7 @@ const ProjectSessions: React.FC<ProjectSessionsProps> = ({ params }) => {
     })) || [];
 
   // --- Data for Work Distribution Sunburst Chart (Replaces Session States) ---
-  const [sunburstLegendData, setSunburstLegendData] = useState<
+  const [, setSunburstLegendData] = useState<
     SunburstLegendItem[]
   >([]);
   const [totalSunburstEstimate, setTotalSunburstEstimate] = useState(0);
@@ -584,7 +582,7 @@ const ProjectSessions: React.FC<ProjectSessionsProps> = ({ params }) => {
   );
 
   // Process session results for the chart
-  const processedRecentSessionResults = useMemo(() => {
+  const _processedRecentSessionResults = useMemo(() => {
     if (!recentRawSessionResults || recentRawSessionResults.length === 0) {
       setRecentSessionResultsChartData([]);
       setRecentSessionResultsSuccessRate(0);

@@ -200,7 +200,7 @@ function MilestoneTypes() {
   const { mutateAsync: deleteManyMilestoneTypesAssignment } =
     useDeleteManyMilestoneTypesAssignment();
 
-  const handleToggleDefault = useCallback((id: number, isDefault: boolean) => {
+  const handleToggleDefault = useCallback((id: number, _isDefault: boolean) => {
     setSelectedMilestoneTypeId(id);
     setIsAlertDialogOpen(true);
   }, []);

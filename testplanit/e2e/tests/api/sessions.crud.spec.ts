@@ -4,7 +4,7 @@ test.use({ storageState: "e2e/.auth/admin.json" });
 test.describe.configure({ mode: "serial" });
 
 test.describe("Sessions CRUD", () => {
-  test("should create a session and read it back", async ({ api, request, baseURL }) => {
+  test("should create a session and read it back", async ({ api, request: _request, baseURL: _baseURL }) => {
     const sessionName = `API Session ${Date.now()}`;
     const projectId = await api.createProject(`API Session Create Test Project ${Date.now()}`);
     const sessionId = await api.createSession(projectId, sessionName);

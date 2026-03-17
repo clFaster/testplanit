@@ -72,8 +72,8 @@ export const IssuesDisplay: React.FC<IssueDisplayProps> = ({
   title,
   status,
   size = "small",
-  projectIds,
-  data,
+  projectIds: _projectIds,
+  data: _data,
   integrationProvider,
   integrationId,
   lastSyncedAt,
@@ -113,7 +113,7 @@ export const IssuesDisplay: React.FC<IssueDisplayProps> = ({
       // Fire and forget - trigger background sync using the same endpoint as the sync button
       fetch(`/api/issues/${id}/sync`, {
         method: "POST",
-      }).catch((err) => {
+      }).catch((_err) => {
         // Silently fail - this is a background optimization
       });
     }
@@ -182,8 +182,8 @@ export const IssuesDisplay: React.FC<IssueDisplayProps> = ({
   ]);
 
   // Issue config is no longer needed as we use integrations directly
-  const issueConfig = null;
-  const isLoadingConfig = false;
+  const _issueConfig = null;
+  const _isLoadingConfig = false;
 
   if (!id || !name) {
     return null;

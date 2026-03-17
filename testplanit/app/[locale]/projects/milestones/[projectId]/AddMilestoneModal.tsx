@@ -248,7 +248,7 @@ export function AddMilestoneModal() {
     }
   }
 
-  const renderMilestoneOptions = (
+  const _renderMilestoneOptions = (
     milestones: {
       value: string;
       label: React.ReactElement;
@@ -267,7 +267,7 @@ export function AddMilestoneModal() {
           >
             {milestone.label}
           </SelectItem>
-          {renderMilestoneOptions(
+          {_renderMilestoneOptions(
             milestones,
             parseInt(milestone.value),
             level + 1
@@ -314,7 +314,7 @@ export function AddMilestoneModal() {
             <FormField
               control={control}
               name="note"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center">
                     {t("common.fields.description")}
@@ -341,7 +341,7 @@ export function AddMilestoneModal() {
             <FormField
               control={control}
               name="milestoneTypeId"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center">
                     {t("common.fields.type")}
@@ -431,7 +431,7 @@ export function AddMilestoneModal() {
                 <FormField
                   control={control}
                   name="startedAt"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem className="flex flex-col">
                       <DatePickerField
                         control={control}
@@ -470,7 +470,7 @@ export function AddMilestoneModal() {
                 <FormField
                   control={control}
                   name="completedAt"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem className="flex flex-col">
                       <DatePickerField
                         control={control}
@@ -553,7 +553,7 @@ export function AddMilestoneModal() {
             <FormField
               control={control}
               name="docs"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center">
                     {t("common.fields.documentation")}

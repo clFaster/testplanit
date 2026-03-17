@@ -19,7 +19,7 @@ export function RemoveAvatar({ user }: RemoveAvatarProps) {
   const [openPopover, setOpenPopover] = useState(false);
   const { update: updateSession } = useSession();
   const queryClient = useQueryClient();
-  const t = useTranslations("users.avatar");
+
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
   async function onRemove() {

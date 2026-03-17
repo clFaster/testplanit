@@ -44,7 +44,7 @@ test.describe("Tree Navigation", () => {
     await repositoryPage.verifyFolderExists(folderName);
   });
 
-  test("Expand Folder in Tree View", async ({ api, page }) => {
+  test("Expand Folder in Tree View", async ({ api, page: _page }) => {
     const projectId = await getTestProjectId(api);
 
     // Create parent with child folder
@@ -159,7 +159,7 @@ test.describe("Tree Navigation", () => {
     await expect(testCasesHeader).toBeVisible({ timeout: 5000 });
   });
 
-  test("Parent Folder Expands After Adding First Child", async ({ api, page }) => {
+  test("Parent Folder Expands After Adding First Child", async ({ api, page: _page }) => {
     const projectId = await getTestProjectId(api);
 
     // Create an empty parent folder
@@ -219,7 +219,7 @@ test.describe("Tree Navigation", () => {
     await expect(parent1Children.first()).toBeVisible({ timeout: 5000 });
   });
 
-  test("Deep Nested Folder Navigation", async ({ api, page }) => {
+  test("Deep Nested Folder Navigation", async ({ api, page: _page }) => {
     const projectId = await getTestProjectId(api);
     const uniqueId = Date.now();
 

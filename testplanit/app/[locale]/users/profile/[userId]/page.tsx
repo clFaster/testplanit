@@ -81,7 +81,7 @@ interface TimezoneOption {
 
 const sampleDate = new Date("2024-05-19T16:20:00");
 
-const UserProfile: React.FC<UserProfileProps> = ({ params, searchParams }) => {
+const UserProfile: React.FC<UserProfileProps> = ({ params, searchParams: _searchParams }) => {
   // Resolve the params and searchParams promises using React's `use`
   const { userId } = use(params);
 

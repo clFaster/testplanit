@@ -131,7 +131,6 @@ export function AddResultFieldModal({
   trigger,
   submitLabel,
 }: AddResultFieldModalProps = {}) {
-  const t = useTranslations("admin.templates.resultFields");
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
   const [internalOpen, setInternalOpen] = useState(false);
@@ -293,8 +292,6 @@ export function AddResultFieldModal({
   });
 
   const {
-    handleSubmit,
-    control,
     setValue,
     watch,
     formState: { errors },
@@ -427,7 +424,7 @@ export function AddResultFieldModal({
 
   useEffect(() => {
     if (types && typeId) {
-      const currentTypeOptions = types.find(
+      const _currentTypeOptions = types.find(
         (type) => type.id.toString() === typeId
       )?.options;
     }

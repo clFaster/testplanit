@@ -62,7 +62,7 @@ class TestAdapter extends BaseAdapter {
     };
   }
 
-  async searchIssues(options: IssueSearchOptions): Promise<{
+  async searchIssues(_options: IssueSearchOptions): Promise<{
     issues: IssueData[];
     total: number;
     hasMore: boolean;
@@ -475,12 +475,12 @@ describe("BaseAdapter", () => {
   describe("applyRateLimit", () => {
     it("should delay if called too quickly", async () => {
       // First call should not delay
-      const start1 = Date.now();
+      const _start1 = Date.now();
       await adapter.testApplyRateLimit();
-      const end1 = Date.now();
+      const _end1 = Date.now();
 
       // Second call should delay
-      const start2 = Date.now();
+      const _start2 = Date.now();
       const delayPromise = adapter.testApplyRateLimit();
 
       // Fast-forward

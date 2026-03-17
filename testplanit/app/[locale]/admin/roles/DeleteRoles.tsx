@@ -45,8 +45,6 @@ export function DeleteRoleModal({ role }: DeleteRoleModalProps) {
     formState: { errors },
   } = form;
 
-  const handleCancel = () => setOpen(false);
-
   async function onSubmit() {
     if (!defaultRole) {
       form.setError("root", {

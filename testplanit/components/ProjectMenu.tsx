@@ -110,7 +110,7 @@ function MenuLink({
 
 export default function ProjectsMenu({
   isCollapsed,
-  onToggleCollapse,
+  onToggleCollapse: _onToggleCollapse,
 }: ProjectMenuProps) {
   const { projectId } = useParams();
   const pathname = usePathname();

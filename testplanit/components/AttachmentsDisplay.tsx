@@ -217,7 +217,7 @@ export const AttachmentsDisplay: React.FC<AttachmentsProps> = ({
       {sortedAttachments.map((attachment, index) => {
         const previousAttachment = findPreviousAttachment(attachment);
         const isMarkedForDelete = isPendingDelete(attachment.id);
-        const hasEdit = hasPendingEdit(attachment.id);
+        const _hasEdit = hasPendingEdit(attachment.id);
         const displayValues = getDisplayValues(attachment);
 
         // Skip rendering if marked for delete in deferred mode (show separate section below)
@@ -447,7 +447,7 @@ export const AttachmentsDisplay: React.FC<AttachmentsProps> = ({
         );
       })}
       {previousAttachments &&
-        previousAttachments.map((prevAttachment, index) => {
+        previousAttachments.map((prevAttachment, _index) => {
           if (
             !sortedAttachments.some(
               (currentAttachment) => currentAttachment.id === prevAttachment.id

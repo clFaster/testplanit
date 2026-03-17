@@ -59,7 +59,7 @@ interface FieldValueRendererProps {
 const FieldValueRenderer: React.FC<FieldValueRendererProps> = ({
   fieldValue,
   fieldType,
-  caseId,
+  caseId: _caseId,
   template,
   fieldId,
   fieldIsRestricted = false,
@@ -371,7 +371,7 @@ const FieldValueRenderer: React.FC<FieldValueRendererProps> = ({
             control={control}
             name={fieldId.toString()}
             defaultValue={fieldValue}
-            render={({ field }) => (
+            render={({ field: _field }) => (
               <DatePickerField
                 control={control}
                 name={fieldId.toString()}

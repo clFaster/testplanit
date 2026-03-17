@@ -4,7 +4,7 @@ export async function seedMilestoneEdgeCases(prisma: PrismaClient, projectId: nu
   console.log("Seeding milestone edge cases for comprehensive testing...");
 
   // Edge Case 1: Milestone that is completed but not started (data inconsistency)
-  const edgeCase1 = await prisma.milestones.create({
+  const _edgeCase1 = await prisma.milestones.create({
     data: {
       name: "Edge Case 1: Completed but not Started",
       projectId: projectId,
@@ -18,7 +18,7 @@ export async function seedMilestoneEdgeCases(prisma: PrismaClient, projectId: nu
   });
 
   // Edge Case 2: Milestone that is started but not completed (normal in-progress)
-  const edgeCase2 = await prisma.milestones.create({
+  const _edgeCase2 = await prisma.milestones.create({
     data: {
       name: "Edge Case 2: Started but not Completed",
       projectId: projectId,
@@ -32,7 +32,7 @@ export async function seedMilestoneEdgeCases(prisma: PrismaClient, projectId: nu
   });
 
   // Edge Case 3: Milestone that is both started and completed (normal completed)
-  const edgeCase3 = await prisma.milestones.create({
+  const _edgeCase3 = await prisma.milestones.create({
     data: {
       name: "Edge Case 3: Started and Completed",
       projectId: projectId,
@@ -47,7 +47,7 @@ export async function seedMilestoneEdgeCases(prisma: PrismaClient, projectId: nu
   });
 
   // Edge Case 4: Milestone that is neither started nor completed (not started)
-  const edgeCase4 = await prisma.milestones.create({
+  const _edgeCase4 = await prisma.milestones.create({
     data: {
       name: "Edge Case 4: Not Started",
       projectId: projectId,
@@ -60,7 +60,7 @@ export async function seedMilestoneEdgeCases(prisma: PrismaClient, projectId: nu
   });
 
   // Edge Case 5: Deleted milestone (should not be counted)
-  const edgeCase5 = await prisma.milestones.create({
+  const _edgeCase5 = await prisma.milestones.create({
     data: {
       name: "Edge Case 5: Deleted Milestone",
       projectId: projectId,

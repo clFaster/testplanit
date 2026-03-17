@@ -51,7 +51,7 @@ export async function completeMilestoneCascade(
   const {
     milestoneId,
     completionDate,
-    isPreview,
+    isPreview: _isPreview,
     forceCompleteDependencies,
     completeTestRuns = true,
     completeSessions = true,

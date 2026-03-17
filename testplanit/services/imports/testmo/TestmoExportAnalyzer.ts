@@ -48,7 +48,7 @@ const DEFAULT_PRESERVE_DATASETS = new Set([
 const DATASET_CONTAINER_KEYS = new Set(["datasets", "entities"]);
 const DATASET_DATA_KEYS = new Set(["data", "rows", "records", "items"]);
 const DATASET_SCHEMA_KEYS = new Set(["schema", "columns", "fields"]);
-const DATASET_NAME_KEYS = new Set(["name", "dataset"]);
+const _DATASET_NAME_KEYS = new Set(["name", "dataset"]);
 const IGNORED_DATASET_KEYS = new Set(["meta", "summary"]);
 
 type StackEntry = {
@@ -371,7 +371,7 @@ export class TestmoExportAnalyzer {
     this.masterRepositoryIds.clear();
 
     const startedAt = new Date();
-    const preserveDatasets =
+    const _preserveDatasets =
       options.preserveDatasets ?? this.defaults.preserveDatasets;
     const sampleRowLimit =
       options.sampleRowLimit ?? this.defaults.sampleRowLimit;
@@ -557,7 +557,7 @@ export class TestmoExportAnalyzer {
                 purpose: "row",
                 completed: false,
                 rowIndex: currentIndex,
-                store: (value: unknown) => {
+                store: (_value: unknown) => {
                   // This is only called for schema captures now
                 },
               };
@@ -631,7 +631,7 @@ export class TestmoExportAnalyzer {
 
       // Call onDatasetComplete for each dataset if provided
       if (options.onDatasetComplete) {
-        for (const [name, dataset] of datasets) {
+        for (const [_name, dataset] of datasets) {
           const datasetSummary: TestmoDatasetSummary = {
             name: dataset.name,
             rowCount: dataset.rowCount,

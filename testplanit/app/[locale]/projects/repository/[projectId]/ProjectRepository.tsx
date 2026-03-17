@@ -239,7 +239,7 @@ interface ViewOptions {
   };
 }
 
-interface ExtendedCases {
+interface _ExtendedCases {
   id: number;
   projectId: number;
   project: any;
@@ -333,7 +333,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
   onTestCaseClick,
   isCompleted = false,
   projectId,
-  ApplicationArea,
+  ApplicationArea: _ApplicationArea,
   selectedTestCaseId,
   overridePagination,
   skipDndProvider = false,
@@ -361,7 +361,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
     permissions: testRunPermissions,
   } = useProjectPermissions(numericProjectId, "TestRuns");
 
-  const ALL_VALUES_FILTER = "__ALL__"; // Special value for All Values filter
+  const _ALL_VALUES_FILTER = "__ALL__"; // Special value for All Values filter
 
   const [selectedFolderId, setSelectedFolderId] = useState<number | null>(
     nodeParam ? parseInt(nodeParam, 10) : null
@@ -377,7 +377,6 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
   const dndContainerRef = useRef<HTMLDivElement>(null);
 
   const t = useTranslations();
-  const tCommon = useTranslations("common");
 
   // Sync URL parameter to state when it changes
   // Only depends on nodeParam to avoid feedback loops
@@ -535,7 +534,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
         refetchOnWindowFocus: true,
       }
     );
-  const testRunCases = testRunCasesWithLoading as TestRunCase[] | undefined;
+  const _testRunCases = testRunCasesWithLoading as TestRunCase[] | undefined;
 
   const { data: caseFoldersWithLoading } =
     useFindManyRepositoryCases(
@@ -802,7 +801,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
 
       if (viewParam.startsWith("dynamic_")) {
         const [_, fieldKey] = viewParam.split("_");
-        const [fieldId, fieldType] = fieldKey.split("_");
+        const [fieldId, _fieldType] = fieldKey.split("_");
         const numericFieldId = parseInt(fieldId);
         const field = Object.values(viewOptions?.dynamicFields || {}).find(
           (f) => f.fieldId === numericFieldId
@@ -853,7 +852,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
         setSelectedFilter(null);
       } else if (viewParam.startsWith("dynamic_") && viewOptions) {
         const [_, fieldKey] = viewParam.split("_");
-        const [fieldId, fieldType] = fieldKey.split("_");
+        const [fieldId, _fieldType] = fieldKey.split("_");
         const numericFieldId = parseInt(fieldId);
         const field = Object.values(viewOptions.dynamicFields).find(
           (f) => f.fieldId === numericFieldId
@@ -884,7 +883,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
 
   const deferredFolderId = useDeferredValue(selectedFolderId);
 
-  const updateURL = useCallback(
+  const _updateURL = useCallback(
     (folderId: number | null) => {
       if (folderId !== null) {
         const params = new URLSearchParams(searchParams.toString());
@@ -987,7 +986,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
         );
       } else if (value.startsWith("dynamic_")) {
         const [_, fieldKey] = value.split("_");
-        const [fieldId, fieldType] = fieldKey.split("_");
+        const [fieldId, _fieldType] = fieldKey.split("_");
         const numericFieldId = parseInt(fieldId);
         const field = Object.values(viewOptions.dynamicFields).find(
           (f) => f.fieldId === numericFieldId

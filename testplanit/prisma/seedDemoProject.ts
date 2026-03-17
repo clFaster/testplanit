@@ -384,7 +384,7 @@ export async function seedDemoProject() {
     },
   });
 
-  const releaseV1 = await prisma.milestones.create({
+  const _releaseV1 = await prisma.milestones.create({
     data: {
       name: "v1.0 Release",
       projectId: demoProject.id,
@@ -946,7 +946,7 @@ export async function seedDemoProject() {
   });
 
   // Issue 1: Password reset email not sent (linked to failed test run result)
-  const issue1 = await prisma.issue.create({
+  const _issue1 = await prisma.issue.create({
     data: {
       name: "BUG-1",
       title: "Password reset email not sent for some domains",
@@ -966,7 +966,7 @@ export async function seedDemoProject() {
   });
 
   // Issue 2: Login error message lacks detail (linked to failed session result)
-  const issue2 = await prisma.issue.create({
+  const _issue2 = await prisma.issue.create({
     data: {
       name: "BUG-2",
       title: "Login error message is too vague",

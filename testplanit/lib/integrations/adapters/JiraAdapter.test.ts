@@ -400,7 +400,7 @@ describe("JiraAdapter", () => {
             }),
         });
 
-      const result = await adapter.updateIssue("TEST-123", {
+      const _result = await adapter.updateIssue("TEST-123", {
         title: "Updated Title",
         priority: "1",
         labels: ["updated"],

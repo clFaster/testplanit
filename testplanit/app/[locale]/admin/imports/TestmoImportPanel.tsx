@@ -801,106 +801,6 @@ export function TestmoImportPanel() {
     [analysis, selectedDataset]
   );
 
-  const mappingSummaryItems = useMemo(() => {
-    if (!mappingAnalysis || !mappingAnalysis.summary) {
-      return [] as Array<{
-        key: string;
-        label: string;
-        value: number;
-        outstanding: number;
-      }>;
-    }
-
-    const summary = mappingAnalysis.summary;
-    const outstandingCounts = mappingCompletion.incompleteCounts;
-
-    return [
-      {
-        key: "projects",
-        label: tGlobal("common.fields.projects"),
-        value: (summary.projects ?? 0) as number,
-        outstanding: (outstandingCounts.projects ?? 0) as number,
-      },
-      {
-        key: "users",
-        label: tGlobal("common.fields.users"),
-        value: (summary.users ?? 0) as number,
-        outstanding: (outstandingCounts.users ?? 0) as number,
-      },
-      {
-        key: "testCases",
-        label: tGlobal("common.fields.testCases"),
-        value: (summary.testCases ?? 0) as number,
-        outstanding: (outstandingCounts.testCases ?? 0) as number,
-      },
-      {
-        key: "testRuns",
-        label: tGlobal("common.fields.testRuns"),
-        value: (summary.testRuns ?? 0) as number,
-        outstanding: (outstandingCounts.testRuns ?? 0) as number,
-      },
-      {
-        key: "sessions",
-        label: tGlobal("common.fields.sessions"),
-        value: (summary.sessions ?? 0) as number,
-        outstanding: (outstandingCounts.sessions ?? 0) as number,
-      },
-      {
-        key: "workflows",
-        label: tGlobal("common.labels.workflows"),
-        value: (summary.workflows ?? 0) as number,
-        outstanding: (outstandingCounts.states ?? 0) as number,
-      },
-      {
-        key: "statuses",
-        label: tGlobal("common.labels.statuses"),
-        value: (summary.statuses ?? 0) as number,
-        outstanding: (outstandingCounts.statuses ?? 0) as number,
-      },
-      {
-        key: "roles",
-        label: tGlobal("common.labels.roles"),
-        value: (summary.roles ?? 0) as number,
-        outstanding: (outstandingCounts.roles ?? 0) as number,
-      },
-      {
-        key: "milestoneTypes",
-        label: tGlobal("common.fields.milestoneTypes"),
-        value: (summary.milestoneTypes ?? 0) as number,
-        outstanding: (outstandingCounts.milestone_types ?? 0) as number,
-      },
-      {
-        key: "groups",
-        label: tGlobal("common.fields.groups"),
-        value: (summary.groups ?? 0) as number,
-        outstanding: (outstandingCounts.groups ?? 0) as number,
-      },
-      {
-        key: "templates",
-        label: tGlobal("common.fields.templates"),
-        value: (summary.templates ?? 0) as number,
-        outstanding: (outstandingCounts.templates ?? 0) as number,
-      },
-      {
-        key: "templateFields",
-        label: t("testmo.mappingSummaryTemplateFields"),
-        value: (summary.templateFields ?? 0) as number,
-        outstanding: (outstandingCounts.template_fields ?? 0) as number,
-      },
-      {
-        key: "customFields",
-        label: tGlobal("search.customFields"),
-        value: (summary.customFields ?? 0) as number,
-        outstanding: (outstandingCounts.customFields ?? 0) as number,
-      },
-      {
-        key: "configurations",
-        label: tGlobal("common.fields.configurations"),
-        value: (summary.configurations ?? 0) as number,
-        outstanding: (outstandingCounts.configs ?? 0) as number,
-      },
-    ];
-  }, [mappingAnalysis, mappingCompletion.incompleteCounts, t, tGlobal]);
 
   const canStartImport = useMemo(() => {
     if (!currentJob || currentJob.status !== "READY") {
@@ -2606,7 +2506,7 @@ export function TestmoImportPanel() {
               ((mappingAnalysis?.ambiguousEntities?.templates?.length ?? 0) >
                 0 ||
                 count > 0);
-            const hasConfigurationMapping =
+            const _hasConfigurationMapping =
               key === "configs" &&
               (mappingAnalysis?.ambiguousEntities?.configurations?.length ??
                 0) > 0;

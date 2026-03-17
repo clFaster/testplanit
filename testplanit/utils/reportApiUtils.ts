@@ -462,8 +462,8 @@ async function handleCrossProjectAggregation({
 
       // Check if it's a dimension
       if (dimensions.includes(sortColumn)) {
-        const dimData = a[sortColumn];
-        const dimDataB = b[sortColumn];
+        const _dimData = a[sortColumn];
+        const _dimDataB = b[sortColumn];
 
         // Handle different dimension types
         if (sortColumn === "date") {
@@ -788,8 +788,8 @@ async function handleProjectSpecificAggregation({
 
       // Check if it's a dimension
       if (dimensions.includes(sortColumn)) {
-        const dimData = a[sortColumn];
-        const dimDataB = b[sortColumn];
+        const _dimData = a[sortColumn];
+        const _dimDataB = b[sortColumn];
 
         // Handle different dimension types
         if (sortColumn === "date") {

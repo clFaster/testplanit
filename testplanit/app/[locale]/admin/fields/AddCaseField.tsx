@@ -298,8 +298,6 @@ export function AddCaseFieldModal({
   });
 
   const {
-    handleSubmit,
-    control,
     setValue,
     watch,
     formState: { errors },
@@ -432,7 +430,7 @@ export function AddCaseFieldModal({
 
   useEffect(() => {
     if (types && typeId) {
-      const currentTypeOptions = types.find(
+      const _currentTypeOptions = types.find(
         (type) => type.id.toString() === typeId
       )?.options;
     }

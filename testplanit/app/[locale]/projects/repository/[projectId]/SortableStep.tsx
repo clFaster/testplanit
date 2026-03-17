@@ -15,7 +15,7 @@ export interface SortableStepProps {
 const SortableStep: React.FC<SortableStepProps> = ({
   id,
   children,
-  readOnly = false,
+  readOnly: _readOnly = false,
 }) => {
   const {
     attributes,

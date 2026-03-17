@@ -97,7 +97,7 @@ export const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
       </div>
     );
   } else if (fileType === "application/pdf") {
-    const { height } = getSizeClasses(32);
+    const { height: _height } = getSizeClasses(32);
     return (
       <iframe
         src={fileURL}
@@ -224,7 +224,7 @@ export const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
       />
     );
   } else {
-    const { height, width } = getSizeClasses(100);
+    const { height: _height, width } = getSizeClasses(100);
     return (
       <div
         className="flex flex-col items-center overflow-hidden max-h-fit"

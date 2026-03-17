@@ -167,11 +167,11 @@ export function EditTemplateModal({ template }: EditTemplateModalProps) {
   });
 
   const {
+    handleSubmit,
     watch,
     setValue,
-    handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors: _errors },
   } = form;
 
   const isDefault = watch("isDefault");
@@ -445,7 +445,7 @@ export function EditTemplateModal({ template }: EditTemplateModalProps) {
             <FormField
               control={form.control}
               name="caseFields"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <div className="flex items-center space-x-2">
                     <FormLabel className="flex items-center">
@@ -474,7 +474,7 @@ export function EditTemplateModal({ template }: EditTemplateModalProps) {
             <FormField
               control={form.control}
               name="resultFields"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <div className="flex items-center space-x-2">
                     <FormLabel className="flex items-center">
@@ -503,7 +503,7 @@ export function EditTemplateModal({ template }: EditTemplateModalProps) {
             <FormField
               control={form.control}
               name="projects"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex justify-between items-center">
                     <div className="flex items-center">

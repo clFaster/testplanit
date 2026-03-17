@@ -72,7 +72,7 @@ export const getColumns = (
     header: t("columns.timestamp"),
     enableSorting: true,
     size: 180,
-    cell: ({ row, getValue }) => (
+    cell: ({ row: _row, getValue }) => (
       <div className="whitespace-nowrap text-sm">
         <DateFormatter
           date={getValue() as Date | string}

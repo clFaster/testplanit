@@ -87,7 +87,7 @@ export default function Cases({
   selectedTestCases = [],
   selectedRunIds,
   onSelectionChange,
-  onConfirm,
+  onConfirm: _onConfirm,
   hideHeader = false,
   isRunMode = false,
   onTestCaseClick,
@@ -104,7 +104,7 @@ export default function Cases({
   const hasAutoSelectedRef = useRef(false);
 
   // Performance logging - use refs to avoid re-renders
-  const performanceLog = useRef({
+  const _performanceLog = useRef({
     componentStart: Date.now(),
     templatesLoaded: null as number | null,
     mainDataLoaded: null as number | null,
@@ -163,14 +163,14 @@ export default function Cases({
   const { mutateAsync: updateTestRunCases } = useUpdateTestRunCases({
     optimisticUpdate: false,
   });
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [selectedAttachmentIndex, setSelectedAttachmentIndex] = useState<
     number | null
   >(null);
   const [selectedAttachments, setSelectedAttachments] = useState<any[]>([]);
 
   // Add state for modal open
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [, setIsModalOpen] = useState(false);
 
   // State for AddResultModal - lifted from StatusCell to prevent re-render issues
   const [addResultModalState, setAddResultModalState] = useState<{
@@ -1121,7 +1121,7 @@ export default function Cases({
               ) {
                 // Operator-based text filtering
                 const parts = singleFilterId.split("|");
-                const operator = parts[0];
+                const _operator = parts[0];
                 const searchValue = parts[1];
 
                 if (searchValue) {
@@ -2330,7 +2330,7 @@ export default function Cases({
     isRunMode && selectedRunIds && selectedRunIds.length > 1;
 
   // Handle selection changes
-  const handleSelectAll = useCallback(() => {
+  const _handleSelectAll = useCallback(() => {
     if (!isSelectionMode || !onSelectionChange || !cases) return;
     // In multi-config mode, use testRunCaseId for unique identification
     const currentPageIds = cases.map((tc) =>
@@ -2356,7 +2356,7 @@ export default function Cases({
   ]);
 
   // Handle bulk edit selection changes
-  const handleBulkEditSelectionChange = useCallback((ids: number[]) => {
+  const _handleBulkEditSelectionChange = useCallback((ids: number[]) => {
     setSelectedCaseIdsForBulkEdit(ids);
   }, []);
 
@@ -2565,7 +2565,7 @@ export default function Cases({
 
       if (event.shiftKey) {
         // Shift+Click: Select/Deselect all cases across all pages
-        const selectableRows = MappedCases.filter((tc) => !tc.isDeleted);
+        const _selectableRows = MappedCases.filter((tc) => !tc.isDeleted);
         const selectableIndices = MappedCases.map((tc, index) =>
           !tc.isDeleted ? index : null
         ).filter((index) => index !== null) as number[];
@@ -3109,7 +3109,7 @@ export default function Cases({
   );
 
   // Instantiate the hook
-  const { handleExport, isExporting } = useExportData<any>({
+  const { handleExport, isExporting: _isExporting } = useExportData<any>({
     fetchAllData: fetchAllDataForHook,
     currentData: cases,
     selectedIds: selectedCaseIdsForBulkEdit,

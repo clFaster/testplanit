@@ -11,7 +11,7 @@ describe("upgrade-notifications", () => {
     });
 
     it("should have title and message for each notification", () => {
-      for (const [version, notification] of Object.entries(
+      for (const [_version, notification] of Object.entries(
         upgradeNotifications
       )) {
         expect(notification.title).toBeDefined();

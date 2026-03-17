@@ -27,7 +27,6 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { CircleX, FolderPlus, Undo2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
@@ -60,11 +59,10 @@ export function AddFolderModal({
   projectId,
   repositoryId,
   parentId,
-  panelWidth,
+  panelWidth: _panelWidth,
   onFolderCreated,
 }: AddFolderModalProps) {
   const t = useTranslations();
-  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutateAsync: createFolder } = useCreateRepositoryFolders();
@@ -170,8 +168,6 @@ export function AddFolderModal({
   }
 
   const {
-    handleSubmit,
-    control,
     formState: { errors },
   } = form;
 

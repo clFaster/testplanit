@@ -24,12 +24,12 @@ interface DeleteTestRunProps {
 }
 
 export function DeleteTestRunModal({
-  testRun,
+  testRun: _testRun,
   open,
   onOpenChange,
   testRunId,
   projectId,
-  onDelete,
+  onDelete: _onDelete,
   onBeforeDelete,
 }: DeleteTestRunProps) {
   const router = useRouter();

@@ -21,8 +21,6 @@ interface SyncIssueProps {
 
 export function SyncIssue({ issue }: SyncIssueProps) {
   const t = useTranslations("admin.issues");
-  const tCommon = useTranslations("common");
-
   const queryClient = useQueryClient();
   const router = useRouter();
   const [isSyncing, setIsSyncing] = useState(false);

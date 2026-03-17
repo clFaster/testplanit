@@ -59,7 +59,7 @@ interface EditRepositoryFolderModalProps {
 
 export function EditFolderModal({
   folderId,
-  selected,
+  selected: _selected,
   open: controlledOpen,
   onOpenChange,
   projectId,
@@ -114,10 +114,6 @@ export function EditFolderModal({
   }, [open, folder, form.reset, form]);
 
   const {
-    watch,
-    setValue,
-    handleSubmit,
-    control,
     formState: { errors },
   } = form;
 

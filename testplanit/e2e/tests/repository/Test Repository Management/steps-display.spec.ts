@@ -13,7 +13,7 @@ import { RepositoryPage } from "../../../page-objects/repository/repository.page
  * - Shared step groups
  */
 test.describe("Steps Display", () => {
-  let repositoryPage: RepositoryPage;
+  let _repositoryPage: RepositoryPage;
 
   // Dedicated project and template for this spec file - isolated from other tests
   let stepsDisplayProjectId: number | null = null;
@@ -43,7 +43,7 @@ test.describe("Steps Display", () => {
   });
 
   test.beforeEach(async ({ page }) => {
-    repositoryPage = new RepositoryPage(page);
+    _repositoryPage = new RepositoryPage(page);
   });
 
   function getTestProjectId(): number {

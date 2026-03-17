@@ -27,7 +27,7 @@ import AddTestRunModal from "./AddTestRunModal";
 import TestRunItem from "./TestRunItem";
 import CompleteTestRunDialog from "./[runId]/CompleteTestRunDialog";
 
-const testRunPropSelect = {
+const _testRunPropSelect = {
   id: true,
   name: true,
   isCompleted: true,
@@ -61,10 +61,10 @@ const testRunPropSelect = {
 } as const;
 
 export type TestRunsWithDetails = Prisma.TestRunsGetPayload<{
-  select: typeof testRunPropSelect;
+  select: typeof _testRunPropSelect;
 }>;
 
-const milestonesPropInclude = {
+const _milestonesPropInclude = {
   milestoneType: { include: { icon: true } },
   children: {
     include: {
@@ -74,7 +74,7 @@ const milestonesPropInclude = {
 } as const;
 
 export type MilestonePropItem = Prisma.MilestonesGetPayload<{
-  include: typeof milestonesPropInclude;
+  include: typeof _milestonesPropInclude;
 }>;
 
 interface TestRunDisplayProps {
@@ -167,7 +167,7 @@ interface DroppableMilestoneGroupProps {
 
 const DroppableMilestoneGroup: React.FC<DroppableMilestoneGroupProps> = ({
   milestoneId,
-  milestoneName,
+  milestoneName: _milestoneName,
   onDropTestRun,
   children,
   className,
@@ -286,7 +286,7 @@ const groupTestRuns = (
   return grouped;
 };
 
-const findMilestonePath = (
+const _findMilestonePath = (
   milestone: MilestonesWithTypes,
   targetMilestoneId: number,
   path: MilestonesWithTypes[] = []
@@ -296,7 +296,7 @@ const findMilestonePath = (
   }
 
   for (const child of milestone.children) {
-    const result = findMilestonePath(child, targetMilestoneId, [
+    const result = _findMilestonePath(child, targetMilestoneId, [
       ...path,
       milestone,
     ]);
@@ -357,8 +357,8 @@ const TestRunDisplay: React.FC<TestRunDisplayProps> = ({
   const [colorMap, setColorMap] = useState<ColorMap | null>(null);
   const [selectedTestRun, setSelectedTestRun] =
     useState<TestRunsWithDetails | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newTestRunId, setNewTestRunId] = useState<number | null>(null);
+  const [, setIsDialogOpen] = useState(false);
+  const [, setNewTestRunId] = useState<number | null>(null);
   const [modalSelectedTestCases, setModalSelectedTestCases] = useState<
     number[]
   >([]);
@@ -478,7 +478,7 @@ const TestRunDisplay: React.FC<TestRunDisplayProps> = ({
     setSelectedTestRun(testRun);
     setIsDialogOpen(true);
   };
-  const handleCloseDialog = () => {
+  const _handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedTestRun(null);
   };

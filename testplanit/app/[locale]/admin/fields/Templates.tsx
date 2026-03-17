@@ -91,7 +91,7 @@ export default function TemplateComponent() {
     []
   );
 
-  const handleToggleDefault = useCallback((id: number, isDefault: boolean) => {
+  const handleToggleDefault = useCallback((id: number, _isDefault: boolean) => {
     setSelectedTemplateId(id);
     setIsAlertDialogOpen(true);
   }, []);

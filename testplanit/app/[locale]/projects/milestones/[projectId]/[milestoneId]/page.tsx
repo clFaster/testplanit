@@ -76,9 +76,7 @@ export default function MilestoneDetailsPage() {
   const shouldStartInEditMode = searchParams.get("edit") === "true";
   const t = useTranslations("milestones");
   const tGlobal = useTranslations();
-  const tSessions = useTranslations("sessions");
   const tCommon = useTranslations("common");
-  const tRuns = useTranslations("runs");
 
   const [isEditMode, setIsEditMode] = useState(shouldStartInEditMode);
   const [isSubmitting, setIsSubmitting] = useState(false);

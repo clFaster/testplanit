@@ -196,7 +196,7 @@ export function useIssueTestCoverageSummaryColumns(
           );
         },
         enableSorting: true,
-        sortingFn: (rowA, rowB, columnId) => {
+        sortingFn: (rowA, rowB, _columnId) => {
           // When grouped, rows have subRows - sort by the count of subRows (which equals linkedTestCases)
           const hasSubRowsA = rowA.subRows && rowA.subRows.length > 0;
           const hasSubRowsB = rowB.subRows && rowB.subRows.length > 0;

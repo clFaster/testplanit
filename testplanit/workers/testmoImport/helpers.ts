@@ -112,7 +112,7 @@ export const buildTemplateFieldMaps = (
   const caseFields = new Map<string, number>();
   const resultFields = new Map<string, number>();
 
-  for (const [key, entry] of Object.entries(templateFields ?? {})) {
+  for (const [_key, entry] of Object.entries(templateFields ?? {})) {
     if (!entry || entry.mappedTo === null || entry.mappedTo === undefined) {
       continue;
     }

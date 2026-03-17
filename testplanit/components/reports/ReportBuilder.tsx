@@ -145,7 +145,6 @@ function ReportBuilderContent({
 }: ReportBuilderProps) {
   const { theme } = useTheme();
   const { data: session } = useSession();
-  const t = useTranslations();
   const tReports = useTranslations("reports.ui");
   const tCommon = useTranslations("common");
   const tAdminMenu = useTranslations("admin.menu");
@@ -172,8 +171,6 @@ function ReportBuilderContent({
     setPageSize,
     totalItems: totalCount,
     setTotalItems: setTotalCount,
-    startIndex,
-    endIndex,
   } = usePagination();
 
   // Form for date range
@@ -1634,7 +1631,7 @@ function ReportBuilderContent({
 
   // Memoize chart props to prevent unnecessary re-renders when pagination/sorting changes
   // Use refs for stable references that don't change on re-renders
-  const chartDimensions = useMemo(
+  const _chartDimensions = useMemo(
     () => {
       const result = lastUsedDimensionsRef.current.map((d) => ({
         value: d.value,
@@ -1646,7 +1643,7 @@ function ReportBuilderContent({
     [chartDataVersion] // Only recompute when chart data version changes
   );
 
-  const chartMetrics = useMemo(
+  const _chartMetrics = useMemo(
     () => {
       const result = lastUsedMetricsRef.current.map((m) => ({
         value: m.value,
@@ -1659,7 +1656,7 @@ function ReportBuilderContent({
     [chartDataVersion] // Only recompute when chart data version changes
   );
 
-  const chartKey = useMemo(
+  const _chartKey = useMemo(
     () => {
       const result = chartDataRef.current
         ? JSON.stringify(chartDataRef.current.slice(0, 5))

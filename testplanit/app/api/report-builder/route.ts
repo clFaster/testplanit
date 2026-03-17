@@ -333,7 +333,7 @@ const METRIC_REGISTRY: Record<
   testResultCount: {
     id: "testResultCount",
     label: "Test Results Count",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, _filters, _dims) => {
       // If date is in groupBy, we need to handle it specially
       const dateIndex = groupBy.indexOf("executedAt");
       if (dateIndex !== -1) {
@@ -556,9 +556,9 @@ const METRIC_REGISTRY: Record<
   testRunCount: {
     id: "testRunCount",
     label: "Test Runs Count",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, _filters, dims) => {
       // If date is in groupBy, we need to handle it specially
-      const dateIndex = groupBy.indexOf("executedAt");
+      const _dateIndex = groupBy.indexOf("executedAt");
       // Case 1: Grouping by fields that live on the TestRunResults table
       if (
         groupBy.some((g) =>
@@ -676,9 +676,9 @@ const METRIC_REGISTRY: Record<
   testCaseCount: {
     id: "testCaseCount",
     label: "Test Cases Count",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, _filters, _dims) => {
       // If date is in groupBy, we need to handle it specially
-      const dateIndex = groupBy.indexOf("executedAt");
+      const _dateIndex = groupBy.indexOf("executedAt");
       // Special handling for milestone grouping
       if (groupBy.includes("milestoneId")) {
         const results = await prisma.testRunCases.findMany({
@@ -852,9 +852,9 @@ const METRIC_REGISTRY: Record<
   avgElapsed: {
     id: "avgElapsed",
     label: "Avg. Elapsed Time",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, _filters, _dims) => {
       // If date is in groupBy, we need to handle it specially
-      const dateIndex = groupBy.indexOf("executedAt");
+      const _dateIndex = groupBy.indexOf("executedAt");
       const needsMilestoneOrConfig = groupBy.some((g) =>
         ["milestoneId", "configId"].includes(g)
       );
@@ -1042,9 +1042,9 @@ const METRIC_REGISTRY: Record<
   sumElapsed: {
     id: "sumElapsed",
     label: "Total Elapsed Time",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, _filters, _dims) => {
       // If date is in groupBy, we need to handle it specially
-      const dateIndex = groupBy.indexOf("executedAt");
+      const _dateIndex = groupBy.indexOf("executedAt");
       const needsMilestoneOrConfig = groupBy.some((g) =>
         ["milestoneId", "configId"].includes(g)
       );

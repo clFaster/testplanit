@@ -243,7 +243,7 @@ export function AddSessionModal({
 
   const [noteContent, setNoteContent] = useState<object>({});
 
-  const handleUpdate = useCallback((newContent: object) => {
+  const _handleUpdate = useCallback((newContent: object) => {
     setMissionContent(newContent);
   }, []);
 
@@ -312,10 +312,8 @@ export function AddSessionModal({
   const {
     handleSubmit,
     control,
-    watch,
     reset,
     formState: { errors },
-    setValue,
   } = form;
 
   const [linkedIssueIds, setLinkedIssueIds] = useState<number[]>([]);
@@ -392,7 +390,7 @@ export function AddSessionModal({
     []
   );
 
-  const handleSelect = (attachments: Attachments[], index: number) => {
+  const _handleSelect = (attachments: Attachments[], index: number) => {
     setSelectedAttachments(attachments);
     setSelectedAttachmentIndex(index);
   };
@@ -683,7 +681,7 @@ export function AddSessionModal({
                 <FormField
                   control={control}
                   name="note"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center">
                         {t("common.fields.description")}
@@ -711,7 +709,7 @@ export function AddSessionModal({
                 <FormField
                   control={control}
                   name="configId"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center">
                         {t("common.fields.configuration")}
@@ -788,7 +786,7 @@ export function AddSessionModal({
                 <FormField
                   control={control}
                   name="mission"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center">
                         {t("common.fields.mission")}
@@ -814,7 +812,7 @@ export function AddSessionModal({
                 <FormField
                   control={control}
                   name="attachments"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center">
                         {t("common.fields.attachments")}
@@ -844,7 +842,7 @@ export function AddSessionModal({
                 <FormField
                   control={control}
                   name="templateId"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center">
                         {t("common.fields.template")}
@@ -895,7 +893,7 @@ export function AddSessionModal({
                 <FormField
                   control={control}
                   name="stateId"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center">
                         {t("common.fields.state")}
@@ -950,7 +948,7 @@ export function AddSessionModal({
                 <FormField
                   control={control}
                   name="assignedToId"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center">
                         {t("common.fields.assignedTo")}

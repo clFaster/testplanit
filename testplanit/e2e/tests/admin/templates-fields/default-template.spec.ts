@@ -125,7 +125,7 @@ test.describe("Default Template - Protection Rules", () => {
     await templatesPage.goto();
   });
 
-  test("Cannot disable default template", async ({ api, page }) => {
+  test("Cannot disable default template", async ({ api, page: _page }) => {
     // Create and set a template as default
     const templateName = `E2E No Disable ${Date.now()}`;
     await api.createTemplate({

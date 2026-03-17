@@ -225,11 +225,11 @@ export function AddResultModal({
   const { data: session } = useSession();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedStatusColor, setSelectedStatusColor] =
+  const [, setSelectedStatusColor] =
     useState<string>("#3b82f6");
   const [editorKey, setEditorKey] = useState<number>(0);
   const [uploadAttachmentsKey, setUploadAttachmentsKey] = useState<number>(0);
-  const [trackedSeconds, setTrackedSeconds] = useState(0);
+  const [, setTrackedSeconds] = useState(0);
   const timeTrackerRef = useRef<TimeTrackerRef>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [selectedAttachmentIndex, setSelectedAttachmentIndex] = useState<
@@ -546,11 +546,11 @@ export function AddResultModal({
     }
   };
 
-  const handleFileSelect = (files: File[]) => {
+  const _handleFileSelect = (files: File[]) => {
     setSelectedFiles(files);
   };
 
-  const handleAttachmentSelect = (
+  const _handleAttachmentSelect = (
     attachments: Attachments[],
     index: number
   ) => {
@@ -1687,7 +1687,7 @@ export function AddResultModal({
               <FormField
                 control={form.control}
                 name="statusId"
-                render={({ field }) => (
+                render={({ field: _field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center">
                       {tCommon("actions.status")}
@@ -2124,10 +2124,10 @@ const SharedStepGroupInputs: React.FC<SharedStepGroupInputsProps> = ({
   getValues,
   statuses,
   projectId,
-  projectIntegration,
+  projectIntegration: _projectIntegration,
   selectedIssues,
   setSelectedIssues,
-  issueMap,
+  issueMap: _issueMap,
 }): React.ReactNode => {
   // Explicitly set return type to React.ReactNode
   const t = useTranslations();

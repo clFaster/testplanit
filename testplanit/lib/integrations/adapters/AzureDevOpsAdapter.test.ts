@@ -382,7 +382,7 @@ describe("AzureDevOpsAdapter", () => {
           }),
       });
 
-      const result = await adapter.updateIssue("123", {
+      const _result = await adapter.updateIssue("123", {
         title: "Updated Title",
       });
 

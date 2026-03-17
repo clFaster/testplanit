@@ -41,7 +41,7 @@ const operatorSymbols: Record<StepsOperator, string> = {
 };
 
 export function StepsFilterInput({
-  fieldId,
+  fieldId: _fieldId,
   onFilterApply,
   onClearFilter,
   currentFilter,

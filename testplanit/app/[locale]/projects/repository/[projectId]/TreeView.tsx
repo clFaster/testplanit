@@ -76,7 +76,7 @@ const TreeView: React.FC<{
   selectedFolderId,
   filteredFolders,
   canAddEdit,
-  runId,
+  runId: _runId,
   folderStatsData,
   onRefetchFolders,
   onRefetchStats,
@@ -129,7 +129,7 @@ const TreeView: React.FC<{
   const {
     data: allFolders,
     isLoading: foldersLoading,
-    error,
+    error: _error,
     refetch: refetchFolders,
   } = useFindManyRepositoryFolders(
     {

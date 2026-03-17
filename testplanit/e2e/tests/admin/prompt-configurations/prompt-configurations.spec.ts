@@ -90,7 +90,7 @@ test.describe("Prompt Configurations - Create Operations", () => {
   });
 
   test("Add dialog opens with pre-filled default prompts", async ({
-    page,
+    page: _page,
   }) => {
     await promptsPage.clickAdd();
 
@@ -183,7 +183,7 @@ test.describe("Prompt Configurations - Edit Operations", () => {
     await promptsPage.goto();
   });
 
-  test("Edit config description", async ({ page }) => {
+  test("Edit config description", async ({ page: _page }) => {
     await promptsPage.clickEditOnRow(configName);
 
     const newDescription = `Updated description ${Date.now()}`;

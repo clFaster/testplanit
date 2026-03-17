@@ -36,7 +36,6 @@ function AppConfigs() {
     pageSize,
     setPageSize,
     totalItems,
-    setTotalItems,
   } = usePagination();
   const [searchString, setSearchString] = useState("");
   const [valueSearchString, setValueSearchString] = useState("");

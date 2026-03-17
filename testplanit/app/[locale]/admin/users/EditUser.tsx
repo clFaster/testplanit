@@ -179,7 +179,6 @@ export function EditUserModal({ user }: EditUserModalProps) {
 
   const {
     setValue,
-    handleSubmit,
     control,
     formState: { errors },
   } = form;
@@ -369,7 +368,7 @@ export function EditUserModal({ user }: EditUserModalProps) {
             <FormField
               control={form.control}
               name="access"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                   <FormLabel className="flex whitespace-nowrap items-center">
                     {tCommon("fields.access")}
@@ -433,7 +432,7 @@ export function EditUserModal({ user }: EditUserModalProps) {
                       <Controller
                         control={control}
                         name="roleId"
-                        render={({ field: { onChange, value } }) => (
+                        render={({ field: { onChange: _onChange, value } }) => (
                           <Select
                             onValueChange={(value) =>
                               field.onChange(parseInt(value))
@@ -471,7 +470,7 @@ export function EditUserModal({ user }: EditUserModalProps) {
             <FormField
               control={form.control}
               name="groups"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex justify-between">
                     <div className="flex items-center">
@@ -519,7 +518,7 @@ export function EditUserModal({ user }: EditUserModalProps) {
             <FormField
               control={form.control}
               name="projects"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex justify-between">
                     <div className="flex items-center">

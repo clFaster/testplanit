@@ -43,7 +43,7 @@ function WorkflowComponent() {
   const router = useRouter();
   const t = useTranslations("admin.workflows");
   const tCommon = useTranslations("common");
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize] = useState(10);
   const queryClient = useQueryClient();
 
   const [casesWorkflows, setCasesWorkflows] = useState<ExtendedWorkflows[]>([]);

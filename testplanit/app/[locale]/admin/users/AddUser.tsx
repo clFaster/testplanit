@@ -195,7 +195,6 @@ export function AddUserModal() {
 
   const {
     setValue,
-    handleSubmit,
     control,
     formState: { errors },
   } = form;
@@ -511,7 +510,7 @@ export function AddUserModal() {
             <FormField
               control={form.control}
               name="access"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                   <FormLabel className="flex whitespace-nowrap items-center">
                     {tCommon("fields.access")}
@@ -597,7 +596,7 @@ export function AddUserModal() {
             <FormField
               control={form.control}
               name="groups"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center justify-between">
                     <div className="flex items-center">
@@ -647,7 +646,7 @@ export function AddUserModal() {
             <FormField
               control={form.control}
               name="projects"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center justify-between">
                     <div className="flex items-center">

@@ -48,7 +48,7 @@ const extractTextFromTipTap = (jsonContent: any): string => {
 // Parse combined step data (single row mode with all steps in one field)
 const parseCombinedStepData = (
   combinedData: string,
-  rowMode: string
+  _rowMode: string
 ): Array<{ step: string; expectedResult?: string; order: number }> => {
   if (!combinedData || combinedData.trim() === "") return [];
 

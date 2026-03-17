@@ -154,7 +154,6 @@ const AddToTestRunDropdown = React.memo(function AddToTestRunDropdown({
   projectId: number;
 }) {
   const tCommon = useTranslations("common");
-  const tComments = useTranslations("comments");
   const queryClient = useQueryClient();
   const { data: testRuns } = useFindManyTestRuns({
     where: {

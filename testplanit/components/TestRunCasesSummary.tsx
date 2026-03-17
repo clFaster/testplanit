@@ -36,7 +36,7 @@ export function TestRunCasesSummary({
   testRunIds,
   projectId: propProjectId,
   className,
-  testRunType,
+  testRunType: _testRunType,
   summaryData: preFetchedSummaryData,
 }: TestRunCasesSummaryProps) {
   const tCommon = useTranslations("common");

@@ -42,7 +42,6 @@ export function IntegrationsList({
 }: IntegrationsListProps) {
   const t = useTranslations("projects.settings.integrations");
   const tAiModels = useTranslations("projects.settings.aiModels");
-  const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
   const router = useRouter();
   const [isAssigning, setIsAssigning] = useState<number | null>(null);

@@ -423,8 +423,8 @@ export function useExportData<
   isRunMode = false,
   testRunCasesData = [],
   isDefaultSort = true,
-  textLongFormat,
-  attachmentFormat,
+  textLongFormat: _textLongFormat,
+  attachmentFormat: _attachmentFormat,
 }: UseExportDataProps<TData>) {
   const [isExporting, setIsExporting] = useState(false);
 

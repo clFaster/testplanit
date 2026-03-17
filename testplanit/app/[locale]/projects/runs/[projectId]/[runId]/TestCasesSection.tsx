@@ -103,7 +103,7 @@ export function TestCasesSection({
   isEditMode = false,
   onTestCasesChange,
   canAddEdit,
-  refetchTestRun,
+  refetchTestRun: _refetchTestRun,
   onMultiConfigSelected,
   onSelectedConfigurationsChange,
 }: TestCasesSectionProps) {
@@ -409,7 +409,7 @@ export function TestCasesSection({
   };
 
   // Map the test cases to the format expected by SelectedTestCasesDrawer
-  const mappedTestCases = testRunData.testCases.map((testCase) => ({
+  const _mappedTestCases = testRunData.testCases.map((testCase) => ({
     id: testCase.repositoryCase.id,
     name: testCase.repositoryCase.name,
     state: {

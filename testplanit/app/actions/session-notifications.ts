@@ -33,7 +33,7 @@ export async function notifySessionAssignment(
     }
 
     // Get the assignee details
-    const assignee = await prisma.user.findUnique({
+    const _assignee = await prisma.user.findUnique({
       where: { id: newAssigneeId },
       select: { name: true },
     });

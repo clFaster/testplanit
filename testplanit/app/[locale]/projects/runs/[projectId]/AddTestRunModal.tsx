@@ -111,7 +111,7 @@ const BaseFormSchema = z.object({
 // Step 1: Basic Information Dialog
 const BasicInfoDialog = React.memo(
   ({
-    open,
+    open: _open,
     onClose,
     onNext,
     form,
@@ -121,14 +121,14 @@ const BasicInfoDialog = React.memo(
     configurationsOptions,
     selectedTags,
     setSelectedTags,
-    selectedFiles,
+    selectedFiles: _selectedFiles,
     handleFileSelect,
     handleSelect,
     selectedAttachmentIndex,
     handleAttachmentClose,
     projectId,
     t,
-    issueConfigId,
+    issueConfigId: _issueConfigId,
     linkedIssueIds,
     setLinkedIssueIds,
     canCreateTags = false,
@@ -536,12 +536,12 @@ interface ForecastData {
 const TestCasesDialog = React.memo(
   ({
     open,
-    onClose,
+    onClose: _onClose,
     onPrevious,
     onNext,
     selectedTestCases,
     setSelectedTestCases,
-    t,
+    t: _t,
     tCommon,
     form,
     projectId,
@@ -640,7 +640,7 @@ const TestCasesDialog = React.memo(
     }, [selectedTestCases, open]);
 
     // Map fetchedTestCases to the structure expected by SelectedTestCasesDrawer
-    const mappedTestCasesForDrawer = useMemo(() => {
+    const _mappedTestCasesForDrawer = useMemo(() => {
       if (!fetchedTestCases) return [];
       return fetchedTestCases.map((tc) => ({
         id: tc.id,
@@ -870,7 +870,7 @@ export default function AddTestRunModal({
     },
     include: { user: { select: { id: true, name: true } } },
   });
-  const { data: tags } = useFindManyTags({
+  useFindManyTags({
     where: { isDeleted: false },
     orderBy: { name: "asc" },
   });
@@ -900,7 +900,7 @@ export default function AddTestRunModal({
       : undefined,
     parentId: m.parentId,
   }));
-  const assignedToOptions =
+  const _assignedToOptions =
     projectAssignments?.map((a) => ({
       value: a.user.id,
       label: a.user.name,
@@ -1003,10 +1003,8 @@ export default function AddTestRunModal({
 
   const {
     handleSubmit,
-    control,
-    watch,
     reset,
-    formState: { errors },
+    formState: { errors: _errors },
     setValue,
   } = form;
 
@@ -1134,11 +1132,11 @@ export default function AddTestRunModal({
   }, [open, initialSelectedCaseIds]);
 
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
-  const userName = session?.user?.name || "Unknown User";
+  const _userName = session?.user?.name || "Unknown User";
   const [selectedAttachmentIndex, setSelectedAttachmentIndex] = useState<
     number | null
   >(null);
-  const [selectedAttachments, setSelectedAttachments] = useState<Attachments[]>(
+  const [, setSelectedAttachments] = useState<Attachments[]>(
     []
   );
 
@@ -1187,7 +1185,7 @@ export default function AddTestRunModal({
     return Promise.all(attachmentsPromises);
   };
 
-  const handleConfirmSelection = (selectedIds: number[]) => {
+  const _handleConfirmSelection = (selectedIds: number[]) => {
     onSelectedCasesChange(selectedIds);
     setValue("testCases", selectedIds);
   };

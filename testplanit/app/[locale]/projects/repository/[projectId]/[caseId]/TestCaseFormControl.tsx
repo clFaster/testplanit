@@ -45,7 +45,7 @@ const TestCaseFormControls: React.FC<TestCaseFormControlsProps> = ({
   isSubmitting,
   testcase,
   setSelectedFiles,
-  selectedFiles,
+  selectedFiles: _selectedFiles,
   handleSelect,
   selectedAttachmentIndex,
   selectedAttachments,

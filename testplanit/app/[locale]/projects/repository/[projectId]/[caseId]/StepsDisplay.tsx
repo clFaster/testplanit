@@ -40,7 +40,7 @@ interface RenderSharedGroupItemsProps {
 
 const RenderSharedGroupItems: React.FC<RenderSharedGroupItemsProps> = ({
   sharedStepGroupId,
-  sharedStepGroupName,
+  sharedStepGroupName: _sharedStepGroupName,
   expandAll,
 }) => {
   const t_steps = useTranslations("repository.steps");
@@ -300,7 +300,6 @@ export const StepsDisplay: React.FC<StepsProps> = ({
   previousSteps,
 }) => {
   const [expandAll, setExpandAll] = useState(false);
-  const t_repo = useTranslations("repository");
   const t_repo_steps = useTranslations("repository.steps");
   const tGlobal = useTranslations();
 

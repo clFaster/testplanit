@@ -56,7 +56,6 @@ function TagList() {
   });
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
-  const t = useTranslations("admin.tags");
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
 

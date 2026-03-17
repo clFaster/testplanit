@@ -2202,7 +2202,7 @@ describe("BulkEditModal", () => {
       vi.clearAllMocks();
 
       // Re-setup fetch mock for Steps field tests - use mockCasesWithTextFields which already includes Steps
-      global.fetch = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      global.fetch = vi.fn((input: RequestInfo | URL, _init?: RequestInit) => {
         const url =
           typeof input === "string"
             ? input
@@ -2469,8 +2469,6 @@ describe("BulkEditModal", () => {
     });
 
     it("should not update steps if no matches found", async () => {
-      const onSaveSuccess = vi.fn();
-      const onClose = vi.fn();
       const { user } = await setupStepsField();
 
       // Enter search pattern that won't match
@@ -2562,7 +2560,7 @@ describe("BulkEditModal", () => {
       ];
 
       // Update fetch mock to return Japanese data
-      global.fetch = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      global.fetch = vi.fn((input: RequestInfo | URL, _init?: RequestInit) => {
         const url =
           typeof input === "string"
             ? input
@@ -2723,7 +2721,7 @@ describe("BulkEditModal", () => {
       ];
 
       // Update fetch mock to return special chars data
-      global.fetch = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      global.fetch = vi.fn((input: RequestInfo | URL, _init?: RequestInit) => {
         const url =
           typeof input === "string"
             ? input
@@ -2824,7 +2822,7 @@ describe("BulkEditModal", () => {
       ];
 
       // Update fetch mock to return emoji data
-      global.fetch = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      global.fetch = vi.fn((input: RequestInfo | URL, _init?: RequestInit) => {
         const url =
           typeof input === "string"
             ? input

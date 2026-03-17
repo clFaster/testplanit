@@ -116,7 +116,7 @@ const startWorker = async () => {
       concurrency: parseInt(process.env.AUDIT_LOG_CONCURRENCY || '10', 10), // Higher concurrency since audit logs are independent
     });
 
-    worker.on("completed", (job) => {
+    worker.on("completed", (_job) => {
       // Don't log every completion to avoid noise
       // console.log(`[AuditLogWorker] Job ${job.id} completed`);
     });

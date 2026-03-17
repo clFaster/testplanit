@@ -22,7 +22,6 @@ export function DeleteAppConfigModal({ config }: DeleteAppConfigModalProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutateAsync: deleteAppConfig } = useDeleteAppConfig();
-  const t = useTranslations("admin.appConfig");
   const tCommon = useTranslations("common");
 
   const handleCancel = () => {

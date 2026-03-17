@@ -594,10 +594,10 @@ export const importAutomationCases = async (
             }
             summary.created += 1;
 
-            const projectName = await getProjectName(tx, projectId);
-            const templateName = await getTemplateName(tx, resolvedTemplateId);
+            const _projectName = await getProjectName(tx, projectId);
+            const _templateName = await getTemplateName(tx, resolvedTemplateId);
             const workflowName = await getWorkflowName(tx, defaultWorkflowId);
-            const resolvedFolderName =
+            const _resolvedFolderName =
               folderNameForVersion ?? (await getFolderName(tx, folderId));
             const creatorName = await getUserName(tx, repositoryCase.creatorId);
 

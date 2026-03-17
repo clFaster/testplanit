@@ -162,7 +162,7 @@ function TestRunFormControls({
   isSubmitting,
   testRun,
   control,
-  errors,
+  errors: _errors,
   configurations,
   workflows,
   milestones,

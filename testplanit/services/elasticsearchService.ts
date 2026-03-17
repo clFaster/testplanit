@@ -45,7 +45,7 @@ export async function testElasticsearchConnection(): Promise<boolean> {
   if (!client) return false;
 
   try {
-    const response = await client.ping();
+    await client.ping();
     return true;
   } catch (error) {
     console.error("Elasticsearch connection failed:", error);

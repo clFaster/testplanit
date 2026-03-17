@@ -184,9 +184,7 @@ export function EditWorkflowsModal({
   }, [open, defaultFormValues, form, form.reset]);
 
   const {
-    watch,
     setValue,
-    handleSubmit,
     control,
     formState: { errors },
   } = form;
@@ -287,7 +285,7 @@ export function EditWorkflowsModal({
             <FormField
               control={form.control}
               name="scope"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel>
                     <FormControl>
@@ -454,7 +452,7 @@ export function EditWorkflowsModal({
             <FormField
               control={form.control}
               name="projects"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex justify-between items-center">
                     <span className="flex items-center">

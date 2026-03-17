@@ -16,7 +16,7 @@ vi.mock("~/lib/navigation", () => ({
 
 // Mock components
 vi.mock("@/components/tables/UserNameCell", () => ({
-  UserNameCell: ({ userId, hideLink }: any) => (
+  UserNameCell: ({ userId, hideLink: _hideLink }: any) => (
     <span>{`User ${userId}`}</span>
   ),
 }));

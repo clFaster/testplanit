@@ -227,7 +227,7 @@ const SummarySunburstChart: React.FC<SummarySunburstChartProps> = ({
           isClickable = true;
           currentPath
             .style("cursor", "pointer")
-            .on("click.navigation", (event) => {
+            .on("click.navigation", (_event) => {
               onSessionClick(sessionId);
             });
         }
@@ -244,7 +244,7 @@ const SummarySunburstChart: React.FC<SummarySunburstChartProps> = ({
           isClickable = true;
           currentPath
             .style("cursor", "pointer")
-            .on("click.navigation", (event) => {
+            .on("click.navigation", (_event) => {
               onTestRunClick(testRunId);
             });
         }
@@ -325,7 +325,7 @@ const SummarySunburstChart: React.FC<SummarySunburstChartProps> = ({
     );
 
     const labelMinAngle = 0.05; // For text labels (depth 1)
-    const userLabelMinAngle = 0.08; // Fallback for user text if needed, or guide for avatar visibility
+    const _userLabelMinAngle = 0.08; // Fallback for user text if needed, or guide for avatar visibility
     const labelFontSize = Math.max(
       isZoomed ? 14 : 7,
       Math.min(isZoomed ? 14 : 9, chartRadius * (isZoomed ? 0.09 : 0.06))

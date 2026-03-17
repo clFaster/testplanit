@@ -19,7 +19,7 @@ export { SyncService, syncService } from "./services/SyncService";
 // Helper function to get an integration client
 export async function getIntegrationClient(
   integration: any,
-  userAuth: any
+  _userAuth: any
 ): Promise<any> {
   const { IntegrationManager } = await import("./IntegrationManager");
   const manager = IntegrationManager.getInstance();

@@ -9,10 +9,10 @@ import { RepositoryPage } from "../../../page-objects/repository/repository.page
  * to view historical versions with diffs.
  */
 test.describe("Version History", () => {
-  let repositoryPage: RepositoryPage;
+  let _repositoryPage: RepositoryPage;
 
   test.beforeEach(async ({ page }) => {
-    repositoryPage = new RepositoryPage(page);
+    _repositoryPage = new RepositoryPage(page);
   });
 
   async function getTestProjectId(

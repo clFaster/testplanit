@@ -4,7 +4,7 @@ import { type NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { redirect, useRouter } from "~/lib/navigation";
+import { redirect } from "~/lib/navigation";
 import {
   ProcessedProject, processProjectsWithEffectiveMembers
 } from "~/utils/projectUtils";
@@ -32,9 +32,9 @@ type AuthUser = {
   access?: string | null;
 };
 
-const Welcome = ({ user }: { user: AuthUser }) => {
+const Welcome = ({ user: _user }: { user: AuthUser }) => {
   const t = useTranslations();
-  const router = useRouter();
+
   const { data: session } = useSession();
   const { data: allUsers, isLoading: isUsersLoading } = useFindManyUser({
     where: { isActive: true, isDeleted: false },

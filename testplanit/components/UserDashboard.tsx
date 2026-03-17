@@ -577,13 +577,13 @@ export function UserDashboard() {
   }, [allOpenRuns, userTestCasesForRuns, untestedStatus]);
 
   // --- New: Derive untested assigned test run cases from the user object ---
-  const untestedAssignedTestRunCases = useMemo(() => {
+  const _untestedAssignedTestRunCases = useMemo(() => {
     if (!user?.testRunCasesAssigned || !untestedStatus?.id) {
       return [];
     }
 
     // Define a type for the elements in user.testRunCasesAssigned after the include
-    type PopulatedTestRunCase = TestRunCases & {
+    type _PopulatedTestRunCase = TestRunCases & {
       results: Array<{ statusId: number }>;
       repositoryCase: { id: number; name: string };
       testRun: {

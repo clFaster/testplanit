@@ -146,7 +146,7 @@ export default function SoftDeletedDataTable({
   const executeConfirmedAction = async () => {
     if (!alertActionType || alertItemId === null) return;
 
-    const currentItemTypeDisplay = tGlobal(translationKey as any);
+    const _currentItemTypeDisplay = tGlobal(translationKey as any);
 
     try {
       let response;

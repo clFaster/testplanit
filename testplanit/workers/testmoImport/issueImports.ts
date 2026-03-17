@@ -317,10 +317,10 @@ export const importIssues = async (
 export const importMilestoneIssues = async (
   tx: Prisma.TransactionClient,
   datasetRows: Map<string, any[]>,
-  milestoneIdMap: Map<number, number>,
-  issueIdMap: Map<number, number>,
-  context: ImportContext,
-  persistProgress: PersistProgressFn
+  _milestoneIdMap: Map<number, number>,
+  _issueIdMap: Map<number, number>,
+  _context: ImportContext,
+  _persistProgress: PersistProgressFn
 ): Promise<EntitySummaryResult> => {
   const summary: EntitySummaryResult = {
     entity: "milestoneIssues",

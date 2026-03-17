@@ -24,7 +24,7 @@ interface ReportSunburstChartProps {
 
 export const ReportSunburstChart: React.FC<ReportSunburstChartProps> = ({
   data,
-  isZoomed = false,
+  isZoomed: _isZoomed = false,
   isTimeBased = false,
   totalLabel,
   totalValue,

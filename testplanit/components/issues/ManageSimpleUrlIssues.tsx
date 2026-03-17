@@ -30,7 +30,7 @@ interface ManageSimpleUrlIssuesProps {
 
 export function ManageSimpleUrlIssues({
   projectId,
-  projectIntegrationId,
+  projectIntegrationId: _projectIntegrationId,
   integrationId,
   linkedIssueIds,
   setLinkedIssueIds,

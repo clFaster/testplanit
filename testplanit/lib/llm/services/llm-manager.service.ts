@@ -292,7 +292,7 @@ export class LlmManager {
   ): AsyncGenerator<LlmStreamResponse, void, unknown> {
     const adapter = await this.getAdapter(llmIntegrationId);
 
-    const totalTokens = 0;
+    const _totalTokens = 0;
     const chunks: string[] = [];
 
     try {

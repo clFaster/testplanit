@@ -5,7 +5,7 @@ import {
   GroupProjectPermission, ProjectAccessType,
   UserProjectPermission
 } from "@prisma/client";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import {
   useCreateManyProjectAssignment, useDeleteManyGroupProjectPermission, useDeleteManyProjectAssignment, useDeleteManyUserProjectPermission, useFindManyGroupProjectPermission, useFindManyGroups, useFindManyProjectAssignment, useFindManyRoles, useFindManyUser, useFindManyUserProjectPermission, useUpdateProjects, useUpsertGroupProjectPermission, useUpsertUserProjectPermission
@@ -70,8 +70,6 @@ interface EditProjectModalProps {
   onClose: () => void;
 }
 
-type SelectedIssueConfig = { id: number; name: string; isDefault?: boolean };
-
 const EditProjectFormSchema = z.object({
   iconUrl: optionalImageUrlSchema,
   name: z.string().min(1, {
@@ -131,7 +129,6 @@ export function EditProjectModal({
   isOpen,
   onClose,
 }: EditProjectModalProps) {
-  const locale = useLocale();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
 

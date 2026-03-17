@@ -38,9 +38,9 @@ interface AssignTestCaseModalProps {
 export function AssignTestCaseModal({
   isOpen,
   onClose,
-  testRunId,
+  testRunId: _testRunId,
   testRunCaseId,
-  caseId,
+  caseId: _caseId,
   caseName,
   currentAssigneeId,
   projectId,

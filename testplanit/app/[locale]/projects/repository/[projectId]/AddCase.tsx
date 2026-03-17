@@ -75,7 +75,7 @@ interface SharedStepGroupWithItems {
 const mapFieldToZodType = (field: any) => {
   const isRequired = field.caseField.isRequired;
 
-  const addMinMax = (schema: z.ZodNumber) => {
+  const _addMinMax = (schema: z.ZodNumber) => {
     if (field.caseField.minValue !== undefined) {
       schema = schema.min(field.caseField.minValue);
     }
@@ -281,7 +281,6 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
   );
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [linkedIssueIds, setLinkedIssueIds] = useState<number[]>([]);
-  const [tagNames, setTagNames] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const {
@@ -443,7 +442,6 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
     control,
     formState: { errors },
     setValue,
-    watch,
   } = form;
 
   const { data: tags } = useFindManyTags({
@@ -1128,7 +1126,7 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
                   <FormField
                     control={control}
                     name="templateId"
-                    render={({ field }) => (
+                    render={({ field: _field }) => (
                       <FormItem className="flex items-baseline space-x-2">
                         <FormLabel className="flex items-center">
                           {t("common.fields.template")}
@@ -1237,7 +1235,7 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
                     <FormField
                       control={control}
                       name="workflowId"
-                      render={({ field }) => (
+                      render={({ field: _field }) => (
                         <FormItem>
                           <FormLabel className="flex items-center">
                             {t("common.fields.state")}

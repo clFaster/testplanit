@@ -276,7 +276,7 @@ export function EditMilestoneTypeModal({
             <FormField
               control={form.control}
               name="projects"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex justify-between items-center">
                     <div className="flex items-center">

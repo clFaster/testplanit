@@ -150,7 +150,6 @@ export function BulkEditModal({
 }: BulkEditModalProps) {
   const t = useTranslations();
   const tCommon = useTranslations("common");
-  const tRepository = useTranslations("repository");
   const tBulkEdit = useTranslations("repository.bulkEdit");
   const { data: session } = useSession();
 
@@ -160,7 +159,7 @@ export function BulkEditModal({
   const [inlineErrors, setInlineErrors] = useState<Record<string, string[]>>(
     {}
   );
-  const [hasSteps, setHasSteps] = useState(false);
+  const [, setHasSteps] = useState(false);
   const [deletePopoverOpen, setDeletePopoverOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -344,7 +343,7 @@ export function BulkEditModal({
   }, [casesData]);
 
   // Determine if the common template includes a Steps field
-  const templateHasStepsField = useMemo(() => {
+  const _templateHasStepsField = useMemo(() => {
     return (
       !hasMultipleTemplates &&
       templateFields.some((field) => field.type.type === "Steps")
@@ -556,7 +555,7 @@ export function BulkEditModal({
   );
 
   // Apply search/replace to field value
-  const applySearchReplaceToFieldValue = useCallback(
+  const _applySearchReplaceToFieldValue = useCallback(
     (
       value: any,
       fieldKey: string,

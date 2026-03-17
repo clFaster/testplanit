@@ -446,7 +446,7 @@ export function SessionVersionRenderer({
     return field;
   };
 
-  const hasChanged =
+  const _hasChanged =
     JSON.stringify(currentValue) !== JSON.stringify(previousValue);
 
   return (

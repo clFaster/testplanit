@@ -58,9 +58,6 @@ function GroupList() {
     column: "name",
     direction: "asc",
   });
-  const [selectedPage, setSelectedPage] = useState<string | undefined>(
-    undefined
-  );
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
 

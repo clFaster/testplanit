@@ -285,9 +285,9 @@ const s3Client = new S3Client({
 
 const FINAL_STATUSES = new Set(["COMPLETED", "FAILED", "CANCELED"]);
 
-const VALID_APPLICATION_AREAS = new Set<string>(Object.values(ApplicationArea));
-const VALID_WORKFLOW_TYPES = new Set<string>(Object.values(WorkflowType));
-const VALID_WORKFLOW_SCOPES = new Set<string>(Object.values(WorkflowScope));
+const _VALID_APPLICATION_AREAS = new Set<string>(Object.values(ApplicationArea));
+const _VALID_WORKFLOW_TYPES = new Set<string>(Object.values(WorkflowType));
+const _VALID_WORKFLOW_SCOPES = new Set<string>(Object.values(WorkflowScope));
 const SYSTEM_NAME_REGEX = /^[A-Za-z][A-Za-z0-9_]*$/;
 const DEFAULT_STATUS_COLOR_HEX = "#B1B2B3";
 const MAX_INT_32 = 2_147_483_647;
@@ -3878,10 +3878,10 @@ const importRepositoryCases = async (
             }
           }
 
-          const projectName = await getProjectName(tx, projectId);
-          const templateName = await getTemplateName(tx, resolvedTemplateId);
+          const _projectName = await getProjectName(tx, projectId);
+          const _templateName = await getTemplateName(tx, resolvedTemplateId);
           const workflowName = await getWorkflowName(tx, resolvedWorkflowId);
-          const folderName = await getFolderName(tx, resolvedFolderId);
+          const _folderName = await getFolderName(tx, resolvedFolderId);
           const creatorName = await getUserName(tx, creatorId);
           const versionCaseName =
             toStringValue(record.name) ?? repositoryCase.name;
@@ -4377,7 +4377,7 @@ const importTestRunCases = async (
       const runTestSourceId = toNumberValue(record.id);
       const runSourceId = toNumberValue(record.run_id);
       const caseSourceId = toNumberValue(record.case_id);
-      const caseName =
+      const _caseName =
         toStringValue(record.name) ?? `Imported Case ${caseSourceId ?? 0}`;
 
       if (
@@ -5625,7 +5625,7 @@ async function processImportMode(importJob: TestmoImportJob, jobId: string, pris
     currentEntity = entity;
     try {
       const now = Date.now();
-      const timeSinceLastUpdate = now - context.lastProgressUpdate;
+      const _timeSinceLastUpdate = now - context.lastProgressUpdate;
 
       // Calculate progress metrics
       const metrics = calculateProgressMetrics(context, plannedTotalCount);

@@ -93,7 +93,7 @@ interface ViewSelectorProps {
   };
 }
 
-const ALL_VALUES_FILTER = "__ALL__";
+const _ALL_VALUES_FILTER = "__ALL__";
 
 export function ViewSelector({
   selectedItem,
@@ -101,7 +101,7 @@ export function ViewSelector({
   viewItems,
   selectedFilter,
   onFilterChange,
-  isRunMode,
+  isRunMode: _isRunMode,
   totalCount,
   viewOptions,
 }: ViewSelectorProps) {
@@ -647,7 +647,7 @@ export function ViewSelector({
               // Parse the dynamic field ID format: "dynamic_{fieldId}_{fieldType}"
               const parts = selectedItem.split("_");
               const fieldId = parts[1]; // Get the field ID part
-              const fieldType = parts.slice(2).join("_"); // Get the field type (handles types with underscores like "Text Long")
+              const _fieldType = parts.slice(2).join("_"); // Get the field type (handles types with underscores like "Text Long")
               const numericFieldId = parseInt(fieldId);
               const field = Object.values(
                 viewOptions?.dynamicFields || {}

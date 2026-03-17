@@ -58,7 +58,7 @@ try {
   // Also copy files directly for build compatibility
   const sourceZenstackDir = path.resolve(runtimePath, zenstackDir);
   const enhanceFile = path.join(symlinkPath, 'enhance.js');
-  const enhanceEdgeFile = path.join(symlinkPath, 'enhance-edge.js');
+  const _enhanceEdgeFile = path.join(symlinkPath, 'enhance-edge.js');
 
   // Copy all zenstack files directly to runtime directory for build compatibility
   const filesToCopy = ['enhance.js', 'enhance-edge.js', 'policy.js', 'model-meta.js', 'models.js'];

@@ -160,7 +160,7 @@ export async function POST(
       return NextResponse.json({ error: "Queue not found" }, { status: 404 });
     }
 
-    const { action, grace, limit, jobTypes } = await request.json();
+    const { action, grace, limit, jobTypes: _jobTypes } = await request.json();
 
     switch (action) {
       case 'pause':

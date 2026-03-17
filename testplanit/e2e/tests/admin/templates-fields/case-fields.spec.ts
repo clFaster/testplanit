@@ -25,7 +25,7 @@ test.describe("Case Fields - Table Display", () => {
     await templatesPage.goto();
   });
 
-  test("Case fields table displays correctly", async ({ page }) => {
+  test("Case fields table displays correctly", async ({ page: _page }) => {
     // Verify the case fields table is visible
     await expect(templatesPage.caseFieldsTable).toBeVisible();
 
@@ -560,7 +560,7 @@ test.describe("Case Fields - Validation", () => {
     await templatesPage.goto();
   });
 
-  test("System name auto-generated", async ({ page }) => {
+  test("System name auto-generated", async ({ page: _page }) => {
     const fieldName = `E2E Auto Name ${Date.now()}`;
 
     await templatesPage.clickAddCaseField();

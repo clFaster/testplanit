@@ -141,7 +141,7 @@ export function createTestExecutionDimensionRegistry(
       ? {
           id: "project",
           label: "Project",
-          getValues: async (prisma: any, projectId?: number) => {
+          getValues: async (prisma: any, _projectId?: number) => {
             const projects = await prisma.projects.findMany({
               where: {
                 isDeleted: false,
@@ -458,7 +458,7 @@ export function createTestExecutionMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         // Type guard to ensure groupBy is defined
         if (!groupBy || !Array.isArray(groupBy)) {
@@ -673,7 +673,7 @@ export function createTestExecutionMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         if (groupBy.includes("executedAt")) {
           const results = await prisma.testRunResults.findMany({
@@ -924,7 +924,7 @@ export function createTestExecutionMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         // Type guard to ensure groupBy is defined
         if (!groupBy || !Array.isArray(groupBy)) {
@@ -1179,7 +1179,7 @@ export function createTestExecutionMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         if (groupBy.includes("executedAt")) {
           const results = await prisma.testRunResults.findMany({
@@ -1423,8 +1423,8 @@ export function createTestExecutionMetricRegistry(
         prisma: any,
         projectId: number | undefined,
         groupBy: string[],
-        filters?: any,
-        dims?: string[]
+        _filters?: any,
+        _dims?: string[]
       ) => {
         if (
           groupBy.includes("executedAt") ||
@@ -1606,7 +1606,7 @@ export function createTestExecutionMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         // Type guard to ensure groupBy is defined
         if (!groupBy || !Array.isArray(groupBy)) {
@@ -1861,7 +1861,7 @@ export function createRepositoryStatsDimensionRegistry(
       ? {
           id: "project",
           label: "Project",
-          getValues: async (prisma: any, projectId?: number) => {
+          getValues: async (prisma: any, _projectId?: number) => {
             const projects = await prisma.projects.findMany({
               where: {
                 isDeleted: false,
@@ -2106,7 +2106,7 @@ export function createRepositoryStatsMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         if (groupBy.includes("createdAt")) {
           const results = await prisma.repositoryCases.findMany({
@@ -2201,7 +2201,7 @@ export function createRepositoryStatsMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         // Type guard to ensure groupBy is defined
         if (!groupBy || !Array.isArray(groupBy)) {
@@ -2360,7 +2360,7 @@ export function createRepositoryStatsMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         if (groupBy.includes("createdAt")) {
           const results = await prisma.repositoryCases.findMany({
@@ -2457,7 +2457,7 @@ export function createRepositoryStatsMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         if (groupBy.includes("createdAt")) {
           const results = await prisma.repositoryCases.findMany({
@@ -2554,7 +2554,7 @@ export function createRepositoryStatsMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         if (groupBy.length === 0) {
           const repositoryCases = await prisma.repositoryCases.findMany({
@@ -2672,7 +2672,7 @@ export function createRepositoryStatsMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         if (groupBy.includes("createdAt")) {
           const results = await prisma.repositoryCases.findMany({
@@ -2845,7 +2845,7 @@ export function createUserEngagementDimensionRegistry(
       ? {
           id: "project",
           label: "Project",
-          getValues: async (prisma: any, projectId?: number) => {
+          getValues: async (prisma: any, _projectId?: number) => {
             const projects = await prisma.projects.findMany({
               where: {
                 isDeleted: false,
@@ -3189,7 +3189,7 @@ export function createUserEngagementMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         if (groupBy.includes("executedAt")) {
           const results = await prisma.testRunResults.findMany({
@@ -3387,12 +3387,12 @@ export function createUserEngagementMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         // Check for both createdAt (Repository Stats) and executedAt (User Engagement)
         const hasDateDimension =
           groupBy.includes("createdAt") || groupBy.includes("executedAt");
-        const dateField = groupBy.includes("createdAt")
+        const _dateField = groupBy.includes("createdAt")
           ? "createdAt"
           : "executedAt";
 
@@ -3574,7 +3574,7 @@ export function createUserEngagementMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         // Check for both createdAt and executedAt (User Engagement uses executedAt)
         const hasDateDimension =
@@ -3776,7 +3776,7 @@ export function createUserEngagementMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         if (groupBy.includes("executedAt")) {
           const results = await prisma.testRunResults.findMany({
@@ -3968,7 +3968,7 @@ export function createUserEngagementMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         if (groupBy.length === 0) {
           const result = await prisma.testRunResults.aggregate({
@@ -4119,7 +4119,7 @@ export function createIssueTrackingDimensionRegistry(
       ? {
           id: "project",
           label: "Project",
-          getValues: async (prisma: any, projectId?: number) => {
+          getValues: async (prisma: any, _projectId?: number) => {
             const projects = await prisma.projects.findMany({
               where: {
                 isDeleted: false,
@@ -4615,7 +4615,7 @@ export function createIssueTrackingMetricRegistry(
         projectId: number | undefined,
         groupBy: string[],
         filters?: any,
-        dims?: string[]
+        _dims?: string[]
       ) => {
         if (isProjectSpecific && projectId) {
           // Project-specific implementation
@@ -4943,7 +4943,7 @@ function getWeekEndDate(date: Date): Date {
 }
 
 // Helper function to get week start date (Monday)
-function getWeekStartDate(weekEndDate: Date): Date {
+function _getWeekStartDate(weekEndDate: Date): Date {
   const weekStart = new Date(weekEndDate);
   weekStart.setUTCDate(weekStart.getUTCDate() - 6); // Go back 6 days (Sunday to Monday)
   weekStart.setUTCHours(0, 0, 0, 0);
@@ -5551,11 +5551,11 @@ export function createAutomationTrendsMetricRegistry(
       id: "automationRate",
       label: "Automation Rate %",
       aggregate: async (
-        prisma: any,
-        projectId: number | undefined,
-        groupBy: string[],
-        filters?: any,
-        dims?: string[]
+        _prisma: any,
+        _projectId: number | undefined,
+        _groupBy: string[],
+        _filters?: any,
+        _dims?: string[]
       ) => {
         // This metric requires calculating from automatedCount and totalCount
         // It will be calculated on the frontend by combining those two metrics

@@ -159,7 +159,6 @@ export function AddStatusModal() {
   });
 
   const {
-    handleSubmit,
     control,
     setValue,
     watch,
@@ -307,7 +306,7 @@ export function AddStatusModal() {
                 <FormField
                   control={form.control}
                   name="colorId"
-                  render={({ field }) => <FormMessage className="mt-1" />}
+                  render={({ field: _field }) => <FormMessage className="mt-1" />}
                 />
               </div>
               <div className="w-full">
@@ -468,7 +467,7 @@ export function AddStatusModal() {
             <FormField
               control={form.control}
               name="scope"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex justify-between items-center">
                     <span className="flex items-center">
@@ -515,7 +514,7 @@ export function AddStatusModal() {
             <FormField
               control={form.control}
               name="projects"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex justify-between items-center">
                     <span className="flex items-center">

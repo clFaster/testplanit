@@ -183,7 +183,7 @@ export function SessionResultsSummary({
       {/* Color bar for results at the top */}
       <TooltipProvider>
         <div className="flex h-2.5 w-full rounded-full overflow-hidden">
-          {summaryData.results.map((result, index) => {
+          {summaryData.results.map((result, _index) => {
             const color = result.statusColorValue || "#B1B2B3";
             // Calculate width: equal distribution if no duration, or proportional if durations exist
 

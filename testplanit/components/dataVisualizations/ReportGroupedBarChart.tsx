@@ -1,6 +1,5 @@
 "use client";
 import * as d3 from "d3";
-import { useTranslations } from "next-intl";
 import React, { useEffect, useRef } from "react";
 import useResponsiveSVG from "~/hooks/useResponsiveSVG";
 import { GroupedChartDataPoint } from "./ReportChart";
@@ -20,7 +19,7 @@ export const ReportGroupedBarChart: React.FC<ReportGroupedBarChartProps> = ({
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { width, height } = useResponsiveSVG(containerRef);
-  const t = useTranslations("charts");
+
 
   useEffect(() => {
     const tooltipElement = document.createElement("div");

@@ -44,7 +44,7 @@ const operatorSymbols: Record<NumericOperator, string> = {
 };
 
 export function NumericFilterInput({
-  fieldId,
+  fieldId: _fieldId,
   fieldType,
   onFilterApply,
   onClearFilter,

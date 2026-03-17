@@ -39,7 +39,7 @@ const operatorSymbols: Record<LinkOperator, string> = {
 };
 
 export function LinkFilterInput({
-  fieldId,
+  fieldId: _fieldId,
   onFilterApply,
   onClearFilter,
   currentFilter,

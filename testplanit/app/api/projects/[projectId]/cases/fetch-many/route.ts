@@ -102,7 +102,7 @@ export async function POST(
     const body = await request.json();
     const validatedData = fetchManyCasesSchema.parse(body);
 
-    const whereClause = {
+    const _whereClause = {
       id: { in: validatedData.caseIds },
       projectId,
       isDeleted: false,

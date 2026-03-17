@@ -56,7 +56,7 @@ vi.mock("next/navigation", async (importOriginal) => {
     ...actual, // Keep original exports like redirect, permanentRedirect
     useSearchParams: () => ({
       // Override specific hooks
-      get: (key: string) => null,
+      get: (_key: string) => null,
     }),
     useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
     usePathname: () => "/mock/path",
@@ -80,7 +80,7 @@ vi.mock("@/components/Debounce", () => ({
 
 // Mock the DataTable component
 vi.mock("@/components/tables/DataTable", () => ({
-  DataTable: vi.fn(({ data, isLoading, columns }) => {
+  DataTable: vi.fn(({ data, isLoading, columns: _columns }) => {
     if (isLoading) {
       return <div>{"DataTable Loading..."}</div>;
     }

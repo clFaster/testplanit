@@ -81,7 +81,7 @@ const DuplicateTestRunDialog: React.FC<DuplicateTestRunDialogProps> = ({
     },
   });
 
-  const { setValue, getValues, handleSubmit, watch } = form;
+  const { setValue, getValues, handleSubmit } = form;
 
   const { data: originalRunData, isLoading: isLoadingOriginalRun } =
     useFindUniqueTestRuns(

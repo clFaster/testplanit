@@ -124,8 +124,6 @@ function ConfigCategoriesList() {
     }
   );
 
-  const debouncedNewRecordName = useDebounce(newRecordName, 2000);
-  const debouncedNewVariantName = useDebounce(newVariantName, 2000);
 
   useEffect(() => {
     if (data) {
@@ -315,12 +313,12 @@ function ConfigCategoriesList() {
     }
   };
 
-  const handleVariantUpdate = (updatedVariant: Variant) => {
+  const handleVariantUpdate = (_updatedVariant: Variant) => {
     setVariantToEdit(null);
     refetch();
   };
 
-  const handleVariantDelete = (variantId: number) => {
+  const handleVariantDelete = (_variantId: number) => {
     refetch();
   };
 

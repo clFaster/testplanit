@@ -196,7 +196,7 @@ export const getColumns = (
     enableHiding: true,
     meta: { isVisible: false },
     size: 150,
-    cell: ({ getValue, row }) => (
+    cell: ({ getValue, row: _row }) => (
       <div className="whitespace-nowrap">
         <DateFormatter
           date={getValue() as Date | string}
@@ -217,7 +217,7 @@ export const getColumns = (
     enableHiding: true,
     meta: { isVisible: false },
     size: 150,
-    cell: ({ getValue, row }) => (
+    cell: ({ getValue, row: _row }) => (
       <div className="whitespace-nowrap">
         <DateFormatter
           date={getValue() as Date | string}

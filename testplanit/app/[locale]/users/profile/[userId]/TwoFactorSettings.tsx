@@ -48,7 +48,7 @@ interface TwoFactorSettingsProps {
 }
 
 export function TwoFactorSettings({
-  userId,
+  userId: _userId,
   twoFactorEnabled,
   isOwnProfile,
   onUpdate,

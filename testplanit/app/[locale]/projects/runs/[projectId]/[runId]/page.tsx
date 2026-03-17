@@ -222,7 +222,7 @@ type TestRunWithRelations = {
   issues: IssueType[];
 };
 
-type MilestoneOption = {
+type _MilestoneOption = {
   value: string;
   label: string;
   milestoneType?: {
@@ -262,8 +262,8 @@ export default function TestRunPage() {
   const panelRightRef = useRef<ImperativePanelHandle>(null);
   const [contentLoaded, setContentLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFormLoading, setIsFormLoading] = useState(false);
-  const [initialValues, setInitialValues] = useState<FormValues | null>(null);
+  const [isFormLoading] = useState(false);
+  const [, setInitialValues] = useState<FormValues | null>(null);
   const [isFormInitialized, setIsFormInitialized] = useState(false);
   const panelLeftRef = useRef<ImperativePanelHandle>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -365,7 +365,7 @@ export default function TestRunPage() {
   });
 
   // Define the form schema with translations inside the component
-  const FormSchema = BaseFormSchema.superRefine((data, ctx) => {
+  const FormSchema = BaseFormSchema.superRefine((_data, _ctx) => {
     // Add any additional validation if needed
   });
 
@@ -504,7 +504,7 @@ export default function TestRunPage() {
       { enabled: isJUnitRun }
     );
 
-  const canEdit =
+  const _canEdit =
     (session?.user.access === "ADMIN" ||
       session?.user.access === "PROJECTADMIN") &&
     !testRunData?.isCompleted;
@@ -653,11 +653,10 @@ export default function TestRunPage() {
     control,
     setValue,
     formState: { errors },
-    reset,
   } = form;
 
   // Panel controls
-  const toggleCollapseLeft = () => {
+  const _toggleCollapseLeft = () => {
     setIsTransitioningLeft(true);
     if (panelLeftRef.current) {
       if (isCollapsedLeft) {
@@ -921,7 +920,7 @@ export default function TestRunPage() {
 
       // Handle new attachments
       if (selectedFiles.length > 0) {
-        const attachmentUrls = await uploadFiles(Number(runId));
+        const _attachmentUrls = await uploadFiles(Number(runId));
       }
 
       // Reset pending changes
@@ -1654,7 +1653,7 @@ export default function TestRunPage() {
                           <FormField
                             control={form.control}
                             name="note"
-                            render={({ field }) => (
+                            render={({ field: _field }) => (
                               <FormItem>
                                 <FormLabel>
                                   {t("common.fields.description")}
@@ -1700,7 +1699,7 @@ export default function TestRunPage() {
                           <FormField
                             control={form.control}
                             name="docs"
-                            render={({ field }) => (
+                            render={({ field: _field }) => (
                               <FormItem>
                                 <FormLabel>
                                   {t("common.fields.documentation")}

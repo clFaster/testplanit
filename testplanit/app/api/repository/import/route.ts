@@ -493,7 +493,7 @@ export async function POST(request: NextRequest) {
               where: { id: caseData.folderId },
               select: { name: true },
             });
-            const folderName = folder?.name || "Unknown";
+            const _folderName = folder?.name || "Unknown";
 
             // Look up workflow state if specified
             let stateId = caseData.stateId;
@@ -894,7 +894,7 @@ export async function POST(request: NextRequest) {
 function validateFieldValue(
   value: any,
   field: CaseFields & { type: CaseFieldTypes; fieldOptions?: any[] },
-  rowNumber: number
+  _rowNumber: number
 ): any {
   if (!value && field.isRequired) {
     throw new Error(`Required field cannot be empty`);

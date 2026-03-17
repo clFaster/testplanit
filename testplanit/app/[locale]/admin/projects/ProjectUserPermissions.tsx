@@ -51,9 +51,9 @@ export type UserPermissionFormState = {
 export function ProjectUserPermissions({
   projectId,
   allUsers,
-  assignedUsersList,
+  assignedUsersList: _assignedUsersList,
   roles,
-  control,
+  control: _control,
   setValue,
   watch,
   getValues,
@@ -264,7 +264,7 @@ export function ProjectUserPermissions({
 
               if (!user || !permission) return null;
 
-              const effectiveRoleDisplay = "";
+              const _effectiveRoleDisplay = "";
               let effectiveAccessDisplay = "";
 
               const currentAccessType = permission.accessType;

@@ -308,7 +308,7 @@ function LlmIntegrationList() {
       const results = await Promise.all(promises);
 
       // Update connection status in memory (would need to be persisted in real app)
-      const updatedIntegrations = (integrations || []).map((integration) => {
+      const _updatedIntegrations = (integrations || []).map((integration) => {
         const result = results.find((r) => r.id === integration.id);
         return result
           ? { ...integration, isConnected: result.isConnected }

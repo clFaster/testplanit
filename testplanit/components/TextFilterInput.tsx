@@ -39,7 +39,7 @@ const operatorSymbols: Record<TextOperator, string> = {
 };
 
 export function TextFilterInput({
-  fieldId,
+  fieldId: _fieldId,
   onFilterApply,
   onClearFilter,
   currentFilter,

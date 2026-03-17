@@ -9,7 +9,7 @@ import { NotificationPreferences } from "./NotificationPreferences";
 vi.mock("next-auth/react");
 vi.mock("~/lib/hooks");
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string, values?: any) => {
+  useTranslations: () => (key: string, _values?: any) => {
     const translations: Record<string, string> = {
       "title": "Notification Preferences",
       "description": "Choose how you want to receive notifications",

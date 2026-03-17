@@ -13,7 +13,6 @@ import {
   useFindManyConfigurations,
   useUpdateConfigurations
 } from "~/lib/hooks";
-import { useRouter } from "~/lib/navigation";
 import AddConfigurationWizard from "./AddConfigurationWizard";
 import { ConfigWithVariants, getColumns } from "./configColumns";
 
@@ -29,7 +28,6 @@ function Configurations(): React.ReactElement | null {
     isLoading: isAuthLoading,
     isAuthenticated,
   } = useRequireAuth();
-  const router = useRouter();
   const t = useTranslations("admin.configurations");
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
@@ -54,9 +52,6 @@ function Configurations(): React.ReactElement | null {
     column: "name",
     direction: "asc",
   });
-  const [selectedPage, setSelectedPage] = useState<string | undefined>(
-    undefined
-  );
   const [searchString, setSearchString] = useState("");
   const debouncedSearchString = useDebounce(searchString, 500);
 

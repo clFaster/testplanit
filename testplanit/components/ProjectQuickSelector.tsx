@@ -25,7 +25,7 @@ export const ProjectQuickSelector = () => {
   const router = useRouter();
   const t = useTranslations("common.ui.search");
   const tGlobal = useTranslations();
-  const tNav = useTranslations("navigation");
+
   const [open, setOpen] = useState(false);
 
   // Use ZenStack hook to fetch projects

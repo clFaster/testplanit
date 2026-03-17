@@ -1369,7 +1369,7 @@ function WorkflowMappingSection({
   t,
   tWorkflowCreate,
   suggestions,
-  existingWorkflows,
+  existingWorkflows: _existingWorkflows,
   workflowOptions,
   configuration,
   onChange,
@@ -3566,7 +3566,7 @@ function StatusMappingSection({
         <TableBody>
           {suggestions.map((status) => {
             const current = ensureStatusConfig(configuration, status.id);
-            const mappedOption =
+            const _mappedOption =
               statusOptions.find(
                 (option) => option.value === current.mappedTo?.toString()
               ) ?? null;
@@ -4131,7 +4131,7 @@ function GroupMappingSection({
         <TableBody>
           {suggestions.map((group) => {
             const current = ensureGroupConfig(configuration, group.id);
-            const mappedGroup = groupOptions.find(
+            const _mappedGroup = groupOptions.find(
               (option) => option.value === current.mappedTo?.toString()
             );
 
@@ -5607,7 +5607,7 @@ function RoleMappingSection({
   description?: string;
   totalCount?: number;
 }) {
-  const tCommon = useTranslations("common");
+  const _tCommon = useTranslations("common");
   const applicationAreas = useMemo(
     () => Object.values(ApplicationArea) as string[],
     []
@@ -5700,7 +5700,7 @@ function RoleMappingSection({
         <TableBody>
           {suggestions.map((role) => {
             const current = ensureRoleConfig(configuration, role.id);
-            const mappedRole = roleOptions.find(
+            const _mappedRole = roleOptions.find(
               (option) => option.value === current.mappedTo?.toString()
             );
             const effectivePermissions =
@@ -6025,7 +6025,7 @@ function MilestoneTypeMappingSection({
               configuration,
               milestoneType.id
             );
-            const matchedOption = milestoneOptions.find(
+            const _matchedOption = milestoneOptions.find(
               (option) => option.value === current.mappedTo?.toString()
             );
             const iconMissing =

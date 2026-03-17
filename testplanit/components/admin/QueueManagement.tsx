@@ -170,7 +170,7 @@ export function QueueManagement() {
     return queueNames[name] || name;
   };
 
-  const getTotalJobs = (counts: QueueCounts | null) => {
+  const _getTotalJobs = (counts: QueueCounts | null) => {
     if (!counts) return 0;
     return counts.waiting + counts.active + counts.delayed;
   };

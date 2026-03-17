@@ -78,10 +78,6 @@ export function EditTagModal({ tag }: EditTagModalProps) {
   }, [open, defaultFormValues, form, form.reset]);
 
   const {
-    watch,
-    setValue,
-    handleSubmit,
-    control,
     formState: { errors },
   } = form;
 

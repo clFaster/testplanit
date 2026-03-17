@@ -1,5 +1,5 @@
 // Extensions that are safe for email rendering - defined as a plain object to avoid importing extensions on client
-const extensionConfig = {
+const _extensionConfig = {
   starterKit: {
     link: false, // We'll configure this separately
   },

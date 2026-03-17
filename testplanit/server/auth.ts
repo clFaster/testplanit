@@ -211,7 +211,7 @@ async function getDynamicProviders() {
               sendVerificationRequest: async ({
                 identifier: email,
                 url,
-                provider,
+                provider: _provider,
               }) => {
                 // Wrap everything in try-catch to ensure we NEVER throw errors
                 try {

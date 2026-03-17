@@ -33,9 +33,9 @@ vi.mock("next-intl", () => ({
 }));
 
 // Mock Browser APIs for download simulation
-const mockLinkClick = vi.fn();
-const mockAppendChild = vi.fn();
-const mockRemoveChild = vi.fn();
+const _mockLinkClick = vi.fn();
+const _mockAppendChild = vi.fn();
+const _mockRemoveChild = vi.fn();
 const mockCreateObjectURL = vi.fn();
 const mockRevokeObjectURL = vi.fn();
 

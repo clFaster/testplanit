@@ -14,7 +14,7 @@ test.describe.configure({ mode: "serial" });
 /**
  * Discover a valid typeId at runtime to avoid hardcoding.
  */
-async function getFirstCaseFieldTypeId(
+async function _getFirstCaseFieldTypeId(
   request: import("@playwright/test").APIRequestContext,
   baseURL: string
 ): Promise<number> {
@@ -166,7 +166,7 @@ test.describe("CaseFieldValues CRUD", () => {
   let projectId: number;
   let folderId: number;
 
-  test.beforeAll(async ({ request, baseURL, api }) => {
+  test.beforeAll(async ({ request: _request, baseURL: _baseURL, api }) => {
     // Create a fresh project so we get a root folder with parentId === null
     projectId = await api.createProject(`API FieldValues Project ${Date.now()}`);
     folderId = await api.getRootFolderId(projectId);

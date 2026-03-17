@@ -44,8 +44,6 @@ import {
   ProcessedProject, processProjectsWithEffectiveMembers
 } from "~/utils/projectUtils";
 
-type PageSizeOption = number | "All";
-
 const validationSchema = z.object({
   completedAt: z
     .date({
@@ -117,7 +115,6 @@ function ProjectAdmin() {
   updateProjectsRef.current = updateProjects;
 
   const {
-    register,
     handleSubmit,
     setValue,
     formState: { errors, isValid },

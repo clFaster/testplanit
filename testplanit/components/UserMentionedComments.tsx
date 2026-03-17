@@ -67,7 +67,6 @@ interface CommentDisplayProps {
 }
 
 function CommentDisplay({ comment }: CommentDisplayProps) {
-  const t = useTranslations("users.profile.mentionedComments");
   const tGlobal = useTranslations();
 
   const displayEditor = useEditor({

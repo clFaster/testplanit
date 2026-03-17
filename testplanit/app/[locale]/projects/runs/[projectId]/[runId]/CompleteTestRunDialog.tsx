@@ -46,7 +46,7 @@ const CompleteTestRunDialog: React.FC<CompleteTestRunDialogProps> = ({
   testRunId,
   projectId,
   stateId,
-  stateName,
+  stateName: _stateName,
 }) => {
   const t = useTranslations();
   const { data: session } = useSession();

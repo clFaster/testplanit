@@ -40,7 +40,7 @@ import { PromptFeatureSection } from "./PromptFeatureSection";
 
 const featureKeys = Object.values(LLM_FEATURES);
 
-const createFormSchema = (t: any) => {
+const createFormSchema = (_t: any) => {
   const promptFields: Record<string, z.ZodObject<any>> = {};
   for (const feature of featureKeys) {
     promptFields[feature] = z.object({

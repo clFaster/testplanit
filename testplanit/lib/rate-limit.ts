@@ -37,7 +37,7 @@ export interface RateLimitResult {
 export function checkPasswordAttemptLimit(
   identifier: string,
   maxAttempts: number = 5,
-  windowMs: number = 15 * 60 * 1000 // 15 minutes
+  _windowMs: number = 15 * 60 * 1000 // 15 minutes
 ): RateLimitResult {
   const now = Date.now();
   const entry = attemptStore.get(identifier);

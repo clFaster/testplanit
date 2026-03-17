@@ -164,7 +164,6 @@ export function AddLlmIntegration({
   onSuccess,
 }: AddLlmIntegrationProps) {
   const t = useTranslations("admin.llm.add");
-  const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
   const tIntegrations = useTranslations("admin.integrations");
   const tLlm = useTranslations("admin.llm");

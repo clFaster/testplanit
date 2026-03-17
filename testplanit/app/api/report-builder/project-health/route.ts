@@ -207,7 +207,7 @@ const METRIC_REGISTRY: Record<
   milestoneCompletion: {
     id: "milestoneCompletion",
     label: "Milestone Completion (%)",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, _filters, _dims) => {
       // Handle case where groupBy contains fields not available for direct grouping
       const filteredGroupBy = groupBy.filter(
         (field) => field !== "projectId" && field !== "createdBy"
@@ -450,7 +450,7 @@ const METRIC_REGISTRY: Record<
   totalMilestones: {
     id: "totalMilestones",
     label: "Total Milestones",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, _filters, _dims) => {
       const filteredGroupBy = groupBy.filter(
         (field) => field !== "projectId" && field !== "createdBy"
       );
@@ -552,7 +552,7 @@ const METRIC_REGISTRY: Record<
   activeMilestones: {
     id: "activeMilestones",
     label: "Active Milestones",
-    aggregate: async (prisma, projectId, groupBy, filters, dims) => {
+    aggregate: async (prisma, projectId, groupBy, _filters, _dims) => {
       const filteredGroupBy = groupBy.filter(
         (field) => field !== "projectId" && field !== "createdBy"
       );

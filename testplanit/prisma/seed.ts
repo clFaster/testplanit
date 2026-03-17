@@ -458,7 +458,7 @@ async function seedCoreData() {
   const adminPassword = process.env.ADMIN_PASSWORD || "admin";
   const hashedPassword = bcrypt.hashSync(adminPassword, 10);
 
-  const admin = await prisma.user.upsert({
+  const _admin = await prisma.user.upsert({
     where: { email: adminEmail }, // Use configured email
     update: {
       roleId: adminRole.id,
@@ -507,7 +507,7 @@ async function seedCoreData() {
   console.log("Core data seeding complete.");
 }
 // --- Helper Functions (Keep existing ones like getFieldTypeIds, seedCaseFieldTypes etc.) ---
-async function seedProjectDocsDefault() {
+async function _seedProjectDocsDefault() {
   const initialContent = {
     type: "doc",
     content: [
@@ -542,7 +542,7 @@ async function seedProjectDocsDefault() {
   console.log("Seeded default project documentation.");
 }
 
-async function seedEditResultsDuration() {
+async function _seedEditResultsDuration() {
   await prisma.appConfig.upsert({
     where: { key: "edit_results_duration" },
     update: {},
@@ -554,7 +554,7 @@ async function seedEditResultsDuration() {
   console.log("Seeded edit results duration config.");
 }
 
-async function seedColors() {
+async function _seedColors() {
   const colorFamilies = [
     {
       name: "Black",
@@ -705,7 +705,7 @@ async function seedColors() {
   return colorMap;
 }
 
-async function seedStatusScopes() {
+async function _seedStatusScopes() {
   const scopes = [
     { name: "Test Run", icon: "play-circle" },
     { name: "Session", icon: "compass" },
@@ -723,7 +723,7 @@ async function seedStatusScopes() {
   await Promise.all(scopePromises);
 }
 
-async function seedStatusesAndAssignments(colorMap: {
+async function _seedStatusesAndAssignments(colorMap: {
   [key: string]: { id: number }[];
 }) {
   const statuses = [

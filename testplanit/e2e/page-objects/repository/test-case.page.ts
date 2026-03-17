@@ -239,7 +239,7 @@ export class TestCasePage extends BasePage {
   /**
    * Add a step to a Steps field
    */
-  async addStep(systemName: string, step: string, expectedResult: string): Promise<void> {
+  async addStep(systemName: string, _step: string, _expectedResult: string): Promise<void> {
     // Click "Add Step" button
     const addStepButton = this.page.getByTestId(`field-${systemName}-input`).locator('button:has-text("Add Step")');
     await addStepButton.click();

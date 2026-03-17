@@ -32,7 +32,7 @@ export function VersionSelect({
   userDateFormat,
   userTimeFormat,
 }: VersionSelectProps) {
-  const t = useTranslations("repository.version");
+
   const tGlobal = useTranslations();
 
   if (!versions || versions.length <= 1) return null;

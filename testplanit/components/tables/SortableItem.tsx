@@ -25,7 +25,7 @@ interface TestCaseDragOperationItem {
 function SortableItem<
   TData extends { id: number | string; folderId: number | null; name: string },
 >({
-  id,
+  id: _id,
   row,
   index,
   visibleColumns,
@@ -181,7 +181,7 @@ function SortableItem<
           setHoverPosition("bottom");
         }
       },
-      drop: (item: TestCaseDragOperationItem, monitor) => {
+      drop: (item: TestCaseDragOperationItem, _monitor) => {
         const dragIndex = item.index;
         const hoverIndex = index;
 
@@ -237,7 +237,7 @@ function SortableItem<
   const getCellClassName = (
     cell: any,
     isSelected: boolean,
-    cellPinningStyleFn: (column: Column<any>) => CSSProperties
+    _cellPinningStyleFn: (column: Column<any>) => CSSProperties
   ) => {
     const isPinned = cell.column.getIsPinned();
     const classes = [
@@ -277,7 +277,7 @@ function SortableItem<
         data-row-id={row.original.id}
         data-testid={`case-row-${row.original.id}`}
         data-handler-id={handlerId}
-        onClick={(e) => {
+        onClick={(_e) => {
           if (!isDragging) {
             handleExpandClick?.(row.original.id);
           }
@@ -296,7 +296,7 @@ function SortableItem<
             return null;
           }
 
-          const isActionCell = cell.column.id === "actions";
+          const _isActionCell = cell.column.id === "actions";
 
           // Get base pinning styles
           let cellStyle = cellPinningStyleFn(cell.column);

@@ -28,7 +28,7 @@ test.describe("Templates - Navigation and Display", () => {
     await expect(templatesPage.addTemplateButton).toBeVisible();
   });
 
-  test("Templates table displays correctly", async ({ page }) => {
+  test("Templates table displays correctly", async ({ page: _page }) => {
     await templatesPage.goto();
 
     // Verify the templates table is visible
@@ -53,7 +53,7 @@ test.describe("Templates - Create Operations", () => {
     await templatesPage.goto();
   });
 
-  test("Add template with name only", async ({ api }) => {
+  test("Add template with name only", async ({ api: _api }) => {
     const templateName = `E2E Template ${Date.now()}`;
 
     await templatesPage.clickAddTemplate();
@@ -120,7 +120,7 @@ test.describe("Templates - Create Operations", () => {
 
   test("Add template with project assignments", async ({ api }) => {
     // Create a project to assign
-    const projectId = await api.createProject(`E2E Project ${Date.now()}`);
+    const _projectId = await api.createProject(`E2E Project ${Date.now()}`);
 
     // Reload to see the new project
     await templatesPage.goto();
@@ -189,7 +189,7 @@ test.describe("Templates - Create Operations", () => {
     await templatesPage.expectFormError("exists");
   });
 
-  test("Cancel add template", async ({ page }) => {
+  test("Cancel add template", async ({ page: _page }) => {
     const templateName = `E2E Cancel ${Date.now()}`;
 
     await templatesPage.clickAddTemplate();
@@ -209,7 +209,7 @@ test.describe("Templates - Edit Operations", () => {
     await templatesPage.goto();
   });
 
-  test("Edit template name", async ({ api, page }) => {
+  test("Edit template name", async ({ api, page: _page }) => {
     // Create a template to edit
     const originalName = `E2E Edit Original ${Date.now()}`;
     await api.createTemplate({ name: originalName });
@@ -362,7 +362,7 @@ test.describe("Templates - Edit Operations", () => {
     expect(fieldCount).toBeGreaterThanOrEqual(1);
   });
 
-  test("Cancel edit template", async ({ api, page }) => {
+  test("Cancel edit template", async ({ api, page: _page }) => {
     // Create a template
     const originalName = `E2E Cancel Edit ${Date.now()}`;
     await api.createTemplate({ name: originalName });

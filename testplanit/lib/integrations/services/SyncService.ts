@@ -10,7 +10,7 @@ import { integrationManager } from "../IntegrationManager";
 
 // Lazy-load zenstack enhance to reduce worker memory at startup
 let _enhance: typeof import("@zenstackhq/runtime").enhance | null = null;
-async function getEnhance() {
+async function _getEnhance() {
   if (!_enhance) {
     const { enhance } = await import("@zenstackhq/runtime");
     _enhance = enhance;
@@ -579,7 +579,7 @@ export class SyncService {
 
     if (!existingIssue) {
       // Debug: Let's see if there are any issues with this key at all
-      const anyIssueWithKey = await db.issue.findFirst({
+      const _anyIssueWithKey = await db.issue.findFirst({
         where: {
           OR: [
             { externalId: issueData.id },

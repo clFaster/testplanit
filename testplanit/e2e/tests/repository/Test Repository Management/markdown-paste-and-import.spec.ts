@@ -385,7 +385,7 @@ test.describe("Markdown Paste & Import", () => {
     await page.waitForLoadState("networkidle");
 
     // Verify key cases appear in the table
-    const expectedCases = [
+    const _expectedCases = [
       "MD - Headings",
       "MD - Emphasis & Inline",
       "MD - Blockquotes",

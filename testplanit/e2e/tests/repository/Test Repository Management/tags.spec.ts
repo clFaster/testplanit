@@ -699,7 +699,7 @@ test.describe("Tags", () => {
   test("Tags Are Visible Across Projects", async ({ api, page }) => {
     // Tags are global in the system - verify a tag created globally is visible across projects
     // Create two separate projects for this test - tests should be self-contained
-    const project1Id = await api.createProject(`E2E Tag Project 1 ${Date.now()}`);
+    const _project1Id = await api.createProject(`E2E Tag Project 1 ${Date.now()}`);
     const project2Id = await api.createProject(`E2E Tag Project 2 ${Date.now()}`);
 
     // Use project1Id implicitly for tag creation (tags are global), and project2Id for the test case

@@ -196,7 +196,7 @@ export function CreateProjectWizard({
   const [localSelectedTemplates, setLocalSelectedTemplates] = useState<
     number[]
   >([]);
-  const [isValidatingName, setIsValidatingName] = useState(false);
+  const [, setIsValidatingName] = useState(false);
   const [nameValidationMessage, setNameValidationMessage] = useState<
     string | null
   >(null);
@@ -434,7 +434,6 @@ export function CreateProjectWizard({
   const {
     watch,
     setValue,
-    formState: { errors },
     reset,
     control,
     handleSubmit,

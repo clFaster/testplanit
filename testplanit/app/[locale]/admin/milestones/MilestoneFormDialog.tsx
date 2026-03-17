@@ -314,7 +314,7 @@ export const MilestoneFormDialog: React.FC<MilestoneFormDialogProps> = ({
                 <FormField
                   control={control}
                   name="note"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center">
                         {t("common.fields.description")}
@@ -341,7 +341,7 @@ export const MilestoneFormDialog: React.FC<MilestoneFormDialogProps> = ({
                 <FormField
                   control={control}
                   name="milestoneTypeId"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center">
                         {t("common.fields.type")}
@@ -411,7 +411,7 @@ export const MilestoneFormDialog: React.FC<MilestoneFormDialogProps> = ({
                     <FormField
                       control={control}
                       name="startedAt"
-                      render={({ field }) => (
+                      render={({ field: _field }) => (
                         <FormItem className="flex flex-col">
                           <DatePickerField
                             control={control}
@@ -450,7 +450,7 @@ export const MilestoneFormDialog: React.FC<MilestoneFormDialogProps> = ({
                     <FormField
                       control={control}
                       name="completedAt"
-                      render={({ field }) => (
+                      render={({ field: _field }) => (
                         <FormItem className="flex flex-col">
                           <DatePickerField
                             control={control}
@@ -533,7 +533,7 @@ export const MilestoneFormDialog: React.FC<MilestoneFormDialogProps> = ({
                 <FormField
                   control={control}
                   name="docs"
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center">
                         {t("common.fields.documentation")}

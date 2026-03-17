@@ -573,7 +573,7 @@ export function DynamicJiraField({
           <FormField
             control={form.control}
             name={field.key}
-            render={({ field: formField }) => (
+            render={({ field: _formField }) => (
               <FormItem>
                 <div className="flex items-center gap-2">
                   <FormLabel>

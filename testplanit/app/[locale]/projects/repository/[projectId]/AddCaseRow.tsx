@@ -160,7 +160,6 @@ export function AddCaseRow({ folderId }: AddCaseRowProps) {
     control,
     formState: { errors },
     setValue,
-    watch,
   } = form;
 
   const nameInputRef = useRef<HTMLInputElement | null>(null);
@@ -306,7 +305,7 @@ export function AddCaseRow({ folderId }: AddCaseRowProps) {
             <FormField
               control={control}
               name="workflowId"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormControl>
                     <Controller

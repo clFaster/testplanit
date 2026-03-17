@@ -24,7 +24,7 @@ test.describe("Result Fields - Table Display", () => {
     await templatesPage.goto();
   });
 
-  test("Result fields table displays correctly", async ({ page }) => {
+  test("Result fields table displays correctly", async ({ page: _page }) => {
     // Verify the result fields table is visible
     await expect(templatesPage.resultFieldsTable).toBeVisible();
 

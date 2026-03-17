@@ -121,7 +121,7 @@ describe("API Token Creation Endpoint", () => {
         expiresAt: "2025-12-31T25:00:00Z", // Invalid hour
       });
       const response = await POST(request);
-      const data = await response.json();
+      await response.json();
 
       expect(response.status).toBe(400);
     });

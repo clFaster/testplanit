@@ -1101,11 +1101,11 @@ test.describe("Case Creation - Steps Fields", () => {
 });
 
 test.describe("Case Creation - Restricted Fields", () => {
-  let repositoryPage: RepositoryPage;
+  let _repositoryPage: RepositoryPage;
   let projectId: number;
 
   test.beforeEach(async ({ page, api }) => {
-    repositoryPage = new RepositoryPage(page);
+    _repositoryPage = new RepositoryPage(page);
     projectId = await api.createProject(`E2E Case Creation ${Date.now()}`);
   });
 
@@ -1141,7 +1141,7 @@ test.describe("Case Creation - Restricted Fields", () => {
     const testRunId = await api.createTestRun(projectId, `Test Run ${Date.now()}`);
 
     // Add the test case to the test run
-    const testRunCaseId = await api.addTestCaseToTestRun(testRunId, caseId);
+    const _testRunCaseId = await api.addTestCaseToTestRun(testRunId, caseId);
 
     // Create a custom role WITHOUT TestRunResultRestrictedFields permission
     const restrictedRoleName = `restricted_role_${Date.now()}`;

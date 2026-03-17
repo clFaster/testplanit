@@ -40,7 +40,7 @@ export const ConfigurationSelect: React.FC<ConfigurationSelectProps> = ({
   onChange,
   configurations,
   isLoading = false,
-  placeholder = "Select Configuration",
+  placeholder: _placeholder = "Select Configuration",
   disabled = false,
 }) => {
   const tCommon = useTranslations("common");

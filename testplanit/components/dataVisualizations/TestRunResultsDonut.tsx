@@ -94,7 +94,7 @@ const TestRunResultsDonut: React.FC<TestRunResultsDonutProps> = ({
 
     const totalCount = d3.sum(data, (d) => d.value);
 
-    const baseFontSize = Math.max(
+    const _baseFontSize = Math.max(
       12,
       Math.min(24, radius * (isZoomed ? 0.4 : 0.25))
     );
@@ -123,7 +123,7 @@ const TestRunResultsDonut: React.FC<TestRunResultsDonutProps> = ({
       .style("stroke-width", isZoomed ? "2px" : "1.5px")
       .style("cursor", "default")
       .style("opacity", 0) // Start invisible
-      .each(function (d) {
+      .each(function (_d) {
         /* no-op for TS, removed _current */
       }); // start at 0 angle
 

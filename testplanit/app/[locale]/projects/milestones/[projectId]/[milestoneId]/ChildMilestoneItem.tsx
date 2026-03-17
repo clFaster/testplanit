@@ -43,7 +43,6 @@ export default function ChildMilestoneItem({
   allMilestones,
 }: ChildMilestoneItemProps) {
   const t = useTranslations("milestones");
-  const tRuns = useTranslations("runs");
   const tCommon = useTranslations("common");
 
   const [milestoneForecast, setMilestoneForecast] =

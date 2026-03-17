@@ -49,7 +49,7 @@ describe("ForecastWorker", () => {
       // Dynamically import to get fresh module with mocks
       const forecastWorkerModule = await import("./forecastWorker");
 
-      const mockJob = {
+      const _mockJob = {
         id: "job-123",
         name: "update-single-case-forecast",
         data: { repositoryCaseId: 42 },

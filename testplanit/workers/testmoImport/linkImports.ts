@@ -217,7 +217,7 @@ export const importProjectLinks = async (
   configuration: TestmoMappingConfiguration,
   datasetRows: Map<string, any[]>,
   projectIdMap: Map<number, number>,
-  context: ImportContext
+  _context: ImportContext
 ): Promise<EntitySummaryResult> => {
   const summary: EntitySummaryResult = {
     entity: "projectLinks",
@@ -290,7 +290,7 @@ export const importMilestoneLinks = async (
   configuration: TestmoMappingConfiguration,
   datasetRows: Map<string, any[]>,
   milestoneIdMap: Map<number, number>,
-  context: ImportContext
+  _context: ImportContext
 ): Promise<EntitySummaryResult> => {
   const summary: EntitySummaryResult = {
     entity: "milestoneLinks",
@@ -363,7 +363,7 @@ export const importRunLinks = async (
   configuration: TestmoMappingConfiguration,
   datasetRows: Map<string, any[]>,
   testRunIdMap: Map<number, number>,
-  context: ImportContext
+  _context: ImportContext
 ): Promise<EntitySummaryResult> => {
   const summary: EntitySummaryResult = {
     entity: "runLinks",

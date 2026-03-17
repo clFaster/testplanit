@@ -253,7 +253,7 @@ function JunitTableSection({
   const [zoomedChart, setZoomedChart] = useState<
     "donut" | "timeline" | "histogram" | null
   >(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [, setIsDialogOpen] = useState(false);
   const [carouselApi, setCarouselApi] = useState<any>(null);
   const [carouselHovered, setCarouselHovered] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);

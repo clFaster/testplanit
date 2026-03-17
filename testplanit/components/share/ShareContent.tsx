@@ -16,7 +16,6 @@ interface ShareContentProps {
 }
 
 export function ShareContent({ shareKey, shareData, session }: ShareContentProps) {
-  const t = useTranslations("reports.sharedReport");
   const tCommon = useTranslations("common");
   const tErrors = useTranslations("common.errors");
   const tAuthBypass = useTranslations("reports.authBypass");

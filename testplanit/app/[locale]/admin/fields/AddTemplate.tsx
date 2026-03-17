@@ -1,6 +1,6 @@
 "use client";
 /* eslint-disable react-hooks/incompatible-library */
-import { Projects, Templates } from "@prisma/client";
+import { Projects } from "@prisma/client";
 import { useEffect, useState } from "react";
 import {
   useCreateManyTemplateCaseAssignment, useCreateManyTemplateProjectAssignment, useCreateManyTemplateResultAssignment, useCreateTemplates, useFindManyCaseFields, useFindManyProjects, useFindManyResultFields, useUpdateManyTemplates
@@ -45,12 +45,6 @@ import { SelectScrollable } from "@/components/SelectScrollableCaseFields";
 import { HelpPopover } from "@/components/ui/help-popover";
 import { Switch } from "@/components/ui/switch";
 import { useTranslations } from "next-intl";
-
-interface ExtendedTemplates extends Templates {
-  projects: { projectId: number }[];
-  caseFields: { caseFieldId: number }[];
-  resultFields: { resultFieldId: number }[];
-}
 
 export function AddTemplateModal() {
   const [open, setOpen] = useState(false);
@@ -130,7 +124,6 @@ export function AddTemplateModal() {
   const {
     watch,
     setValue,
-    handleSubmit,
     control,
     formState: { errors },
   } = form;
@@ -381,7 +374,7 @@ export function AddTemplateModal() {
             <FormField
               control={form.control}
               name="caseFields"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <div className="flex items-center space-x-2">
                     <FormLabel className="flex items-center">
@@ -413,7 +406,7 @@ export function AddTemplateModal() {
             <FormField
               control={form.control}
               name="resultFields"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <div className="flex items-center space-x-2">
                     <FormLabel className="flex items-center">
@@ -445,7 +438,7 @@ export function AddTemplateModal() {
             <FormField
               control={form.control}
               name="projects"
-              render={({ field }) => (
+              render={({ field: _field }) => (
                 <FormItem>
                   <FormLabel className="flex justify-between items-center">
                     <div className="flex items-center">

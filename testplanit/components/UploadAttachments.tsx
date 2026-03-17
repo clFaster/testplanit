@@ -39,7 +39,7 @@ export default function UploadAttachments({
 }: UploadAttachmentsProps) {
   const t = useTranslations("common.upload.attachments");
   const tGlobal = useTranslations();
-  const tBreadcrumb = useTranslations("common.ui.breadcrumb");
+
   const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -216,7 +216,7 @@ export default function UploadAttachments({
     }
   };
 
-  const truncateFileName = (fileName: string, maxLength = 24) => {
+  const _truncateFileName = (fileName: string, maxLength = 24) => {
     if (fileName.length <= maxLength) {
       return fileName;
     }
@@ -235,7 +235,7 @@ export default function UploadAttachments({
     return `${baseName}...${extension}`;
   };
 
-  const isImageFile = (file: File) => file.type.startsWith("image/");
+  const _isImageFile = (file: File) => file.type.startsWith("image/");
 
   if (compact) {
     return (

@@ -489,7 +489,7 @@ export const FlakyTestsBubbleChart: React.FC<FlakyTestsBubbleChartProps> = ({
 
       // Add hover interaction for backlog bubble
       backlogGroup
-        .on("mouseover", function (event) {
+        .on("mouseover", function (_event) {
           d3.select(this)
             .select("circle")
             .transition()

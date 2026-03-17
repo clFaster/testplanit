@@ -113,9 +113,9 @@ export function ReportRenderer({
   mode = "project",
   projects = [],
   consecutiveRuns = 5,
-  staleDaysThreshold,
-  minExecutionsForRate,
-  lookbackDays,
+  staleDaysThreshold: _staleDaysThreshold,
+  minExecutionsForRate: _minExecutionsForRate,
+  lookbackDays: _lookbackDays,
   dateGrouping = "weekly",
   totalFlakyTests,
   currentPage,
@@ -137,7 +137,6 @@ export function ReportRenderer({
   readOnly = false,
   headerActions,
 }: ReportRendererProps) {
-  const t = useTranslations();
   const tCommon = useTranslations("common");
   const tReports = useTranslations("reports.ui");
 

@@ -55,7 +55,7 @@ test.describe("Repository Statistics - Test Case Dimension", () => {
   /**
    * Legacy helper - kept for backwards compatibility with passing tests
    */
-  async function navigateToReports(
+  async function _navigateToReports(
     page: import("@playwright/test").Page,
     projectId: number
   ) {
@@ -66,7 +66,7 @@ test.describe("Repository Statistics - Test Case Dimension", () => {
   /**
    * Legacy helper - kept for backwards compatibility with passing tests
    */
-  async function switchToBuilderTab(page: import("@playwright/test").Page) {
+  async function _switchToBuilderTab(page: import("@playwright/test").Page) {
     const builderTab = page.locator('[role="tab"]').filter({ hasText: /Report Builder/i });
     await expect(builderTab).toBeVisible({ timeout: 5000 });
     await builderTab.click();
@@ -77,7 +77,7 @@ test.describe("Repository Statistics - Test Case Dimension", () => {
    * Legacy helper - replaced by direct URL navigation
    * The select component dropdown doesn't open reliably in E2E tests
    */
-  async function selectRepositoryStatsReport(page: import("@playwright/test").Page) {
+  async function _selectRepositoryStatsReport(_page: import("@playwright/test").Page) {
     // This function is deprecated - use navigateToRepositoryStatsReport instead
     throw new Error('Use navigateToRepositoryStatsReport() instead');
   }
@@ -94,7 +94,7 @@ test.describe("Repository Statistics - Test Case Dimension", () => {
   /**
    * Helper to select a dimension from the dropdown
    */
-  async function selectDimension(
+  async function _selectDimension(
     page: import("@playwright/test").Page,
     dimensionName: string
   ) {
@@ -119,7 +119,7 @@ test.describe("Repository Statistics - Test Case Dimension", () => {
   /**
    * Helper to select a metric from the dropdown
    */
-  async function selectMetric(
+  async function _selectMetric(
     page: import("@playwright/test").Page,
     metricName: string
   ) {

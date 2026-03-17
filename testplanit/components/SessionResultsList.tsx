@@ -233,7 +233,7 @@ export function SessionResultsList({
   const tCommon = useTranslations("common");
   const locale = useLocale();
   const pathname = usePathname();
-  const router = useRouter();
+  const _router = useRouter();
   const params = useParams();
   const currentLocale = params.locale as string;
   const [selectedAttachmentIndex, setSelectedAttachmentIndex] = useState<
@@ -486,7 +486,7 @@ export function SessionResultsList({
       });
 
       // Set the resolver with updated schema that includes the template fields
-      const updatedResolver = zodResolver(
+      const _updatedResolver = zodResolver(
         createFormSchema(locale, tCommon, templateResultFields)
       );
 
@@ -1162,7 +1162,7 @@ export function SessionResultsList({
       case "Text Long": {
         const fieldId = field.resultField.id.toString();
         const displayName = field.resultField.displayName;
-        const hint = field.resultField.hint;
+        const _hint = field.resultField.hint;
         const isRequired = field.resultField.isRequired;
         // Get initialHeight
         const initialHeight = field.resultField.initialHeight;
@@ -1363,7 +1363,7 @@ export function SessionResultsList({
   return (
     <div className="space-y-4">
       {(sessionResults as unknown as ExtendedSessionResults[]).map(
-        (result, index) => (
+        (result, _index) => (
           <Card
             key={`result-${result.id}-${refreshResults}`}
             id={`result-${result.id}`}
@@ -1622,7 +1622,7 @@ export function SessionResultsList({
                     const fieldId = field.resultField.id.toString();
 
                     // Debug: check if field is registered in form
-                    const isRegistered =
+                    const _isRegistered =
                       form.getFieldState(fieldId).isDirty !== undefined;
                   });
                 }

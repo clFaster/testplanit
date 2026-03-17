@@ -84,7 +84,7 @@ interface ParsedCase {
 }
 
 // Zod validation schema for page 1
-const createPage1Schema = (t: any, tGlobal: any) =>
+const createPage1Schema = (t: any, _tGlobal: any) =>
   z
     .object({
       selectedFile: z.any().refine((file) => file !== null, {
@@ -1483,7 +1483,7 @@ export function ImportCasesWizard({
     );
   };
 
-  const canProceedToNextPage = () => {
+  const _canProceedToNextPage = () => {
     // Always return true to keep the button enabled
     return true;
   };

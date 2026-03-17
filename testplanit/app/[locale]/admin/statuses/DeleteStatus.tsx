@@ -36,7 +36,6 @@ export function DeleteStatusModal({ status }: DeleteStatusModalProps) {
   const {
     formState: { errors },
     setError,
-    handleSubmit,
     reset,
   } = form;
 

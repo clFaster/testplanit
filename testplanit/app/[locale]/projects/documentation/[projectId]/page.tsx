@@ -35,10 +35,10 @@ export default function ProjectDocumentation({
   searchParams,
 }: ProjectDocumentationProps) {
   const { projectId } = use(params);
-  const resolvedSearchParams = use(searchParams);
+  use(searchParams);
 
   const router = useRouter();
-  const { data: session, status: sessionStatus } = useSession();
+  const { status: sessionStatus } = useSession();
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [docs, setDocs] = useState<

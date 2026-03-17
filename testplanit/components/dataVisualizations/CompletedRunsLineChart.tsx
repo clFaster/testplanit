@@ -260,7 +260,7 @@ const CompletedRunsLineChart: React.FC<CompletedRunsLineChartProps> = ({
       .attr("class", "legend")
       .attr("transform", `translate(${margin.left}, 5)`);
 
-    const legendItemWidth = 100;
+    const _legendItemWidth = 100;
     const legendSpacing = isZoomed ? 120 : 90;
 
     legendData.forEach((item, i) => {

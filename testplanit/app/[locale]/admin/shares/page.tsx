@@ -10,15 +10,14 @@ interface PageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params: _params }: PageProps) {
   const t = await getTranslations("reports.shareDialog.manageShares");
   return {
     title: t("adminTitle"),
   };
 }
 
-export default async function AdminSharesPage({ params }: PageProps) {
-  const { locale } = await params;
+export default async function AdminSharesPage({ params: _params }: PageProps) {
   const session = await getServerSession(authOptions);
 
   // Only ADMIN users can access this page

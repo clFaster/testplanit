@@ -2503,7 +2503,7 @@ export class ApiHelper {
 
       // Wait for all assignments to complete (or fail)
       await Promise.allSettled(assignments);
-    } catch (error) {
+    } catch (_error) {
       // Silently fail - this is not critical
     }
   }

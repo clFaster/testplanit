@@ -89,7 +89,7 @@ test.describe("Folder Creation", () => {
     await repositoryPage.verifyFolderExists(folderName);
   });
 
-  test("Create Folder with Maximum Name Length", async ({ api, page }) => {
+  test("Create Folder with Maximum Name Length", async ({ api, page: _page }) => {
     const projectId = await getTestProjectId(api);
     await repositoryPage.goto(projectId);
 

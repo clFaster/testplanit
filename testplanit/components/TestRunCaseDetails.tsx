@@ -72,7 +72,7 @@ interface TestRunCaseDetailsProps {
 export function TestRunCaseDetails({
   caseId,
   projectId,
-  onClose,
+  onClose: _onClose,
   testRunId,
   testRunCaseId,
   currentStatus,
@@ -81,7 +81,6 @@ export function TestRunCaseDetails({
   isTransitioning = false,
   isCompleted = false,
 }: TestRunCaseDetailsProps) {
-  const t = useTranslations("runs.details");
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
   const { data: session } = useSession();
@@ -94,7 +93,7 @@ export function TestRunCaseDetails({
   const [showAddResultModal, setShowAddResultModal] = useState(false);
   const [selectedStatusId, setSelectedStatusId] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [_showAssignModal, _setShowAssignModal] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
 
   // Fetch permissions
@@ -362,7 +361,7 @@ export function TestRunCaseDetails({
     isLoading: boolean;
   };
 
-  const { data: templates } = useFindManyTemplates({
+  const { data: _templates } = useFindManyTemplates({
     where: {
       isDeleted: false,
       isEnabled: true,

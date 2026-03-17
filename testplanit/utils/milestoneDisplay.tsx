@@ -20,7 +20,7 @@ interface HasMilestone {
   milestoneId?: number | null;
 }
 
-interface RenderItemProps<T> {
+interface _RenderItemProps<T> {
   item: T;
   isNew: boolean;
   newItemId: number | null;

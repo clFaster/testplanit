@@ -84,7 +84,7 @@ interface StepsFormProps {
   hideSharedStepsButtons?: boolean;
 }
 
-interface EditorUpdateEvent {
+interface _EditorUpdateEvent {
   editor: Editor;
 }
 
@@ -94,7 +94,7 @@ const TipTapEditorWrapper: React.FC<{
   initialContent?: object;
   readOnly?: boolean;
   projectId: number;
-}> = ({ control, name, initialContent, readOnly = false, projectId }) => {
+}> = ({ control: _control, name, initialContent, readOnly = false, projectId }) => {
   const { setValue } = useFormContext();
 
   const handleEditorUpdate = (content: any) => {
@@ -487,8 +487,7 @@ const StepsForm: React.FC<StepsFormProps> = ({
   const tCommon = useTranslations("common");
   const tRepoSteps = useTranslations("repository.steps");
   const { data: session } = useSession();
-  const { setValue } = useFormContext();
-  const { fields, append, remove, move, update, replace } = useFieldArray({
+  const { fields, append, remove, move, update: _update, replace } = useFieldArray({
     control,
     name: name,
   });
@@ -580,7 +579,7 @@ const StepsForm: React.FC<StepsFormProps> = ({
     return emptyEditorContent;
   };
 
-  function isEnrichedStep(step: any): step is EnrichedStep {
+  function _isEnrichedStep(step: any): step is EnrichedStep {
     return (
       typeof step === "object" &&
       "order" in step &&

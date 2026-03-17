@@ -79,12 +79,6 @@ interface FieldDefinition {
   field?: PrismaCaseField & { type: { type: string }; fieldOptions?: any[] };
 }
 
-// Define the expected shape for a step
-type Step = {
-  type: string;
-  content: string;
-};
-
 // Define a simple schema for the steps form within FieldValueInput
 // It needs a key matching the fieldKey for useFieldArray
 const createStepsSchema = (fieldKey: string) =>

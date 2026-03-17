@@ -53,7 +53,7 @@ const operatorSymbols: Record<DateOperator, string> = {
 };
 
 export function DateFilterInput({
-  fieldId,
+  fieldId: _fieldId,
   onFilterApply,
   onClearFilter,
   currentFilter,
@@ -112,7 +112,7 @@ export function DateFilterInput({
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const _handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleApply();
     }

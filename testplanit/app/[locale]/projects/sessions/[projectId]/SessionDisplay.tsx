@@ -154,7 +154,7 @@ const groupSessions = (
   return grouped;
 };
 
-const findMilestonePath = (
+const _findMilestonePath = (
   milestone: MilestonesWithTypes,
   targetMilestoneId: number,
   path: MilestonesWithTypes[] = []
@@ -164,7 +164,7 @@ const findMilestonePath = (
   }
 
   for (const child of milestone.children) {
-    const result = findMilestonePath(child, targetMilestoneId, [
+    const result = _findMilestonePath(child, targetMilestoneId, [
       ...path,
       milestone,
     ]);
@@ -176,7 +176,7 @@ const findMilestonePath = (
   return null;
 };
 
-interface SessionItemProps {
+interface _SessionItemProps {
   testSession: SessionsWithDetails;
   isCompleted: boolean;
   onComplete: (testSession: SessionsWithDetails) => void;
@@ -204,7 +204,7 @@ const SessionDisplay: React.FC<SessionDisplayProps> = ({
     useState<SessionsWithDetails | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newSessionId, setNewSessionId] = useState<number | null>(null);
-  const [openMilestones, setOpenMilestones] = useState<Record<number, boolean>>(
+  const [, setOpenMilestones] = useState<Record<number, boolean>>(
     {}
   );
 
@@ -268,7 +268,7 @@ const SessionDisplay: React.FC<SessionDisplayProps> = ({
     setSelectedSession(null);
   };
 
-  const toggleMilestone = (milestoneId: number) => {
+  const _toggleMilestone = (milestoneId: number) => {
     setOpenMilestones((prev) => ({
       ...prev,
       [milestoneId]: !prev[milestoneId],
@@ -303,7 +303,7 @@ const SessionDisplay: React.FC<SessionDisplayProps> = ({
       if (!hasSessions(milestone)) return null;
 
       const status = getStatus(milestone);
-      const condition = getCondition(milestone);
+      const _condition = getCondition(milestone);
       const { badge } = getStatusStyle(status, resolvedTheme || "light", colorMap);
 
       // Check if there are sessions under this milestone

@@ -4,7 +4,7 @@ describe("repositoryCaseSync Integration Tests", () => {
   describe("Text extraction from steps", () => {
     it("demonstrates expected text extraction behavior", () => {
       // Example TipTap JSON structure
-      const tipTapJson = {
+      const _tipTapJson = {
         type: "doc",
         content: [
           {
@@ -20,7 +20,7 @@ describe("repositoryCaseSync Integration Tests", () => {
       };
 
       // Expected extracted text
-      const expectedText = "Click the login button";
+      const _expectedText = "Click the login button";
 
       // The extractStepText function should:
       // 1. Parse JSON strings
@@ -55,7 +55,7 @@ describe("repositoryCaseSync Integration Tests", () => {
         }
       ];
 
-      testCases.forEach(({ input, expected }) => {
+      testCases.forEach(({ input: _input, expected }) => {
         // Custom field values should be serialized to strings
         // to ensure Elasticsearch can index them properly
         expect(typeof expected).toBe("string");
@@ -66,7 +66,7 @@ describe("repositoryCaseSync Integration Tests", () => {
   describe("Shared step expansion", () => {
     it("demonstrates shared step expansion logic", () => {
       // Example shared step structure
-      const sharedStepGroup = {
+      const _sharedStepGroup = {
         id: 10,
         name: "Login Steps",
         items: [
