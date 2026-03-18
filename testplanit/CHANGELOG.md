@@ -1,3 +1,9 @@
+## [0.16.23](https://github.com/TestPlanIt/testplanit/compare/v0.16.22...v0.16.23) (2026-03-18)
+
+### Enhancements
+
+* **scheduler:** replace repeatable job removal with upsertJobScheduler ([4018b66](https://github.com/TestPlanIt/testplanit/commit/4018b66984b8e815adb97eb7816bbd0c48e075f8))
+
 ## [0.16.22](https://github.com/TestPlanIt/testplanit/compare/v0.16.21...v0.16.22) (2026-03-17)
 
 ### Enhancements
