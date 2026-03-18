@@ -1,3 +1,9 @@
+## [0.16.25](https://github.com/TestPlanIt/testplanit/compare/v0.16.24...v0.16.25) (2026-03-18)
+
+### Bug Fixes
+
+* **ci:** pass NPM_TOKEN to semantic-release step ([30086f2](https://github.com/TestPlanIt/testplanit/commit/30086f2875a2be9148a60c707a4035cfea79e3ef))
+
 ## [0.16.24](https://github.com/TestPlanIt/testplanit/compare/v0.16.23...v0.16.24) (2026-03-18)
 
 ### Bug Fixes
