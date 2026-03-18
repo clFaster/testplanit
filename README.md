@@ -5,8 +5,10 @@ This monorepo contains the source code and related files for the TestPlanIt proj
 ## Screenshots
 
 ![Test Cases](testplanit/assets/test-cases.png)
+![QuickScript](testplanit/assets/quickscript.png)
 ![Test Runs](testplanit/assets/test-runs.png)
 ![Sessions](testplanit/assets/sessions.png)
+![Issues](testplanit/assets/issues.png)
 ![Reports](testplanit/assets/reports.png)
 
 ## Structure
