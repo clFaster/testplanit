@@ -1,3 +1,9 @@
+## [0.16.26](https://github.com/TestPlanIt/testplanit/compare/v0.16.25...v0.16.26) (2026-03-18)
+
+### Enhancements
+
+* **test runs, session:** Use comboboxes for long selects ([#140](https://github.com/TestPlanIt/testplanit/issues/140)) ([433a798](https://github.com/TestPlanIt/testplanit/commit/433a7981f2b498287912559cc23ca82a2b2b5dad))
+
 ## [0.16.25](https://github.com/TestPlanIt/testplanit/compare/v0.16.24...v0.16.25) (2026-03-18)
 
 ### Bug Fixes
