@@ -1,3 +1,9 @@
+## [0.16.24](https://github.com/TestPlanIt/testplanit/compare/v0.16.23...v0.16.24) (2026-03-18)
+
+### Bug Fixes
+
+* **lint:** remove unused variable assignments in SlashCommand and CLI config ([974bbfd](https://github.com/TestPlanIt/testplanit/commit/974bbfd49499f72bf46dd3838560b5e10d8adb31))
+
 ## [0.16.23](https://github.com/TestPlanIt/testplanit/compare/v0.16.22...v0.16.23) (2026-03-18)
 
 ### Enhancements
