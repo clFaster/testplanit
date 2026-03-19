@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { provider, apiKey, endpoint, deploymentName } = body;
+    const { provider, apiKey, endpoint, deploymentName, defaultModel } = body;
 
     // Testing credentials for provider
 
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       config: {
         id: 0,
         llmIntegrationId: null,
-        defaultModel: "test",
+        defaultModel: defaultModel || "test",
         availableModels: {},
         maxTokensPerRequest: 4096,
         maxRequestsPerMinute: 60,

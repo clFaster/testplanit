@@ -271,15 +271,18 @@ export function EditLlmIntegration({
     const values = form.getValues();
 
     try {
+      const payload = {
+        provider: values.provider,
+        apiKey: values.apiKey,
+        endpoint: values.endpoint,
+        deploymentName: values.deploymentName,
+        defaultModel: values.defaultModel,
+      };
+
       const response = await fetch("/api/admin/llm/test-credentials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider: values.provider,
-          apiKey: values.apiKey,
-          endpoint: values.endpoint,
-          deploymentName: values.deploymentName,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();

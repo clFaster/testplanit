@@ -326,6 +326,7 @@ export function AddLlmIntegration({
           apiKey: values.apiKey,
           endpoint: values.endpoint,
           deploymentName: values.deploymentName,
+          defaultModel: values.defaultModel,
         }),
       });
 
