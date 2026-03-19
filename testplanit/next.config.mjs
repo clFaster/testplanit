@@ -6,11 +6,9 @@ const withNextIntl = createNextIntlPlugin({
   locales: ['en-US', 'es-ES', 'fr-FR'],
   defaultLocale: 'en-US',
   requestConfig: './i18n/request.ts',
-  createNextIntlPlugin: {
-    createMessagesDeclaration: {
-      path: './messages/en-US.json',
-      makeParamsOptional: true
-    }
+  createMessagesDeclaration: {
+    path: './messages/en-US.json',
+    makeParamsOptional: true
   }
 });
 

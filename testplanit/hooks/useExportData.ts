@@ -545,11 +545,12 @@ export function useExportData<
               }
             : options;
 
-        // Transform and format data
-        const transformedAndFormattedData = dataToExportInitial.flatMap(
+        // Transform and format data, carrying raw attachments for PDF export
+        const transformedWithAttachments = dataToExportInitial.flatMap(
           (item) => {
             const activeSteps =
               item.steps?.filter((step) => !step.isDeleted) ?? [];
+            const rawAttachments = item.attachments ?? [];
 
             if (effectiveOptions.rowMode === "single") {
               let combinedStepData = "";
@@ -600,13 +601,13 @@ export function useExportData<
                 exportableColumns,
                 t
               );
-              return [formattedBase];
+              return [{ formatted: formattedBase, rawAttachments }];
             } else {
               // Multi Row Mode
-              const multiRows: any[] = [];
+              const multiRows: { formatted: Record<string, any>; rawAttachments: any[] }[] = [];
               if (!activeSteps || activeSteps.length === 0) {
-                multiRows.push(
-                  formatItemData(
+                multiRows.push({
+                  formatted: formatItemData(
                     {
                       ...item,
                       stepContent: "",
@@ -616,8 +617,9 @@ export function useExportData<
                     effectiveOptions,
                     exportableColumns,
                     t
-                  )
-                );
+                  ),
+                  rawAttachments,
+                });
               } else {
                 activeSteps.forEach((step, index) => {
                   const stepContent = formatStepContent(
@@ -633,8 +635,8 @@ export function useExportData<
                           effectiveOptions.stepsFormat
                         );
                   if (index === 0) {
-                    multiRows.push(
-                      formatItemData(
+                    multiRows.push({
+                      formatted: formatItemData(
                         {
                           ...item,
                           stepContent,
@@ -644,11 +646,12 @@ export function useExportData<
                         effectiveOptions,
                         exportableColumns,
                         t
-                      )
-                    );
+                      ),
+                      rawAttachments,
+                    });
                   } else {
-                    multiRows.push(
-                      formatItemData(
+                    multiRows.push({
+                      formatted: formatItemData(
                         {
                           id: item.id,
                           name: item.name,
@@ -660,14 +663,19 @@ export function useExportData<
                         effectiveOptions,
                         exportableColumns,
                         t
-                      )
-                    );
+                      ),
+                      rawAttachments: [], // Continuation rows don't carry attachments
+                    });
                   }
                 });
               }
               return multiRows;
             }
           }
+        );
+
+        const transformedAndFormattedData = transformedWithAttachments.map(
+          (entry) => entry.formatted
         );
 
         // CSV Export Logic
@@ -722,16 +730,8 @@ export function useExportData<
           const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
           const fileName = `${fileNamePrefix}-export-${timestamp}.pdf`;
 
-          // For embedded images, we need the raw attachment data from the original items
-          const itemsWithRawAttachments = transformedAndFormattedData.map(
-            (formattedItem, idx) => {
-              const originalItem = dataToExportInitial[idx];
-              return {
-                formatted: formattedItem,
-                rawAttachments: originalItem?.attachments ?? [],
-              };
-            }
-          );
+          // Use pre-associated attachments from the transformation step
+          const itemsWithRawAttachments = transformedWithAttachments;
 
           // Pre-load all images if embedding is enabled
           type LoadedImage = {
