@@ -1,3 +1,9 @@
+## [0.16.27](https://github.com/TestPlanIt/testplanit/compare/v0.16.26...v0.16.27) (2026-03-19)
+
+### Bug Fixes
+
+* **llm:** Fix LLM integration test from add/edit form by adding default model handling ([3cce6ad](https://github.com/TestPlanIt/testplanit/commit/3cce6ad15c25ce7b3297a1c4579994bc6e175fde))
+
 ## [0.16.26](https://github.com/TestPlanIt/testplanit/compare/v0.16.25...v0.16.26) (2026-03-18)
 
 ### Enhancements
