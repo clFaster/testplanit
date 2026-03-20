@@ -112,6 +112,7 @@ export function TestLlmIntegration({ integration }: TestLlmIntegrationProps) {
         size="sm"
         onClick={() => setOpen(true)}
         className="px-2 py-1 h-auto"
+        data-testid="llm-test-button"
       >
         <TestTube2 className="h-4 w-4" />
       </Button>

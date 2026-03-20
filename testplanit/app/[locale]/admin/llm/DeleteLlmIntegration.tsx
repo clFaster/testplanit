@@ -76,6 +76,7 @@ export function DeleteLlmIntegration({
         className="px-2 py-1 h-auto"
         disabled={integration.llmProviderConfig?.isDefault && !isOnlyIntegration}
         title={integration.llmProviderConfig?.isDefault && !isOnlyIntegration ? t("cannotDeleteDefault") : undefined}
+        data-testid="llm-delete-button"
       >
         <Trash2 className="h-8 w-8 shrink-0" />
       </Button>

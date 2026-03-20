@@ -448,6 +448,7 @@ export function EditLlmIntegration({
         size="icon"
         onClick={() => setOpen(true)}
         className="px-2 py-1 h-auto"
+        data-testid="llm-edit-button"
       >
         <Edit className="h-4 w-4" />
       </Button>

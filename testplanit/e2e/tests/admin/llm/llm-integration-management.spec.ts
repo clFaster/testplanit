@@ -241,46 +241,24 @@ test.describe("LLM Integration Management - Edit and Delete Operations", () => {
         .filter({ hasText: integrationName });
       await expect(row).toBeVisible({ timeout: 10000 });
 
-      // EditLlmIntegration uses a Button with Pencil icon
-      // In the actions column, order is: TestTube2(test), Pencil(edit), Trash(delete)
-      // The edit button is the second action button
-      const actionButtons = row.locator("button");
-      const buttonCount = await actionButtons.count();
+      // Click the edit button using its test ID
+      const editButton = row.getByTestId("llm-edit-button");
+      await expect(editButton).toBeVisible({ timeout: 5000 });
+      await editButton.click();
 
-      // Try each button until we find the edit dialog (has form for editing)
-      let editDialogOpened = false;
-      for (let i = 0; i < buttonCount && !editDialogOpened; i++) {
-        const btn = actionButtons.nth(i);
-        // Skip destructive buttons (delete)
-        const btnClass = await btn.getAttribute("class").catch(() => "");
-        if (btnClass?.includes("destructive")) continue;
+      // Edit dialog should open
+      const dialog = page.locator('[role="dialog"]');
+      await expect(dialog).toBeVisible({ timeout: 5000 });
 
-        await btn.click();
-        await page.waitForTimeout(500);
-
-        const dialog = page.locator('[role="dialog"]');
-        const isVisible = await dialog.isVisible().catch(() => false);
-        if (isVisible) {
-          editDialogOpened = true;
-          // Some kind of dialog opened - verify it has content
-          await expect(dialog).toBeVisible({ timeout: 5000 });
-
-          // Close it
-          const closeButton = dialog
-            .locator("button")
-            .filter({ hasText: /Close|Cancel/i });
-          if (await closeButton.first().isVisible({ timeout: 1000 }).catch(() => false)) {
-            await closeButton.first().click();
-          } else {
-            // Press Escape to close
-            await page.keyboard.press("Escape");
-          }
-          break;
-        }
+      // Close the dialog
+      const closeButton = dialog
+        .locator("button")
+        .filter({ hasText: /Close|Cancel/i });
+      if (await closeButton.first().isVisible({ timeout: 1000 }).catch(() => false)) {
+        await closeButton.first().click();
+      } else {
+        await page.keyboard.press("Escape");
       }
-
-      // editDialogOpened may be true or false depending on whether the dialog opened
-      // Both are acceptable - the test just verifies the flow doesn't crash
     } finally {
       // Cleanup
       if (integrationId) {
@@ -337,9 +315,8 @@ test.describe("LLM Integration Management - Edit and Delete Operations", () => {
     const row = page.locator("tbody tr").filter({ hasText: integrationName });
     await expect(row).toBeVisible({ timeout: 10000 });
 
-    // The delete button is the last action button (variant="destructive" with Trash2 icon)
-    const actionButtons = row.locator("button");
-    const deleteButton = actionButtons.last();
+    // Click the delete button using its test ID
+    const deleteButton = row.getByTestId("llm-delete-button");
 
     await deleteButton.click();
 
@@ -426,76 +403,45 @@ test.describe("LLM Integration Management - Test Connection", () => {
         .filter({ hasText: integrationName });
       await expect(row).toBeVisible({ timeout: 10000 });
 
-      // TestLlmIntegration is the first button (ghost variant, TestTube2 icon)
-      // Actions column order: TestLlmIntegration, EditLlmIntegration, DeleteLlmIntegration
-      const actionButtons = row.locator("button");
-      const buttonCount = await actionButtons.count();
+      // Click the test button using its test ID
+      const testButton = row.getByTestId("llm-test-button");
+      await expect(testButton).toBeVisible({ timeout: 5000 });
+      await testButton.click();
 
-      // Try clicking each non-destructive button until we find one that opens a dialog
-      let dialogFound = false;
-      for (let i = 0; i < buttonCount && !dialogFound; i++) {
-        const btn = actionButtons.nth(i);
-        const btnClass = await btn.getAttribute("class").catch(() => "");
-        // Skip destructive buttons (delete)
-        if (btnClass?.includes("destructive")) continue;
+      // Test connection dialog should open
+      const dialog = page.locator('[role="dialog"]');
+      await expect(dialog).toBeVisible({ timeout: 5000 });
 
-        await btn.click();
-        await page.waitForTimeout(800);
+      // Check if this dialog has a "Test Connection" button
+      const testConnectionButton = dialog.locator("button").filter({
+        hasText: /Test Connection|Retest/i,
+      });
+      const hasTestButton = await testConnectionButton
+        .first()
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
 
-        const dialog = page.locator('[role="dialog"]');
-        const isVisible = await dialog
-          .isVisible({ timeout: 1500 })
-          .catch(() => false);
-
-        if (isVisible) {
-          dialogFound = true;
-
-          // Check if this is the test dialog (has "Test Connection" button)
-          const testConnectionButton = dialog.locator("button").filter({
-            hasText: /Test Connection|Retest/i,
-          });
-          const hasTestButton = await testConnectionButton
-            .first()
-            .isVisible({ timeout: 2000 })
-            .catch(() => false);
-
-          if (hasTestButton) {
-            // Click the test connection button - will fail since no real LLM configured
-            // Accept both success and failure as valid outcomes
-            await testConnectionButton.first().click();
-
-            // Wait for response (either success or failure toast)
-            await page.waitForTimeout(3000);
-
-            // Accept either success or failure as valid outcomes
-            const hasToast = await page
-              .locator("[data-sonner-toast]")
-              .isVisible()
-              .catch(() => false);
-            // Both outcomes are acceptable (real LLM not available in E2E)
-            expect(hasToast || true).toBe(true);
-          }
-
-          // Close dialog
-          const closeButton = dialog
-            .locator("button")
-            .filter({ hasText: /Close|Cancel/i });
-          if (
-            await closeButton
-              .first()
-              .isVisible({ timeout: 1000 })
-              .catch(() => false)
-          ) {
-            await closeButton.first().click();
-          } else {
-            await page.keyboard.press("Escape");
-          }
-          break;
-        }
+      if (hasTestButton) {
+        // Click the test connection button - will fail since no real LLM configured
+        await testConnectionButton.first().click();
+        // Wait for response (either success or failure toast)
+        await page.waitForTimeout(3000);
       }
 
-      // dialogFound may or may not be true - test just verifies the flow works
-      // Accept any outcome since the TestTube icon may render differently than expected
+      // Close dialog
+      const closeButton = dialog
+        .locator("button")
+        .filter({ hasText: /Close|Cancel/i });
+      if (
+        await closeButton
+          .first()
+          .isVisible({ timeout: 1000 })
+          .catch(() => false)
+      ) {
+        await closeButton.first().click();
+      } else {
+        await page.keyboard.press("Escape");
+      }
     } finally {
       // Cleanup
       if (integrationId) {
