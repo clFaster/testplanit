@@ -5,7 +5,9 @@
 - ✅ **v1.0 AI Bulk Auto-Tagging** - Phases 1-4 (shipped 2026-03-08)
 - ✅ **v1.1 ZenStack Upgrade Regression Tests** - Phases 5-8 (shipped 2026-03-17)
 - 📋 **v2.0 Comprehensive Test Coverage** - Phases 9-24 (planned)
-- 🚧 **v2.1 Per-Project Export Template Assignment** - Phases 25-27 (in progress)
+- ✅ **v2.1 Per-Project Export Template Assignment** - Phases 25-27 (shipped 2026-03-19)
+- ✅ **v0.17.0-copy-move Copy/Move Test Cases Between Projects** - Phases 28-33 (shipped 2026-03-21)
+- 🚧 **v0.17.0 Per-Prompt LLM Configuration** - Phases 34-39 (in progress)
 
 ## Phases
 
@@ -48,13 +50,37 @@
 - [ ] **Phase 23: General Components** - Shared UI components tested with edge cases and accessibility
 - [ ] **Phase 24: Hooks, Notifications, and Workers** - Custom hooks, notification flows, and workers unit tested
 
-### 🚧 v2.1 Per-Project Export Template Assignment (Phases 25-27)
+<details>
+<summary>✅ v2.1 Per-Project Export Template Assignment (Phases 25-27) - SHIPPED 2026-03-19</summary>
 
-**Milestone Goal:** Allow admins to assign specific Case Export Templates to individual projects and set a per-project default, so users only see relevant templates when exporting.
+- [x] **Phase 25: Default Template Schema** - Project model extended with optional default export template relation
+- [x] **Phase 26: Admin Assignment UI** - Admin can assign, unassign, and set a default export template per project
+- [x] **Phase 27: Export Dialog Filtering** - Export dialog shows only project-assigned templates with project default pre-selected
 
-- [x] **Phase 25: Default Template Schema** - Project model extended with optional default export template relation (completed 2026-03-19)
-- [x] **Phase 26: Admin Assignment UI** - Admin can assign, unassign, and set a default export template per project (completed 2026-03-19)
-- [x] **Phase 27: Export Dialog Filtering** - Export dialog shows only project-assigned templates with project default pre-selected (completed 2026-03-19)
+</details>
+
+<details>
+<summary>✅ v0.17.0-copy-move Copy/Move Test Cases Between Projects (Phases 28-33) - SHIPPED 2026-03-21</summary>
+
+- [x] **Phase 28: Copy/Move Schema and Worker Foundation** - BullMQ worker and schema support async copy/move operations
+- [x] **Phase 29: Preflight Compatibility Checks** - Compatibility checks prevent invalid cross-project copies
+- [x] **Phase 30: Folder Tree Copy/Move** - Folder hierarchies are preserved during copy/move operations
+- [x] **Phase 31: Copy/Move UI Entry Points** - Users can initiate copy/move from cases and folder tree
+- [x] **Phase 32: Progress and Result Feedback** - Users see real-time progress and outcome for copy/move jobs
+- [x] **Phase 33: Copy/Move Test Coverage** - Copy/move flows are verified end-to-end and via unit tests
+
+</details>
+
+### 🚧 v0.17.0 Per-Prompt LLM Configuration (Phases 34-37)
+
+**Milestone Goal:** Allow each prompt within a PromptConfig to use a different LLM integration, so teams can optimize cost, speed, and quality per AI feature. Resolution chain: Project LlmFeatureConfig > PromptConfigPrompt > Project default.
+
+- [x] **Phase 34: Schema and Migration** - PromptConfigPrompt supports per-prompt LLM assignment with DB migration (completed 2026-03-21)
+- [x] **Phase 35: Resolution Chain** - PromptResolver and LlmManager implement the full three-level LLM resolution chain with backward compatibility (completed 2026-03-21)
+- [x] **Phase 36: Admin Prompt Editor LLM Selector** - Admin can assign an LLM integration and model override to each prompt, with mixed-integration indicator (completed 2026-03-21)
+- [x] **Phase 37: Project AI Models Overrides** - Project admins can set per-feature LLM overrides with resolution chain display (completed 2026-03-21)
+- [x] **Phase 38: Export/Import and Testing** - Per-prompt LLM fields in export/import, unit tests for resolution chain, E2E tests for admin and project UI (completed 2026-03-21)
+- [x] **Phase 39: Documentation** - User-facing docs for per-prompt LLM configuration and project-level overrides (completed 2026-03-21)
 
 ## Phase Details
 
@@ -352,10 +378,99 @@ Plans:
 
 ---
 
+### Phase 34: Schema and Migration
+**Goal**: PromptConfigPrompt supports per-prompt LLM assignment with proper database migration
+**Depends on**: Phase 33
+**Requirements**: SCHEMA-01, SCHEMA-02, SCHEMA-03
+**Success Criteria** (what must be TRUE):
+  1. PromptConfigPrompt has optional llmIntegrationId FK and modelOverride string fields in schema.zmodel; ZenStack generation succeeds
+  2. Database migration adds both columns with proper FK constraint to LlmIntegration and index on llmIntegrationId
+  3. A PromptConfigPrompt record can be saved with a specific LLM integration and retrieved with the relation included
+  4. LlmFeatureConfig model confirmed to have correct fields and access rules for project admins
+**Plans**: 1 plan
+
+Plans:
+- [ ] 34-01-PLAN.md -- Add llmIntegrationId and modelOverride to PromptConfigPrompt in schema.zmodel, generate migration, validate
+
+### Phase 35: Resolution Chain
+**Goal**: The LLM selection logic applies the correct integration for every AI feature call using a three-level fallback chain with full backward compatibility
+**Depends on**: Phase 34
+**Requirements**: RESOLVE-01, RESOLVE-02, RESOLVE-03, COMPAT-01
+**Success Criteria** (what must be TRUE):
+  1. PromptResolver returns per-prompt LLM integration ID and model override when set on the resolved prompt
+  2. Resolution chain enforced: project LlmFeatureConfig > PromptConfigPrompt.llmIntegrationId > project default integration
+  3. When neither per-prompt nor project override exists, the project default LLM integration is used (existing behavior preserved)
+  4. Existing projects and prompt configs without per-prompt LLM assignments continue to work without any changes
+**Plans**: 1 plan
+
+Plans:
+- [ ] 35-01-PLAN.md -- Extend PromptResolver to surface per-prompt LLM info and update LlmManager to apply the resolution chain
+
+### Phase 36: Admin Prompt Editor LLM Selector
+**Goal**: Admins can assign an LLM integration and optional model override to each prompt directly in the prompt config editor, with visual indicator for mixed configs
+**Depends on**: Phase 35
+**Requirements**: ADMIN-01, ADMIN-02, ADMIN-03
+**Success Criteria** (what must be TRUE):
+  1. Each feature accordion in the admin prompt config editor shows an LLM integration selector populated with all available integrations
+  2. Admin can select an LLM integration and model override for a prompt; the selection is saved when the prompt config is submitted
+  3. On returning to the editor, the previously saved per-prompt LLM assignment is pre-selected in the selector
+  4. Prompt config list/table shows a summary indicator when prompts within a config use mixed LLM integrations
+**Plans**: 2 plans
+
+Plans:
+- [ ] 36-01-PLAN.md -- Add LLM integration and model override selectors to PromptFeatureSection accordion and wire save/load
+- [ ] 36-02-PLAN.md -- Add mixed-integration indicator to prompt config list/table
+
+### Phase 37: Project AI Models Overrides
+**Goal**: Project admins can configure per-feature LLM overrides from the project AI Models settings page with clear resolution chain display
+**Depends on**: Phase 35
+**Requirements**: PROJ-01, PROJ-02
+**Success Criteria** (what must be TRUE):
+  1. The Project AI Models settings page shows a per-feature override section listing all 7 LLM features with an integration selector for each
+  2. Project admin can assign a specific LLM integration to a feature; the assignment is saved as a LlmFeatureConfig record
+  3. Project admin can clear a per-feature override; the feature falls back to prompt-level assignment or project default
+  4. The effective resolution chain is displayed per feature (which LLM will actually be used and why — override, prompt-level, or default)
+**Plans**: 1 plan
+
+Plans:
+- [ ] 37-01-PLAN.md -- Build per-feature override UI on AI Models settings page with resolution chain display and LlmFeatureConfig CRUD
+
+### Phase 38: Export/Import and Testing
+**Goal**: Per-prompt LLM fields are portable via export/import, and all new functionality is verified with unit and E2E tests
+**Depends on**: Phase 36, Phase 37
+**Requirements**: EXPORT-01, TEST-01, TEST-02, TEST-03, TEST-04
+**Success Criteria** (what must be TRUE):
+  1. Per-prompt LLM assignments (integration reference + model override) are included in prompt config export and correctly restored on import
+  2. Unit tests pass for PromptResolver 3-tier resolution chain covering all fallback levels independently
+  3. Unit tests pass for LlmFeatureConfig override behavior (create, update, delete, fallback)
+  4. E2E tests pass for admin prompt editor LLM integration selector workflow (select, save, reload, clear)
+  5. E2E tests pass for project AI Models per-feature override workflow (assign, clear, verify effective LLM)
+**Plans**: 3 plans
+
+Plans:
+- [ ] 38-01-PLAN.md -- Add per-prompt LLM fields to prompt config export/import
+- [ ] 38-02-PLAN.md -- Unit tests for resolution chain and LlmFeatureConfig
+- [ ] 38-03-PLAN.md -- E2E tests for admin prompt editor and project AI Models overrides
+
+### Phase 39: Documentation
+**Goal**: User-facing documentation covers per-prompt LLM configuration and project-level overrides
+**Depends on**: Phase 38
+**Requirements**: DOCS-01, DOCS-02
+**Success Criteria** (what must be TRUE):
+  1. Documentation explains how admins configure per-prompt LLM integrations in the admin prompt editor
+  2. Documentation explains how project admins set per-feature LLM overrides on the AI Models settings page
+  3. Documentation describes the resolution chain precedence (project override > prompt-level > project default)
+**Plans**: 1 plan
+
+Plans:
+- [x] 39-01-PLAN.md -- Write user-facing documentation for per-prompt LLM configuration and project-level overrides
+
+---
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14 → 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23 → 24 → 25 → 26 → 27
+Phases execute in numeric order: 34 → 35 → 36 + 37 (parallel) → 38 → 39
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -383,6 +498,18 @@ Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14 → 15 →
 | 22. Custom API Route Tests | v2.0 | 0/TBD | Not started | - |
 | 23. General Components | v2.0 | 0/TBD | Not started | - |
 | 24. Hooks, Notifications, and Workers | v2.0 | 0/TBD | Not started | - |
-| 25. Default Template Schema | 1/1 | Complete    | 2026-03-19 | - |
-| 26. Admin Assignment UI | 2/2 | Complete    | 2026-03-19 | - |
-| 27. Export Dialog Filtering | 1/1 | Complete    | 2026-03-19 | - |
+| 25. Default Template Schema | v2.1 | 1/1 | Complete | 2026-03-19 |
+| 26. Admin Assignment UI | v2.1 | 2/2 | Complete | 2026-03-19 |
+| 27. Export Dialog Filtering | v2.1 | 1/1 | Complete | 2026-03-19 |
+| 28. Copy/Move Schema and Worker Foundation | v0.17.0-copy-move | TBD | Complete | 2026-03-21 |
+| 29. Preflight Compatibility Checks | v0.17.0-copy-move | TBD | Complete | 2026-03-21 |
+| 30. Folder Tree Copy/Move | v0.17.0-copy-move | TBD | Complete | 2026-03-21 |
+| 31. Copy/Move UI Entry Points | v0.17.0-copy-move | TBD | Complete | 2026-03-21 |
+| 32. Progress and Result Feedback | v0.17.0-copy-move | TBD | Complete | 2026-03-21 |
+| 33. Copy/Move Test Coverage | v0.17.0-copy-move | TBD | Complete | 2026-03-21 |
+| 34. Schema and Migration | 1/1 | Complete    | 2026-03-21 | - |
+| 35. Resolution Chain | 1/1 | Complete    | 2026-03-21 | - |
+| 36. Admin Prompt Editor LLM Selector | 2/2 | Complete    | 2026-03-21 | - |
+| 37. Project AI Models Overrides | 1/1 | Complete    | 2026-03-21 | - |
+| 38. Export/Import and Testing | 3/3 | Complete    | 2026-03-21 | - |
+| 39. Documentation | 1/1 | Complete    | 2026-03-21 | - |

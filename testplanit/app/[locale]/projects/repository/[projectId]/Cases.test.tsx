@@ -70,6 +70,7 @@ vi.mock("next-auth/react", async (importOriginal) => {
 
 // Mock all ZenStack hooks from ~/lib/hooks
 vi.mock("~/lib/hooks", () => ({
+  useCountProjects: vi.fn(() => ({ data: 2, isLoading: false })),
   useFindManyRepositoryFolders: vi.fn(() => ({ data: [], isLoading: false })),
   useCountRepositoryCases: vi.fn(() => ({ data: 0, isLoading: false, refetch: vi.fn() })),
   useFindManyTemplates: vi.fn(() => ({ data: [], isLoading: false })),
@@ -212,6 +213,12 @@ vi.mock("@/components/AttachmentsCarousel", () => ({
 vi.mock("@/components/auto-tag/AutoTagWizardDialog", () => ({
   AutoTagWizardDialog: vi.fn(() => (
     <div data-testid="auto-tag-wizard">AutoTagWizardDialog stub</div>
+  )),
+}));
+
+vi.mock("@/components/copy-move/CopyMoveDialog", () => ({
+  CopyMoveDialog: vi.fn(() => (
+    <div data-testid="copy-move-dialog">CopyMoveDialog stub</div>
   )),
 }));
 

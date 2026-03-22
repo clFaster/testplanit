@@ -1,71 +1,53 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.1
-milestone_name: Per-Project Export Template Assignment
-status: planning
-stopped_at: Completed 27-export-dialog-filtering/27-01-PLAN.md
-last_updated: "2026-03-19T05:37:52.328Z"
-last_activity: 2026-03-18 — Roadmap created for v2.1 (Phases 25-27)
+milestone: v2.0
+milestone_name: Comprehensive Test Coverage
+status: completed
+last_updated: "2026-03-21T21:17:59.641Z"
+last_activity: "2026-03-21 — Completed 39-01: per-prompt LLM and per-feature override documentation"
 progress:
-  total_phases: 19
-  completed_phases: 3
-  total_plans: 4
-  completed_plans: 4
-  percent: 0
+  total_phases: 25
+  completed_phases: 23
+  total_plans: 56
+  completed_plans: 59
 ---
 
 # State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-18)
+See: .planning/PROJECT.md (updated 2026-03-21)
 
 **Core value:** Teams can plan, execute, and track testing across manual and automated workflows in one place — with AI assistance to reduce repetitive work.
-**Current focus:** v2.1 Per-Project Export Template Assignment — Phase 25: Default Template Schema
+**Current focus:** v0.17.0 Per-Prompt LLM Configuration
 
 ## Current Position
 
-Phase: 25 of 27 (Default Template Schema)
-Plan: — of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-18 — Roadmap created for v2.1 (Phases 25-27)
-
-Progress: [░░░░░░░░░░] 0% (v2.1 phases)
-
-## Performance Metrics
-
-**Velocity:**
-- Total plans completed (v2.1): 0
-- Average duration: —
-- Total execution time: —
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
+Phase: 39 of 39 (Documentation)
+Plan: 39-01 complete
+Status: Complete — all phases and plans done
+Last activity: 2026-03-21 — Completed 39-01: per-prompt LLM and per-feature override documentation
 
 ## Accumulated Context
-| Phase 25-default-template-schema P01 | 5min | 2 tasks | 5 files |
-| Phase 26-admin-assignment-ui P01 | 5 | 1 tasks | 1 files |
-| Phase 26 P02 | 15min | 2 tasks | 3 files |
-| Phase 26-admin-assignment-ui P02 | 45min | 3 tasks | 4 files |
-| Phase 27-export-dialog-filtering P01 | 15min | 2 tasks | 2 files |
 
 ### Decisions
 
-- Follow TemplateProjectAssignment pattern (existing pattern for case field template assignments)
-- Backward compatible fallback: no assignments = show all enabled templates
-- SCHEMA-01 already complete (CaseExportTemplateProjectAssignment join model exists in schema.zmodel)
-- ZenStack hooks for CaseExportTemplateProjectAssignment are already generated
-- [Phase 25-default-template-schema]: Used onDelete: SetNull on defaultCaseExportTemplateId FK so deleting a CaseExportTemplate clears the default on referencing projects
-- [Phase 25-default-template-schema]: Named relation 'ProjectDefaultExportTemplate' disambiguates from CaseExportTemplateProjectAssignment join-table relation
-- [Phase 26-admin-assignment-ui]: Mirrored Projects model access pattern for project-admin-scoped create/delete on CaseExportTemplateProjectAssignment
-- [Phase 26-admin-assignment-ui]: Added translation keys in Task 1 commit because TypeScript validates next-intl keys against en-US.json at compile time
-- [Phase 26-admin-assignment-ui]: MultiAsyncCombobox chosen over checkbox list for better UX with large template lists
-- [Phase 26-admin-assignment-ui]: selectedTemplates stored as TemplateOption[] objects so badge data available without re-lookup
-- [Phase 27-export-dialog-filtering]: Used templateId (not caseExportTemplateId) — join model field name per schema.zmodel
-- [Phase 27-export-dialog-filtering]: filteredTemplates pattern: fetch global templates + assignment filter in useMemo for project-scoped template display
+(Carried from previous milestone)
+
+- Worker uses raw `prisma` (not `enhance()`); ZenStack access control gated once at API entry only
+- Unique constraint errors detected via string-matching err.info?.message for "duplicate key" (not err.code === "P2002")
+- [Phase 34-schema-and-migration]: No onDelete:Cascade on PromptConfigPrompt.llmIntegration relation — deleting LLM integration sets llmIntegrationId to NULL, preserving prompts
+- [Phase 34-schema-and-migration]: Index added on PromptConfigPrompt.llmIntegrationId following LlmFeatureConfig established pattern
+- [Phase 35-resolution-chain]: Prompt resolver called before resolveIntegration so per-prompt LLM fields are available to the 3-tier chain
+- [Phase 35-resolution-chain]: Explicit-integration endpoints (chat, test, admin chat) unchanged - client-specified integration takes precedence over server-side resolution chain
+- [Phase 36-admin-prompt-editor-llm-selector]: llmIntegrations column uses Map<id,name> to collect unique integrations across prompts, renders three states: Project Default (size 0), single badge (size 1), N LLMs badge (size N)
+- [Phase 36-01]: __clear__ sentinel used in Select to represent null since shadcn Select cannot natively represent null values; clearing integration also clears modelOverride
+- [Phase 37-project-ai-models-overrides]: FeatureOverrides component fetches its own LlmFeatureConfig and PromptConfigPrompt data — page.tsx passes only integrations and projectDefaultIntegration as props
+- [Phase 38-02]: Use createForWorker (not getInstance) for resolveIntegration tests to avoid singleton state bleed between tests
+- [Phase 38-export-import-and-testing]: [Phase 38-01]: Export uses llmIntegrationName (human-readable) not raw ID for portability; import resolves names against active integrations only, sets null with unresolvedIntegrations reporting on miss
+- [Phase 38-03]: Use api.createProject() for projectId in AI models tests; projectId fixture defaults to 1 which does not exist in E2E database
+- [Phase 38-03]: __clear__ sentinel in LLM Integration select renders as 'Project Default (clear)' per en-US translation, not 'Project Default'
+- [Phase 39-01]: Documentation updated in-place on existing pages — no new sidebar entries or pages needed; resolution chain section uses explicit anchor for cross-referencing
 
 ### Pending Todos
 
@@ -74,9 +56,3 @@ None yet.
 ### Blockers/Concerns
 
 None yet.
-
-## Session Continuity
-
-Last session: 2026-03-19T05:35:21.836Z
-Stopped at: Completed 27-export-dialog-filtering/27-01-PLAN.md
-Resume file: None
