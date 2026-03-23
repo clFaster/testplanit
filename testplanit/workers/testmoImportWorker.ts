@@ -2915,9 +2915,7 @@ const importRepositoryFolders = async (
       if (!repositoryIdMap.has(targetRepoId)) {
         repositoryIdMap.set(targetRepoId, repositoryId);
       }
-      if (repoSourceId !== null) {
-        repositoryIdMap.set(repoSourceId, repositoryId);
-      }
+      repositoryIdMap.set(repoSourceId, repositoryId);
 
       let parentId: number | null = null;
       if (parentSourceId !== null) {
@@ -3328,10 +3326,8 @@ const importRepositoryCases = async (
               }
             );
             decrementEntityTotal(context, "repositoryCases");
-            if (caseSourceId !== null) {
-              canonicalCaseIds.delete(caseSourceId);
-              stepsByCaseId.delete(caseSourceId);
-            }
+            canonicalCaseIds.delete(caseSourceId);
+            stepsByCaseId.delete(caseSourceId);
             continue;
           }
 
@@ -3340,9 +3336,7 @@ const importRepositoryCases = async (
             repoSourceId,
             canonicalRepoIdByProject
           );
-          if (caseSourceId !== null) {
-            caseMetaMap.set(caseSourceId, { projectId, name: caseName });
-          }
+          caseMetaMap.set(caseSourceId, { projectId, name: caseName });
 
           if (targetRepoId === null) {
             const existingFallback = await tx.repositoryCases.findFirst({
@@ -3386,9 +3380,7 @@ const importRepositoryCases = async (
 
           const resolvedRepositoryId = repositoryId;
 
-          if (repoSourceId !== null) {
-            repositoryIdMap.set(repoSourceId, resolvedRepositoryId);
-          }
+          repositoryIdMap.set(repoSourceId, resolvedRepositoryId);
 
           let folderId =
             folderSourceId !== null
@@ -3827,7 +3819,7 @@ const importRepositoryCases = async (
                 }
 
                 const stepPayload = convertToTipTapJsonValue(combinedStepText);
-                if (stepPayload !== undefined && stepPayload !== null) {
+                if (stepPayload !== null) {
                   stepEntry.step = JSON.stringify(stepPayload);
                 }
               }
@@ -3844,7 +3836,7 @@ const importRepositoryCases = async (
 
                 const expectedPayload =
                   convertToTipTapJsonValue(combinedExpectedText);
-                if (expectedPayload !== undefined && expectedPayload !== null) {
+                if (expectedPayload !== null) {
                   stepEntry.expectedResult = JSON.stringify(expectedPayload);
                 }
               }
@@ -4418,7 +4410,7 @@ const importTestRunCases = async (
 
       let repositoryCaseId = caseIdMap.get(caseSourceId);
 
-      if (!repositoryCaseId && caseSourceId !== null) {
+      if (!repositoryCaseId) {
         const meta = caseMetaMap.get(caseSourceId);
         if (meta) {
           const fallbackCase = await prisma.repositoryCases.findFirst({

@@ -8329,9 +8329,7 @@ var importRepositoryFolders = async (prisma2, datasetRows, projectIdMap, reposit
       if (!repositoryIdMap.has(targetRepoId)) {
         repositoryIdMap.set(targetRepoId, repositoryId);
       }
-      if (repoSourceId !== null) {
-        repositoryIdMap.set(repoSourceId, repositoryId);
-      }
+      repositoryIdMap.set(repoSourceId, repositoryId);
       let parentId = null;
       if (parentSourceId !== null) {
         const mappedParent = folderIdMap.get(parentSourceId);
@@ -8642,10 +8640,8 @@ var importRepositoryCases = async (prisma2, datasetRows, projectIdMap, repositor
               }
             );
             decrementEntityTotal(context, "repositoryCases");
-            if (caseSourceId !== null) {
-              canonicalCaseIds.delete(caseSourceId);
-              stepsByCaseId.delete(caseSourceId);
-            }
+            canonicalCaseIds.delete(caseSourceId);
+            stepsByCaseId.delete(caseSourceId);
             continue;
           }
           const targetRepoId = getPreferredRepositoryId(
@@ -8653,9 +8649,7 @@ var importRepositoryCases = async (prisma2, datasetRows, projectIdMap, repositor
             repoSourceId,
             canonicalRepoIdByProject
           );
-          if (caseSourceId !== null) {
-            caseMetaMap.set(caseSourceId, { projectId, name: caseName });
-          }
+          caseMetaMap.set(caseSourceId, { projectId, name: caseName });
           if (targetRepoId === null) {
             const existingFallback = await tx.repositoryCases.findFirst({
               where: {
@@ -8693,9 +8687,7 @@ var importRepositoryCases = async (prisma2, datasetRows, projectIdMap, repositor
             repositoryIdMap.set(targetRepoId, repositoryId);
           }
           const resolvedRepositoryId = repositoryId;
-          if (repoSourceId !== null) {
-            repositoryIdMap.set(repoSourceId, resolvedRepositoryId);
-          }
+          repositoryIdMap.set(repoSourceId, resolvedRepositoryId);
           let folderId = folderSourceId !== null ? folderIdMap.get(folderSourceId) ?? null : null;
           if (folderId == null) {
             const rootFolderId = repositoryRootFolderMap.get(resolvedRepositoryId);
@@ -9036,7 +9028,7 @@ var importRepositoryCases = async (prisma2, datasetRows, projectIdMap, repositor
                   combinedStepText += (combinedStepText ? "\n" : "") + `<data>${stepData}</data>`;
                 }
                 const stepPayload = convertToTipTapJsonValue(combinedStepText);
-                if (stepPayload !== void 0 && stepPayload !== null) {
+                if (stepPayload !== null) {
                   stepEntry.step = JSON.stringify(stepPayload);
                 }
               }
@@ -9046,7 +9038,7 @@ var importRepositoryCases = async (prisma2, datasetRows, projectIdMap, repositor
                   combinedExpectedText += (combinedExpectedText ? "\n" : "") + `<data>${expectedResultData}</data>`;
                 }
                 const expectedPayload = convertToTipTapJsonValue(combinedExpectedText);
-                if (expectedPayload !== void 0 && expectedPayload !== null) {
+                if (expectedPayload !== null) {
                   stepEntry.expectedResult = JSON.stringify(expectedPayload);
                 }
               }
@@ -9491,7 +9483,7 @@ var importTestRunCases = async (prisma2, datasetRows, testRunIdMap, caseIdMap, c
         continue;
       }
       let repositoryCaseId = caseIdMap.get(caseSourceId);
-      if (!repositoryCaseId && caseSourceId !== null) {
+      if (!repositoryCaseId) {
         const meta = caseMetaMap.get(caseSourceId);
         if (meta) {
           const fallbackCase = await prisma2.repositoryCases.findFirst({

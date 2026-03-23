@@ -92,7 +92,7 @@ Each prompt within a configuration can optionally use a different LLM integratio
   - **Integration name** — All prompts use the same integration
   - **N LLMs** badge — Prompts use different integrations across features
 
-See [AI Models — LLM Resolution Chain](../llm-integrations#llm-resolution-chain) for how TestPlanIt determines which LLM is used when multiple levels of configuration exist.
+See [LLM Resolution Chain](../llm-integrations#llm-resolution-chain) for how TestPlanIt determines which LLM is used when multiple levels of configuration exist.
 
 ## Project Assignment
 

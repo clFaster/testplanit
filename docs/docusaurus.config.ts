@@ -127,7 +127,7 @@ const config: Config = {
     navbar: {
       title: 'TestPlanIt Docs',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'TestPlanIt Logo',
         src: 'img/logo.svg',
       },
       items: [
