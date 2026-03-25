@@ -1,3 +1,9 @@
+## [0.18.1](https://github.com/TestPlanIt/testplanit/compare/v0.18.0...v0.18.1) (2026-03-25)
+
+### Enhancements
+
+* **workers:** add new workers for copy-move and duplicate-scan processes ([5762a38](https://github.com/TestPlanIt/testplanit/commit/5762a3866724c86f4b977b84769e4ed82cce9cee))
+
 ## [0.18.0](https://github.com/TestPlanIt/testplanit/compare/v0.17.1...v0.18.0) (2026-03-25)
 
 ### Features
