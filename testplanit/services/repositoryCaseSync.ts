@@ -215,9 +215,10 @@ async function buildFolderPath(
  */
 export async function syncRepositoryCaseToElasticsearch(
   caseId: number,
-  tenantId?: string
+  tenantId?: string,
+  prismaClient?: PrismaClientType
 ): Promise<boolean> {
-  const doc = await buildRepositoryCaseDocument(caseId);
+  const doc = await buildRepositoryCaseDocument(caseId, prismaClient);
   if (!doc) {
     // Case no longer exists (hard deleted) - remove from Elasticsearch
     await deleteRepositoryCase(caseId, tenantId);

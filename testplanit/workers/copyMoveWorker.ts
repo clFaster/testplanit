@@ -707,7 +707,7 @@ const processor = async (job: Job<CopyMoveJobData>): Promise<CopyMoveJobResult> 
   await job.updateProgress({ processed: sourceCases.length, total: sourceCases.length, finalizing: true });
 
   for (const id of createdTargetIds) {
-    syncRepositoryCaseToElasticsearch(id).catch((err) =>
+    syncRepositoryCaseToElasticsearch(id, job.data.tenantId, prisma).catch((err) =>
       console.error(`ES sync failed for new case ${id}:`, err)
     );
   }
@@ -715,7 +715,7 @@ const processor = async (job: Job<CopyMoveJobData>): Promise<CopyMoveJobResult> 
   // For move: also remove source cases from ES index (best-effort)
   if (job.data.operation === "move") {
     for (const sourceId of job.data.caseIds) {
-      syncRepositoryCaseToElasticsearch(sourceId).catch((err) =>
+      syncRepositoryCaseToElasticsearch(sourceId, job.data.tenantId, prisma).catch((err) =>
         console.error(`ES sync failed for moved source case ${sourceId}:`, err)
       );
     }

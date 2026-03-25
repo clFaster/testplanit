@@ -87,7 +87,7 @@ export async function processStepScan(
   });
 
   // 4. Resolve shared step placeholders BEFORE scanning (prevents false-positive matches)
-  const resolvedCases = await resolveSharedSteps(cases as any[]);
+  const resolvedCases = await resolveSharedSteps(cases as any[], prisma);
 
   // 5. Report initial progress so the UI shows a progress bar immediately
   const totalPairs = (resolvedCases.length * (resolvedCases.length - 1)) / 2;

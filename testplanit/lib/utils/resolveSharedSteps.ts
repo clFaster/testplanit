@@ -1,4 +1,4 @@
-import { prisma } from "~/lib/prisma";
+import { prisma as defaultPrisma } from "~/lib/prisma";
 
 /**
  * Minimal shape required for a step to be resolved.
@@ -22,10 +22,15 @@ export interface StepWithSharedRef {
  * the real step items from the shared step group, maintaining insertion order.
  *
  * Uses a single batch query for all shared step groups across all cases.
+ *
+ * @param cases - Array of cases with steps to resolve
+ * @param prismaClient - Optional Prisma client (defaults to the app's global client;
+ *   pass tenant client in multi-tenant workers)
  */
 export async function resolveSharedSteps<
   T extends { steps?: StepWithSharedRef[] },
->(cases: T[]): Promise<T[]> {
+>(cases: T[], prismaClient?: any): Promise<T[]> {
+  const prisma = prismaClient ?? defaultPrisma;
   // Collect all unique sharedStepGroupIds across all cases
   const sharedGroupIds = new Set<number>();
   for (const c of cases) {
