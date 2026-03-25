@@ -145,6 +145,45 @@ module.exports = {
       env: {
         NODE_ENV: 'production'
       }
+    },
+    {
+      name: 'copy-move-worker',
+      script: isDev ? 'tsx' : 'node',
+      args: isDev ? 'workers/copyMoveWorker.ts' : 'dist/workers/copyMoveWorker.js',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '512M',
+      node_args: '--max-old-space-size=384',
+      env: {
+        NODE_ENV: 'production'
+      }
+    },
+    {
+      name: 'duplicate-scan-worker',
+      script: isDev ? 'tsx' : 'node',
+      args: isDev ? 'workers/duplicateScanWorker.ts' : 'dist/workers/duplicateScanWorker.js',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '512M',
+      node_args: '--max-old-space-size=384',
+      env: {
+        NODE_ENV: 'production'
+      }
+    },
+    {
+      name: 'step-scan-worker',
+      script: isDev ? 'tsx' : 'node',
+      args: isDev ? 'workers/stepSequenceScanWorker.ts' : 'dist/workers/stepSequenceScanWorker.js',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '512M',
+      node_args: '--max-old-space-size=384',
+      env: {
+        NODE_ENV: 'production'
+      }
     }
   ]
 };

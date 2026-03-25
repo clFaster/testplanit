@@ -35,10 +35,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Prevent duplicate concurrent scans for the same project
+    // Prevent duplicate concurrent scans for the same project+tenant
+    const tenantId = getCurrentTenantId();
     const existingJobs = await queue.getJobs(["active", "waiting"]);
     const existing = existingJobs.find(
-      (j) => j.data?.projectId === parsed.data.projectId,
+      (j) =>
+        j.data?.projectId === parsed.data.projectId &&
+        j.data?.tenantId === tenantId,
     );
     if (existing) {
       return NextResponse.json({ jobId: existing.id });
@@ -47,7 +50,7 @@ export async function POST(request: Request) {
     const job = await queue.add("scan-project", {
       projectId: parsed.data.projectId,
       userId: session.user.id,
-      tenantId: getCurrentTenantId(),
+      tenantId,
     });
 
     return NextResponse.json({ jobId: job.id });
