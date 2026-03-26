@@ -1,3 +1,9 @@
+## [0.18.5](https://github.com/TestPlanIt/testplanit/compare/v0.18.4...v0.18.5) (2026-03-26)
+
+### Enhancements
+
+* **auditLog:** enhance tenantId handling in audit events ([ea40819](https://github.com/TestPlanIt/testplanit/commit/ea408193f33bd05f56ebc5b0cf6ad95d6aed47f6))
+
 ## [0.18.4](https://github.com/TestPlanIt/testplanit/compare/v0.18.3...v0.18.4) (2026-03-26)
 
 ### Enhancements
