@@ -4084,7 +4084,12 @@
         "testmo-imports": "Testmo Imports",
         "elasticsearch-reindex": "Elasticsearch Reindex",
         "audit-logs": "Audit Logs",
-        "auto-tag": "AI Auto-Tag"
+        "budget-alerts": "Budget Alerts",
+        "auto-tag": "AI Auto-Tag",
+        "repo-cache": "Repository Cache",
+        "copy-move": "Copy & Move",
+        "duplicate-scan": "Duplicate Scan",
+        "step-scan": "Step Sequence Scan"
       },
       "status": {
         "paused": "Paused",

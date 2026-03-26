@@ -490,7 +490,7 @@ describe("CopyMoveWorker", () => {
       const { processor } = await loadWorker();
       await processor(makeMockJob() as Job);
 
-      expect(mockSyncToES).toHaveBeenCalledWith(1001);
+      expect(mockSyncToES).toHaveBeenCalledWith(1001, undefined, mockPrisma);
     });
 
     it("should NOT copy comments on copy operation", async () => {
@@ -1118,8 +1118,8 @@ describe("CopyMoveWorker", () => {
       await processor(makeMockJob({ id: "job-es-1", data: jobData }) as Job);
 
       // ES sync called for both created target case IDs
-      expect(mockSyncToES).toHaveBeenCalledWith(1001);
-      expect(mockSyncToES).toHaveBeenCalledWith(1002);
+      expect(mockSyncToES).toHaveBeenCalledWith(1001, undefined, mockPrisma);
+      expect(mockSyncToES).toHaveBeenCalledWith(1002, undefined, mockPrisma);
       expect(mockSyncToES).toHaveBeenCalledTimes(2);
     });
 

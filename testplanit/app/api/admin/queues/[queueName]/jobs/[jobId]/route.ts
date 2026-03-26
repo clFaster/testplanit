@@ -59,7 +59,12 @@ function getQueueByName(queueName: string): Queue | null {
     "testmo-imports": allQueues.testmoImportQueue,
     "elasticsearch-reindex": allQueues.elasticsearchReindexQueue,
     "audit-logs": allQueues.auditLogQueue,
+    "budget-alerts": allQueues.budgetAlertQueue,
     "auto-tag": allQueues.autoTagQueue,
+    "repo-cache": allQueues.repoCacheQueue,
+    "copy-move": allQueues.copyMoveQueue,
+    "duplicate-scan": allQueues.duplicateScanQueue,
+    "step-scan": allQueues.stepScanQueue,
   };
   return queueMap[queueName] ?? null;
 }

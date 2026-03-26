@@ -1,4 +1,4 @@
-import { prisma as defaultPrisma } from "~/lib/prisma";
+import { prisma as defaultPrisma } from "../prismaBase";
 
 /**
  * Minimal shape required for a step to be resolved.
@@ -24,7 +24,7 @@ export interface StepWithSharedRef {
  * Uses a single batch query for all shared step groups across all cases.
  *
  * @param cases - Array of cases with steps to resolve
- * @param prismaClient - Optional Prisma client (defaults to the app's global client;
+ * @param prismaClient - Optional Prisma client (defaults to the lightweight base client;
  *   pass tenant client in multi-tenant workers)
  */
 export async function resolveSharedSteps<
@@ -87,7 +87,7 @@ export async function resolveSharedSteps<
             expectedResult: item.expectedResult,
             order: step.order,
             isDeleted: false,
-            sharedStepGroupId: null,
+            sharedStepGroupId: step.sharedStepGroupId,
           });
         }
       } else if (step.sharedStepGroupId != null) {

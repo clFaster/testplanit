@@ -4084,7 +4084,12 @@
         "testmo-imports": "Importaciones de Testmo",
         "elasticsearch-reindex": "Reindexación de Elasticsearch",
         "audit-logs": "Registros de auditoría",
-        "auto-tag": "Etiquetado automático con IA"
+        "budget-alerts": "Alertas presupuestarias",
+        "auto-tag": "Etiquetado automático con IA",
+        "repo-cache": "Caché del repositorio",
+        "copy-move": "Copiar y mover",
+        "duplicate-scan": "Escaneo duplicado",
+        "step-scan": "Escaneo de secuencia de pasos"
       },
       "status": {
         "paused": "En pausa",

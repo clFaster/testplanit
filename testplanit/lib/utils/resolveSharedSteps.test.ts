@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveSharedSteps, StepWithSharedRef } from "./resolveSharedSteps";
 
-// Mock prisma
-vi.mock("~/lib/prisma", () => ({
+// Mock prismaBase (lazy-loaded fallback when no client is passed)
+vi.mock("../prismaBase", () => ({
   prisma: {
     sharedStepItem: {
       findMany: vi.fn(),
@@ -10,7 +10,7 @@ vi.mock("~/lib/prisma", () => ({
   },
 }));
 
-import { prisma } from "~/lib/prisma";
+import { prisma } from "../prismaBase";
 
 const mockFindMany = vi.mocked(prisma.sharedStepItem.findMany);
 
@@ -96,9 +96,9 @@ describe("resolveSharedSteps", () => {
     expect(result[0].steps).toHaveLength(2);
     expect(result[0].steps![0].step).toEqual(makeSharedItem(201, 100, 0).step);
     expect(result[0].steps![1].step).toEqual(makeSharedItem(202, 100, 1).step);
-    // Shared step references should be cleared
-    expect(result[0].steps![0].sharedStepGroupId).toBeNull();
-    expect(result[0].steps![1].sharedStepGroupId).toBeNull();
+    // Expanded steps should preserve the shared step group ID they came from
+    expect(result[0].steps![0].sharedStepGroupId).toBe(100);
+    expect(result[0].steps![1].sharedStepGroupId).toBe(100);
   });
 
   it("maintains order with mixed regular and shared steps", async () => {
@@ -227,7 +227,7 @@ describe("resolveSharedSteps", () => {
 
     // Original should still have the shared ref
     expect(cases[0].steps[0].sharedStepGroupId).toBe(100);
-    // Result should have expanded items
-    expect(result[0].steps![0].sharedStepGroupId).toBeNull();
+    // Result should have expanded items (preserving the group ID)
+    expect(result[0].steps![0].sharedStepGroupId).toBe(100);
   });
 });

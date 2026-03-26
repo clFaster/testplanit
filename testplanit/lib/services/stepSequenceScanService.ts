@@ -47,6 +47,7 @@ interface CaseInput {
     step: any; // TipTap JSON or plain string
     expectedResult: any; // TipTap JSON or plain string
     order: number;
+    sharedStepGroupId?: number | null;
   }>;
 }
 
@@ -55,6 +56,7 @@ interface ExtractedStep {
   step: string; // plain text after extractStepText
   expectedResult: string; // plain text after extractStepText
   order: number;
+  sharedStepGroupId?: number | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -97,6 +99,7 @@ export class StepSequenceScanService {
           step: extractStepText(s.step),
           expectedResult: extractStepText(s.expectedResult),
           order: s.order,
+          sharedStepGroupId: s.sharedStepGroupId ?? null,
         }));
       extracted.set(c.id, steps);
 
@@ -206,10 +209,42 @@ export class StepSequenceScanService {
       await onProgress(totalPairs, totalPairs);
     }
 
-    // 3. Return only groups that have >= 2 members (sanity check — all should)
-    return Array.from(fingerprintToGroup.values()).filter(
-      (g) => g.members.length >= 2,
-    );
+    // 3. Filter out false positives where matched steps are already shared
+    //    (all steps in the sequence across all member cases originate from the
+    //    same sharedStepGroupId — they're already using a shared step group)
+    // 4. Return only groups that have >= 2 members (sanity check — all should)
+    return Array.from(fingerprintToGroup.values()).filter((g) => {
+      if (g.members.length < 2) return false;
+
+      // Collect shared step group IDs from all matched steps across all members
+      const groupIds = new Set<number>();
+      let allFromSharedGroup = true;
+
+      for (const member of g.members) {
+        const memberSteps = extracted.get(member.caseId);
+        if (!memberSteps) { allFromSharedGroup = false; break; }
+
+        // Find steps in the matched range by ID
+        const startIdx = memberSteps.findIndex((s) => s.id === member.startStepId);
+        const endIdx = memberSteps.findIndex((s) => s.id === member.endStepId);
+        if (startIdx === -1 || endIdx === -1) { allFromSharedGroup = false; break; }
+
+        for (let k = startIdx; k <= endIdx; k++) {
+          const sgId = memberSteps[k]?.sharedStepGroupId;
+          if (sgId == null) {
+            allFromSharedGroup = false;
+            break;
+          }
+          groupIds.add(sgId);
+        }
+        if (!allFromSharedGroup) break;
+      }
+
+      // If all matched steps come from a single shared step group, it's a false positive
+      if (allFromSharedGroup && groupIds.size === 1) return false;
+
+      return true;
+    });
   }
 }
 

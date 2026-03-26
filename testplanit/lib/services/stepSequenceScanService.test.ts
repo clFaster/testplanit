@@ -317,6 +317,74 @@ describe("StepSequenceScanService", async () => {
   // Shared step placeholder false-positive documentation
   // -------------------------------------------------------------------------
 
+  // -------------------------------------------------------------------------
+  // Shared step group false-positive filtering
+  // -------------------------------------------------------------------------
+
+  it("filters out sequences where all matched steps come from the same shared step group", async () => {
+    // Two cases that both use shared step group 100 — after resolveSharedSteps
+    // they have identical step text with sharedStepGroupId preserved
+    const a = makeCase(1, [
+      { id: 1, step: "Navigate to login page", expectedResult: "", order: 1 },
+      { id: 2, step: "Enter username", expectedResult: "", order: 2 },
+      { id: 3, step: "Enter password", expectedResult: "", order: 3 },
+    ]);
+    // Add sharedStepGroupId to all steps
+    a.steps = a.steps.map((s) => ({ ...s, sharedStepGroupId: 100 }));
+
+    const b = makeCase(2, [
+      { id: 10, step: "Navigate to login page", expectedResult: "", order: 1 },
+      { id: 11, step: "Enter username", expectedResult: "", order: 2 },
+      { id: 12, step: "Enter password", expectedResult: "", order: 3 },
+    ]);
+    b.steps = b.steps.map((s) => ({ ...s, sharedStepGroupId: 100 }));
+
+    const result = await service.findSharedSequences([a, b]);
+    // Should be filtered out — these steps are already shared
+    expect(result).toHaveLength(0);
+  });
+
+  it("does NOT filter sequences where steps come from different shared step groups", async () => {
+    const a = makeCase(1, [
+      { id: 1, step: "Navigate to login page", expectedResult: "", order: 1 },
+      { id: 2, step: "Enter username", expectedResult: "", order: 2 },
+      { id: 3, step: "Enter password", expectedResult: "", order: 3 },
+    ]);
+    a.steps = a.steps.map((s) => ({ ...s, sharedStepGroupId: 100 }));
+
+    const b = makeCase(2, [
+      { id: 10, step: "Navigate to login page", expectedResult: "", order: 1 },
+      { id: 11, step: "Enter username", expectedResult: "", order: 2 },
+      { id: 12, step: "Enter password", expectedResult: "", order: 3 },
+    ]);
+    b.steps = b.steps.map((s) => ({ ...s, sharedStepGroupId: 200 }));
+
+    const result = await service.findSharedSequences([a, b]);
+    // Different shared step groups — should still be reported as duplicates
+    expect(result).toHaveLength(1);
+  });
+
+  it("does NOT filter sequences with a mix of shared and regular steps", async () => {
+    const a = makeCase(1, [
+      { id: 1, step: "Navigate to login page", expectedResult: "", order: 1 },
+      { id: 2, step: "Enter username", expectedResult: "", order: 2 },
+      { id: 3, step: "Enter password", expectedResult: "", order: 3 },
+    ]);
+    // First step is from shared group, rest are regular
+    a.steps = a.steps.map((s, i) => ({ ...s, sharedStepGroupId: i === 0 ? 100 : null }));
+
+    const b = makeCase(2, [
+      { id: 10, step: "Navigate to login page", expectedResult: "", order: 1 },
+      { id: 11, step: "Enter username", expectedResult: "", order: 2 },
+      { id: 12, step: "Enter password", expectedResult: "", order: 3 },
+    ]);
+    b.steps = b.steps.map((s, i) => ({ ...s, sharedStepGroupId: i === 0 ? 100 : null }));
+
+    const result = await service.findSharedSequences([a, b]);
+    // Mix of shared and regular — should still be reported
+    expect(result).toHaveLength(1);
+  });
+
   it("skips cases with empty step text (unresolved shared step placeholders) due to token overlap pre-filter", async () => {
     // Two cases that both have steps with empty text (simulating unresolved shared step placeholders)
     // The token overlap pre-filter correctly skips these since empty strings produce no tokens

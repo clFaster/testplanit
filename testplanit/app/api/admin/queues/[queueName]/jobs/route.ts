@@ -16,7 +16,12 @@ function getQueueByName(queueName: string): Queue | null {
     "testmo-imports": allQueues.testmoImportQueue,
     "elasticsearch-reindex": allQueues.elasticsearchReindexQueue,
     "audit-logs": allQueues.auditLogQueue,
+    "budget-alerts": allQueues.budgetAlertQueue,
     "auto-tag": allQueues.autoTagQueue,
+    "repo-cache": allQueues.repoCacheQueue,
+    "copy-move": allQueues.copyMoveQueue,
+    "duplicate-scan": allQueues.duplicateScanQueue,
+    "step-scan": allQueues.stepScanQueue,
   };
   return queueMap[queueName] ?? null;
 }
@@ -88,12 +93,14 @@ export async function GET(
       );
     }
 
-    // Helper to filter jobs by tenant
-    const filterByTenant = (jobs: Job[]): Job[] => {
+    // Helper to filter jobs by tenant (also strips null entries from getJobs)
+    const filterByTenant = (jobs: (Job | undefined | null)[]): Job[] => {
+      // getJobs() can return null/undefined for removed-but-indexed entries
+      const valid = jobs.filter((j): j is Job => j != null && j.id != null);
       if (!multiTenant) {
-        return jobs;
+        return valid;
       }
-      return jobs.filter((job) => job.data?.tenantId === currentTenantId);
+      return valid.filter((job) => job.data?.tenantId === currentTenantId);
     };
 
     let allFilteredJobs: Job[];
@@ -122,25 +129,45 @@ export async function GET(
     const total = allFilteredJobs.length;
     const jobs = allFilteredJobs.slice(start, end);
 
-    // Format jobs for response
+    // Format jobs for response — handle per-job errors gracefully so one
+    // broken entry (e.g. a stale job scheduler) doesn't fail the whole request
     const formattedJobs = await Promise.all(
       jobs.map(async (job) => {
-        const state = await job.getState();
-        return {
-          id: job.id,
-          name: job.name,
-          data: job.data,
-          opts: job.opts,
-          progress: job.progress,
-          returnvalue: job.returnvalue,
-          stacktrace: job.stacktrace,
-          timestamp: job.timestamp,
-          attemptsMade: job.attemptsMade,
-          failedReason: job.failedReason,
-          finishedOn: job.finishedOn,
-          processedOn: job.processedOn,
-          state,
-        };
+        try {
+          const state = await job.getState();
+          return {
+            id: job.id,
+            name: job.name,
+            data: job.data,
+            opts: job.opts,
+            progress: job.progress,
+            returnvalue: job.returnvalue,
+            stacktrace: job.stacktrace,
+            timestamp: job.timestamp,
+            attemptsMade: job.attemptsMade,
+            failedReason: job.failedReason,
+            finishedOn: job.finishedOn,
+            processedOn: job.processedOn,
+            state,
+          };
+        } catch {
+          // Return what we can — getState() may fail for scheduler entries
+          return {
+            id: job.id,
+            name: job.name ?? "unknown",
+            data: job.data,
+            opts: job.opts,
+            progress: job.progress,
+            returnvalue: job.returnvalue,
+            stacktrace: job.stacktrace,
+            timestamp: job.timestamp,
+            attemptsMade: job.attemptsMade,
+            failedReason: job.failedReason,
+            finishedOn: job.finishedOn,
+            processedOn: job.processedOn,
+            state: "unknown",
+          };
+        }
       })
     );
 

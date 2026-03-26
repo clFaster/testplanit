@@ -165,7 +165,12 @@ export function QueueManagement() {
       "testmo-imports": t("queueNames.testmo-imports"),
       "elasticsearch-reindex": t("queueNames.elasticsearch-reindex"),
       "audit-logs": t("queueNames.audit-logs"),
+      "budget-alerts": t("queueNames.budget-alerts"),
       "auto-tag": t("queueNames.auto-tag"),
+      "repo-cache": t("queueNames.repo-cache"),
+      "copy-move": t("queueNames.copy-move"),
+      "duplicate-scan": t("queueNames.duplicate-scan"),
+      "step-scan": t("queueNames.step-scan"),
     };
     return queueNames[name] || name;
   };
@@ -178,7 +183,7 @@ export function QueueManagement() {
   const getStatusBadge = (queue: QueueInfo) => {
     if (queue.error) {
       return (
-        <Badge variant="destructive" className="flex items-center gap-1">
+        <Badge variant="destructive" className="flex items-center gap-1" title={queue.error}>
           <XCircle className="h-3 w-3" />
           {tGlobal("common.errors.error")}
         </Badge>

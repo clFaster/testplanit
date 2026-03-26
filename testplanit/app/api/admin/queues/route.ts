@@ -52,7 +52,12 @@ export async function GET(request: NextRequest) {
       'testmo-imports': 1,
       'elasticsearch-reindex': 2,
       'audit-logs': 5,
-      'auto-tag': 1
+      'budget-alerts': 3,
+      'auto-tag': 1,
+      'repo-cache': 2,
+      'copy-move': 1,
+      'duplicate-scan': 1,
+      'step-scan': 1
     };
 
     // Get configured concurrency from environment (or use defaults)
@@ -64,7 +69,12 @@ export async function GET(request: NextRequest) {
       'testmo-imports': parseInt(process.env.TESTMO_IMPORT_CONCURRENCY || String(defaultConcurrency['testmo-imports']), 10),
       'elasticsearch-reindex': parseInt(process.env.ELASTICSEARCH_REINDEX_CONCURRENCY || String(defaultConcurrency['elasticsearch-reindex']), 10),
       'audit-logs': parseInt(process.env.AUDIT_LOG_CONCURRENCY || String(defaultConcurrency['audit-logs']), 10),
-      'auto-tag': parseInt(process.env.AUTO_TAG_CONCURRENCY || String(defaultConcurrency['auto-tag']), 10)
+      'budget-alerts': parseInt(process.env.BUDGET_ALERT_CONCURRENCY || String(defaultConcurrency['budget-alerts']), 10),
+      'auto-tag': parseInt(process.env.AUTO_TAG_CONCURRENCY || String(defaultConcurrency['auto-tag']), 10),
+      'repo-cache': parseInt(process.env.REPO_CACHE_CONCURRENCY || String(defaultConcurrency['repo-cache']), 10),
+      'copy-move': parseInt(process.env.COPY_MOVE_CONCURRENCY || String(defaultConcurrency['copy-move']), 10),
+      'duplicate-scan': parseInt(process.env.DUPLICATE_SCAN_CONCURRENCY || String(defaultConcurrency['duplicate-scan']), 10),
+      'step-scan': parseInt(process.env.STEP_SCAN_CONCURRENCY || String(defaultConcurrency['step-scan']), 10)
     };
 
     const allQueues = getAllQueues();
@@ -76,7 +86,12 @@ export async function GET(request: NextRequest) {
       { name: 'testmo-imports', queue: allQueues.testmoImportQueue },
       { name: 'elasticsearch-reindex', queue: allQueues.elasticsearchReindexQueue },
       { name: 'audit-logs', queue: allQueues.auditLogQueue },
-      { name: 'auto-tag', queue: allQueues.autoTagQueue }
+      { name: 'budget-alerts', queue: allQueues.budgetAlertQueue },
+      { name: 'auto-tag', queue: allQueues.autoTagQueue },
+      { name: 'repo-cache', queue: allQueues.repoCacheQueue },
+      { name: 'copy-move', queue: allQueues.copyMoveQueue },
+      { name: 'duplicate-scan', queue: allQueues.duplicateScanQueue },
+      { name: 'step-scan', queue: allQueues.stepScanQueue }
     ];
 
     // Get current tenant ID for filtering in multi-tenant mode
@@ -120,9 +135,9 @@ export async function GET(request: NextRequest) {
               queue.getJobs(['paused'], 0, 1000)
             ]);
 
-            // Filter jobs by tenantId
+            // Filter jobs by tenantId (strip null entries from getJobs)
             const filterByTenant = (jobs: any[]) =>
-              jobs.filter(job => job.data?.tenantId === currentTenantId).length;
+              jobs.filter(job => job != null && job.data?.tenantId === currentTenantId).length;
 
             counts = {
               waiting: filterByTenant(waiting),
