@@ -1,8 +1,39 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import type { PrismaClient } from "@prisma/client";
+import type { Prisma, PrismaClient } from "@prisma/client";
 import { hash } from "bcrypt";
-import type { Adapter, AdapterUser } from "next-auth/adapters";
+import type { Adapter, AdapterAccount, AdapterUser } from "next-auth/adapters";
 import { NotificationService } from "~/lib/services/notificationService";
+
+const ACCOUNT_FIELDS: Record<keyof Prisma.AccountUncheckedCreateInput, true> = {
+  id: true,
+  userId: true,
+  type: true,
+  provider: true,
+  providerAccountId: true,
+  refresh_token: true,
+  access_token: true,
+  expires_at: true,
+  token_type: true,
+  scope: true,
+  id_token: true,
+  session_state: true,
+};
+
+function sanitizeAccountData(account: AdapterAccount): Prisma.AccountUncheckedCreateInput {
+  const result: Record<string, unknown> = {};
+
+  for (const key of Object.keys(ACCOUNT_FIELDS)) {
+    if (key in account) {
+      result[key] = account[key as keyof AdapterAccount];
+    }
+  }
+
+  if (result.session_state && typeof result.session_state !== "string") {
+    result.session_state = null;
+  }
+
+  return result as Prisma.AccountUncheckedCreateInput;
+}
 
 /**
  * Custom Prisma adapter that ensures UserPreferences are created
@@ -13,6 +44,11 @@ export function createCustomPrismaAdapter(prisma: PrismaClient): Adapter {
 
   return {
     ...baseAdapter,
+    async linkAccount(account: AdapterAccount) {
+      return prisma.account.create({
+        data: sanitizeAccountData(account),
+      }) as unknown as AdapterAccount;
+    },
     // Override createVerificationToken to add timing protection
     async createVerificationToken(data: { identifier: string; expires: Date; token: string }) {
       // Always create the token (for both existing and non-existing users)
