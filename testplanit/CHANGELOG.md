@@ -1,3 +1,9 @@
+## [0.18.4](https://github.com/TestPlanIt/testplanit/compare/v0.18.3...v0.18.4) (2026-03-26)
+
+### Enhancements
+
+* enhance queue management and job handling ([ebc9171](https://github.com/TestPlanIt/testplanit/commit/ebc9171b104516c8c35f041bfe420a4ed1fd6122))
+
 ## [0.18.3](https://github.com/TestPlanIt/testplanit/compare/v0.18.2...v0.18.3) (2026-03-25)
 
 ### Bug Fixes
