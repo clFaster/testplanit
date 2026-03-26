@@ -1,3 +1,9 @@
+## [0.18.7](https://github.com/TestPlanIt/testplanit/compare/v0.18.6...v0.18.7) (2026-03-26)
+
+### Enhancements
+
+* **page titles:** Enhancement/page routing improvements ([#154](https://github.com/TestPlanIt/testplanit/issues/154)) ([6470b7e](https://github.com/TestPlanIt/testplanit/commit/6470b7e8e94f2dbb490bc4ea2a8d6b426122a5ed))
+
 ## [0.18.6](https://github.com/TestPlanIt/testplanit/compare/v0.18.5...v0.18.6) (2026-03-26)
 
 ### Bug Fixes
