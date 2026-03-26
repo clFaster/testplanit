@@ -1,3 +1,9 @@
+## [0.18.6](https://github.com/TestPlanIt/testplanit/compare/v0.18.5...v0.18.6) (2026-03-26)
+
+### Bug Fixes
+
+* Authentication with Microsoft SSO by sanitizeAccountData function for OAuth account linking ([#153](https://github.com/TestPlanIt/testplanit/issues/153)) ([0c79039](https://github.com/TestPlanIt/testplanit/commit/0c7903978d10c028cdf4827ffc438fc55abdf077))
+
 ## [0.18.5](https://github.com/TestPlanIt/testplanit/compare/v0.18.4...v0.18.5) (2026-03-26)
 
 ### Enhancements
