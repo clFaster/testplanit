@@ -1,3 +1,9 @@
+## [0.18.8](https://github.com/TestPlanIt/testplanit/compare/v0.18.7...v0.18.8) (2026-03-27)
+
+### Bug Fixes
+
+* **permissions:** Fix ACLs on Steps table ([#156](https://github.com/TestPlanIt/testplanit/issues/156)) ([c75ee1f](https://github.com/TestPlanIt/testplanit/commit/c75ee1fd2a3f6e07404f14db57eec9d63b83b3ed))
+
 ## [0.18.7](https://github.com/TestPlanIt/testplanit/compare/v0.18.6...v0.18.7) (2026-03-26)
 
 ### Enhancements
