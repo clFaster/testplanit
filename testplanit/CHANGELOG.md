@@ -1,3 +1,14 @@
+## [0.18.10](https://github.com/TestPlanIt/testplanit/compare/v0.18.9...v0.18.10) (2026-03-27)
+
+### Bug Fixes
+
+* Update dependencies to latest versions ([0525833](https://github.com/TestPlanIt/testplanit/commit/0525833cd9814f203b61f48766647a45a20b0def))
+* Update documentation link for Magic Select background worker setup ([e15a341](https://github.com/TestPlanIt/testplanit/commit/e15a341bfa6b6c0226728737c2421907d5c06951))
+
+### Enhancements
+
+* Improve LLM Request Handling: Token Management, Retry Logic, and Background Processing ([#159](https://github.com/TestPlanIt/testplanit/issues/159)) ([07a5e39](https://github.com/TestPlanIt/testplanit/commit/07a5e39b3bc0c1f08bc7881329e0d123b5185e1e))
+
 ## [0.18.9](https://github.com/TestPlanIt/testplanit/compare/v0.18.8...v0.18.9) (2026-03-27)
 
 ### Bug Fixes
