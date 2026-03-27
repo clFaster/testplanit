@@ -2,12 +2,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // ─── Stable mock refs via vi.hoisted() ───────────────────────────────────────
 
-const { mockGetServerSession, mockEnhance, mockPrismaUserFindUnique } =
-  vi.hoisted(() => ({
-    mockGetServerSession: vi.fn(),
-    mockEnhance: vi.fn(),
-    mockPrismaUserFindUnique: vi.fn(),
-  }));
+const {
+  mockGetServerSession,
+  mockEnhance,
+  mockPrismaUserFindUnique,
+} = vi.hoisted(() => ({
+  mockGetServerSession: vi.fn(),
+  mockEnhance: vi.fn(),
+  mockPrismaUserFindUnique: vi.fn(),
+}));
 
 // ─── Mock next-auth ───────────────────────────────────────────────────────────
 
@@ -117,7 +120,7 @@ function setupDefaultMocks() {
 
   mockEnhancedDb.repositoryCases.findMany
     .mockResolvedValueOnce(baseSourceCases) // source cases
-    .mockResolvedValueOnce([]); // collisions
+    .mockResolvedValueOnce([]); // collision check (no collisions by default)
 
   mockEnhancedDb.templateProjectAssignment.findMany.mockResolvedValue(
     baseTargetTemplateAssignments,
@@ -195,10 +198,9 @@ describe("POST /api/repository/copy-move/preflight", () => {
     // Override: source case uses templateId 99 which is not in target assignments
     mockEnhancedDb.repositoryCases.findMany
       .mockReset()
-      .mockResolvedValueOnce([
+      .mockResolvedValue([
         { ...baseSourceCases[0], templateId: 99 },
-      ])
-      .mockResolvedValueOnce([]);
+      ]);
     mockEnhancedDb.templateProjectAssignment.findMany.mockResolvedValue([
       { templateId: 10, template: { id: 10, name: "Default Template" } },
     ]);
@@ -280,10 +282,9 @@ describe("POST /api/repository/copy-move/preflight", () => {
     // Source case has a state "Custom State" (id=999) not in target workflow
     mockEnhancedDb.repositoryCases.findMany
       .mockReset()
-      .mockResolvedValueOnce([
+      .mockResolvedValue([
         { ...baseSourceCases[0], stateId: 999 },
-      ])
-      .mockResolvedValueOnce([]);
+      ]);
 
     // We need to also mock to return workflow state name for source
     // The route fetches source workflow states separately — let's provide that info
@@ -308,10 +309,9 @@ describe("POST /api/repository/copy-move/preflight", () => {
     setupDefaultMocks();
     mockEnhancedDb.repositoryCases.findMany
       .mockReset()
-      .mockResolvedValueOnce([
+      .mockResolvedValue([
         { ...baseSourceCases[0], stateId: 999 },
-      ])
-      .mockResolvedValueOnce([]);
+      ]);
 
     const { POST } = await import("./route");
     const res = await POST(makeRequest(validBody));
@@ -325,10 +325,11 @@ describe("POST /api/repository/copy-move/preflight", () => {
   // Test 13
   it("returns collisions array when target has cases with matching name/className/source", async () => {
     setupDefaultMocks();
-    // Override second findMany call (collisions check) to return a collision
+    // Override enhanced DB collision check to return a collision
+    // repositoryCases.findMany is called twice: first for source cases, then for collision check
     mockEnhancedDb.repositoryCases.findMany
       .mockReset()
-      .mockResolvedValueOnce(baseSourceCases)
+      .mockResolvedValueOnce(baseSourceCases) // source cases
       .mockResolvedValueOnce([
         {
           id: 99,
@@ -336,7 +337,7 @@ describe("POST /api/repository/copy-move/preflight", () => {
           className: null,
           source: "MANUAL",
         },
-      ]);
+      ]); // collision check
 
     const { POST } = await import("./route");
     const res = await POST(makeRequest(validBody));

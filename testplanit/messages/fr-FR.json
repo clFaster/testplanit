@@ -1094,8 +1094,8 @@
       },
       "aiModels": {
         "description": "Configurer les modèles d'IA pour la génération et l'analyse intelligentes des cas de test",
-        "availableModels": "Modèles disponibles",
-        "availableModelsDescription": "Sélectionnez un modèle d'IA parmi ceux configurés par votre administrateur système.",
+        "availableModels": "Projet par défaut",
+        "availableModelsDescription": "Choisissez un modèle d'IA par défaut pour ce projet parmi ceux configurés par votre administrateur système.",
         "currentModelSettings": "Paramètres du modèle actuel",
         "currentModelDescription": "Détails de configuration du modèle d'IA actuellement actif : {name}",
         "noModelsAvailable": "Aucun modèle d'IA n'est actuellement disponible. Veuillez contacter votre administrateur système pour configurer les modèles d'IA pour votre organisation.",
@@ -1104,21 +1104,23 @@
         "budget": "Budget",
         "streamingTooltip": "Diffusion en continu des réponses en temps réel activée",
         "systemDefault": "Valeur par défaut du système",
+        "setAsDefault": "Définir comme valeur par défaut",
+        "clearDefault": "Effacer par défaut",
         "useForProject": "Utilisation pour un projet",
-        "removeModel": "Supprimer le modèle",
-        "removeWarningTitle": "La suppression de ce modèle d'IA aura pour effet de :",
-        "removeWarning1": "Désactivez toutes les fonctionnalités basées sur l'IA dans ce projet.",
-        "removeWarning2": "Supprimer l'accès à la génération et à l'analyse automatisées des cas de test",
-        "switchModel": "Modèle de commutateur",
-        "switchWarningTitle": "Passer à un modèle d'IA différent permettra de :",
+        "removeModel": "Effacer par défaut",
+        "removeWarningTitle": "Effacer le modèle d'IA par défaut aura pour effet de :",
+        "removeWarning1": "Désactivez les fonctionnalités basées sur l'IA, sauf si des dérogations spécifiques à chaque fonctionnalité sont configurées.",
+        "removeWarning2": "Supprimer le modèle de repli utilisé pour la génération et l'analyse des cas de test",
+        "switchModel": "Modifier la valeur par défaut",
+        "switchWarningTitle": "Modifier le modèle d'IA par défaut aura pour effet de :",
         "switchWarning1": "Modifier le comportement des fonctionnalités d'IA dans ce projet",
         "switchWarning2": "Peut affecter la qualité et le style du contenu généré",
-        "modelAssigned": "Modèle d'IA affecté avec succès au projet",
-        "modelAssignError": "Échec de l'attribution du modèle d'IA au projet",
-        "modelRemoved": "Modèle d'IA retiré du projet avec succès",
-        "modelRemoveError": "Impossible de supprimer le modèle d'IA du projet",
-        "confirmRemove": "Êtes-vous sûr de vouloir supprimer «{name}» de ce projet ?",
-        "confirmSwitch": "Êtes-vous sûr de vouloir passer de \"{from}\" à \"{to}\" ?",
+        "modelAssigned": "Modèle d'IA par défaut défini pour ce projet",
+        "modelAssignError": "Échec de la définition du modèle d'IA par défaut",
+        "modelRemoved": "Modèle d'IA par défaut effacé",
+        "modelRemoveError": "Échec de la suppression du modèle d'IA par défaut",
+        "confirmRemove": "Êtes-vous sûr de vouloir effacer «{name}» comme valeur par défaut pour ce projet ?",
+        "confirmSwitch": "Êtes-vous sûr de vouloir modifier la valeur par défaut de \"{from}\" à \"{to} \" ?",
         "currency": {
           "dollar": "$",
           "perMonth": "/mo"
@@ -1135,6 +1137,8 @@
           "effectiveLlm": "LLM efficace",
           "source": "Source",
           "noOverride": "Aucune modification possible",
+          "noLlm": "Pas de LLM (handicapé)",
+          "disabledOverride": "Désactivé (Priorité)",
           "projectOverride": "Remplacement du projet",
           "promptConfig": "Invite de configuration",
           "noLlmConfigured": "Aucun LLM configuré",
@@ -2090,6 +2094,10 @@
       "buttonText": "Générer des cas de test",
       "title": "Générer des cas de test avec l'IA",
       "description": "Utiliser l'IA pour générer automatiquement des scénarios de test complets à partir de problèmes ou de documents externes.",
+      "generatingPreparing": "Préparation de la demande...",
+      "generatingCallingAi": "En attendant que l'IA génère des cas de test...",
+      "generatingProcessing": "Traitement des cas de test générés...",
+      "generatingHint": "Cela peut prendre une minute en fonction de la complexité de votre document source.",
       "steps": {
         "selectIssue": "Sélectionner la source",
         "selectTemplate": "Choisissez un modèle",
@@ -2154,7 +2162,7 @@
         "templateFields": "Champs du modèle :",
         "moreFields": "... et {count, plural, one {# champ supplémentaire} other {# champs supplémentaires}}"
       },
-      "generating": "Générer des cas de test avec l'IA...",
+      "generatingLegacy": "Générer des cas de test avec l'IA...",
       "import": "{count, plural, =0 {Importer les cas de test} =1 {Importer 1 cas de test} other {Importer # cas de test}}",
       "importing": "{count, plural, =0 {Importation des cas de test...} =1 {Importation de 1 cas de test...} other {Importation de # cas de test...}}",
       "openInExternalSystem": "Ouvrir dans {provider}",
@@ -2307,7 +2315,7 @@
       "tokenUsage": "{total} jetons utilisés",
       "noLlmIntegration": "Les fonctionnalités d'IA nécessitent une intégration LLM. Configurez-en une dans les paramètres du projet.",
       "configure": {
-        "title": "Configurer la sélection",
+        "title": "Étendue du cas de test",
         "description": "Cas de test trouvé {count, plural, =1 {# cas de test} other {# cas de test}} dans le dépôt",
         "descriptionFiltered": "Trouvé {count, plural, =1 {# cas de test potentiellement pertinent} other {# cas de test potentiellement pertinents}} de {total, plural, =1 {# total} other {# total}} dans le dépôt",
         "noMatchesTitle": "Aucun cas de test correspondant trouvé",
@@ -2322,12 +2330,19 @@
       },
       "loading": {
         "batch": "Traitement du lot {current} de {total}",
-        "analyzing": "Analyse des cas de test..."
+        "analyzing": "Analyse des cas de test...",
+        "progress": "Analyse de {analyzed} des cas de test {total}...",
+        "waitingForAi": "En attente de la réponse de l'IA (lot {batch} de {total})...",
+        "selectedSoFar": "{count, plural, =1 {# cas de test sélectionné jusqu'à présent} other {# cas de test sélectionnés jusqu'à présent}}",
+        "resolving_integration": "Résolution de l'intégration de l'IA...",
+        "fetching_cases": "Récupération des cas de test..."
       },
       "success": {
         "title": "Cas de test suggérés",
         "description": "{count, plural, =1 {# cas de test sélectionné} other {# cas de test sélectionnés}} en fonction du contexte d'exécution de vos tests",
-        "linkedCasesAdded": "{count, plural, =1 {# cas liés inclus automatiquement} other {# cas liés inclus automatiquement}}"
+        "linkedCasesAdded": "{count, plural, =1 {# cas liés inclus automatiquement} other {# cas liés inclus automatiquement}}",
+        "truncationWarningTitle": "Résultats partiels",
+        "truncationWarning": "{count, plural, =1 {# lot a été tronqué} other {# lots ont été tronqués}} par le modèle d'IA — certains cas de test peuvent ne pas avoir été évalués."
       },
       "noSuggestions": {
         "title": "Aucun cas de test correspondant",
@@ -4091,6 +4106,7 @@
         "repo-cache": "Cache du dépôt",
         "copy-move": "Copier et déplacer",
         "duplicate-scan": "Analyse en double",
+        "magic-select": "Magic Select",
         "step-scan": "Analyse de la séquence d'étapes"
       },
       "status": {

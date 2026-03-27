@@ -689,6 +689,10 @@ test.describe("Access Control - GLOBAL_ROLE Steps Permission (ACL-06)", () => {
       }
     );
 
+    if (response.status() !== 201) {
+      const errorBody = await response.json().catch(() => null);
+      console.error("Step create failed:", response.status(), JSON.stringify(errorBody));
+    }
     expect(response.status()).toBe(201);
     const result = await response.json();
     expect(result.data.id).toBeGreaterThan(0);

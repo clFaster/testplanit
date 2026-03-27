@@ -1,4 +1,4 @@
-import { LLM_FEATURES } from "@/lib/llm/constants";
+import { LLM_FEATURES, SYNC_RETRY_PROFILE } from "@/lib/llm/constants";
 import { LlmManager } from "@/lib/llm/services/llm-manager.service";
 import { PromptResolver } from "@/lib/llm/services/prompt-resolver.service";
 import type { LlmRequest } from "@/lib/llm/types";
@@ -248,7 +248,7 @@ ADDITIONAL FIELDS (include ALL of these in fieldValues):
 ${optionalFieldsList}
 
 REQUIREMENTS:
-- Generate ${quantityGuidance} test cases that are SPECIFIC to the provided issue
+- Generate ${quantityGuidance} that are SPECIFIC to the provided issue
 - Each test case name should reference the actual feature/functionality being tested${stepsInstruction}${priorityInstruction}
 - CRITICAL: ALL REQUIRED FIELDS must be included in fieldValues with meaningful content
 - IMPORTANT: Include ALL optional fields in fieldValues, especially text fields like Description, Preconditions, and Post Conditions
@@ -337,21 +337,21 @@ STATUS: ${issue.status}${issue.priority ? ` | PRIORITY: ${issue.priority}` : ""}
 
 function getQuantityGuidance(quantity: string): string {
   switch (quantity.toLowerCase()) {
-    case "few":
-      return "2-3";
-    case "several":
-      return "4-6";
-    case "many":
-      return "7-10";
     case "just_one":
-      return "1";
+      return "1 test case";
     case "couple":
-      return "2";
+      return "2 test cases";
+    case "few":
+      return "2-3 test cases";
+    case "several":
+      return "4-6 test cases";
+    case "many":
+      return "7-10 test cases";
     case "all":
     case "maximum":
-      return "10-15";
+      return "as many test cases as needed for comprehensive coverage — the user wants full coverage including edge cases, error scenarios, and boundary conditions";
     default:
-      return "3-5"; // default
+      return "3-5 test cases";
   }
 }
 
@@ -481,9 +481,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Keep projectLlmIntegrations for provider config max tokens lookup
-    const activeLlmIntegration = project.projectLlmIntegrations[0];
-
     // Build the prompts using resolved template as base (or fall back to hard-coded)
     const systemPromptBase = resolvedPrompt.source !== "fallback" ? resolvedPrompt.systemPrompt : undefined;
     const userPromptBase = resolvedPrompt.source !== "fallback" ? resolvedPrompt.userPrompt || undefined : undefined;
@@ -495,13 +492,67 @@ export async function POST(request: NextRequest) {
       autoGenerateTags,
       systemPromptBase
     );
-    const userPrompt = buildUserPrompt(issue, context, userPromptBase);
+    let userPrompt = buildUserPrompt(issue, context, userPromptBase);
 
-    // Use the configured max tokens from the LLM provider, but ensure it's at least 6000
-    const configuredMaxTokens =
-      activeLlmIntegration.llmIntegration.llmProviderConfig?.defaultMaxTokens ||
-      resolvedPrompt.maxOutputTokens;
-    const maxTokens = Math.max(configuredMaxTokens, 6000);
+    // TOKEN-02: Read provider config from the resolved integration (not projectLlmIntegrations[0])
+    let maxTokensPerRequest = 4096;
+    let maxTokens = resolvedPrompt.maxOutputTokens ?? 4096;
+
+    const providerConfig = await (prisma as any).llmProviderConfig.findFirst({
+      where: { llmIntegrationId: resolved.integrationId },
+    });
+    if (providerConfig) {
+      maxTokensPerRequest = providerConfig.maxTokensPerRequest ?? 4096;
+      maxTokens = providerConfig.defaultMaxTokens ?? resolvedPrompt.maxOutputTokens ?? 4096;
+    }
+
+    // TOKEN-05: Pre-call prompt budget estimation and content truncation
+    const CONTENT_BUDGET_RATIO = 0.65;
+    const systemPromptTokens = Math.ceil(systemPrompt.length / 4);
+    const contentBudget = Math.floor(maxTokensPerRequest * CONTENT_BUDGET_RATIO) - systemPromptTokens;
+
+    let wasTruncated = false;
+    let estimatedUserTokens = Math.ceil(userPrompt.length / 4);
+
+    if (estimatedUserTokens > contentBudget) {
+      // Deep-clone context and issue to avoid mutating originals
+      const truncatedContext = { ...context };
+      const truncatedIssue = { ...issue };
+
+      // Phase 1: Truncate existing test cases from the end
+      if (truncatedContext.existingTestCases && truncatedContext.existingTestCases.length > 0) {
+        let cases = [...truncatedContext.existingTestCases];
+        while (cases.length > 0) {
+          cases = cases.slice(0, -1);
+          truncatedContext.existingTestCases = cases;
+          userPrompt = buildUserPrompt(truncatedIssue, truncatedContext, userPromptBase);
+          estimatedUserTokens = Math.ceil(userPrompt.length / 4);
+          if (estimatedUserTokens <= contentBudget) break;
+        }
+        wasTruncated = true;
+      }
+
+      // Phase 2: Truncate comments from the end if still over budget
+      if (estimatedUserTokens > contentBudget && truncatedIssue.comments && truncatedIssue.comments.length > 0) {
+        let comments = [...truncatedIssue.comments];
+        while (comments.length > 0) {
+          comments = comments.slice(0, -1);
+          truncatedIssue.comments = comments;
+          userPrompt = buildUserPrompt(truncatedIssue, truncatedContext, userPromptBase);
+          estimatedUserTokens = Math.ceil(userPrompt.length / 4);
+          if (estimatedUserTokens <= contentBudget) break;
+        }
+        wasTruncated = true;
+      }
+
+      if (wasTruncated) {
+        console.warn(
+          `[test-case-gen] Prompt over budget (${estimatedUserTokens} est. tokens vs ${contentBudget} budget). ` +
+          `Truncated existing cases from ${context.existingTestCases?.length ?? 0} to ${truncatedContext.existingTestCases?.length ?? 0}, ` +
+          `comments from ${issue.comments?.length ?? 0} to ${truncatedIssue.comments?.length ?? 0}.`
+        );
+      }
+    }
 
     const llmRequest: LlmRequest = {
       messages: [
@@ -515,7 +566,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       temperature: resolvedPrompt.temperature,
-      maxTokens, // Use the higher of configured or minimum required
+      maxTokens, // from provider config defaultMaxTokens (TOKEN-02)
       userId: session.user.id,
       feature: "test_case_generation",
       ...(resolved.model ? { model: resolved.model } : {}),
@@ -527,10 +578,29 @@ export async function POST(request: NextRequest) {
       },
     };
 
+    const { maxRetries, baseDelayMs } = SYNC_RETRY_PROFILE;
     const response = await manager.chat(
       resolved.integrationId,
-      llmRequest
+      llmRequest,
+      { maxRetries, baseDelayMs },
     );
+
+    // RETRY-03: Check truncation BEFORE JSON parse
+    if (response.finishReason === "length") {
+      return NextResponse.json(
+        {
+          error: `Response was truncated (used ${response.totalTokens ?? 0}/${maxTokens} tokens). Try reducing input size or increasing token limit.`,
+          truncated: true,
+          tokens: {
+            used: response.totalTokens ?? 0,
+            limit: maxTokens,
+            prompt: response.promptTokens ?? 0,
+            completion: response.completionTokens ?? 0,
+          },
+        },
+        { status: 422 },
+      );
+    }
 
     // Parse the LLM response
     let parsedResponse: { testCases: GeneratedTestCase[] } = { testCases: [] };
@@ -874,6 +944,10 @@ export async function POST(request: NextRequest) {
           completion: response.completionTokens,
           total: response.totalTokens,
         },
+        truncated: wasTruncated,
+        ...(wasTruncated && {
+          truncationNote: "Existing test cases and/or comments were trimmed to fit token budget",
+        }),
       },
     });
   } catch (error) {

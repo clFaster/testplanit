@@ -1094,8 +1094,8 @@
       },
       "aiModels": {
         "description": "Configurar modelos IA para generar y analizar casos de prueba inteligentes",
-        "availableModels": "Modelos disponibles",
-        "availableModelsDescription": "Seleccione entre los modelos de IA configurados por el administrador del sistema.",
+        "availableModels": "Proyecto predeterminado",
+        "availableModelsDescription": "Seleccione un modelo de IA predeterminado para este proyecto de entre los configurados por el administrador del sistema.",
         "currentModelSettings": "Ajustes actuales del modelo",
         "currentModelDescription": "Detalles de configuración del modelo de IA activo actualmente: {name}",
         "noModelsAvailable": "Actualmente no hay modelos de IA disponibles. Póngase en contacto con el administrador del sistema para configurar modelos de IA para su organización.",
@@ -1104,21 +1104,23 @@
         "budget": "Presupuestario",
         "streamingTooltip": "Respuesta en tiempo real habilitada",
         "systemDefault": "Sistema por defecto",
+        "setAsDefault": "Establecer como predeterminado",
+        "clearDefault": "Borrar valores predeterminados",
         "useForProject": "Usar para el proyecto",
-        "removeModel": "Eliminar modelo",
-        "removeWarningTitle": "Eliminar este modelo IA será:",
-        "removeWarning1": "Detener todas las características de AI-powered en este proyecto",
-        "removeWarning2": "Eliminar el acceso a la generación y análisis de casos de prueba automatizados",
-        "switchModel": "Cambiar modelo",
-        "switchWarningTitle": "Cambiar a un modelo de IA diferente será:",
+        "removeModel": "Borrar valores predeterminados",
+        "removeWarningTitle": "Borrar el modelo de IA predeterminado hará lo siguiente:",
+        "removeWarning1": "Desactive las funciones basadas en IA a menos que se hayan configurado anulaciones por función.",
+        "removeWarning2": "Eliminar el modelo de reserva utilizado para la generación y el análisis de casos de prueba.",
+        "switchModel": "Cambiar valor predeterminado",
+        "switchWarningTitle": "Cambiar el modelo de IA predeterminado tendrá las siguientes consecuencias:",
         "switchWarning1": "Cambiar cómo se comportan las características de IA en este proyecto",
         "switchWarning2": "Puede afectar la calidad y el estilo del contenido generado",
-        "modelAssigned": "Modelo de IA asignado al proyecto con éxito",
-        "modelAssignError": "Error al asignar modelo de IA al proyecto",
-        "modelRemoved": "Modelo de IA eliminado del proyecto con éxito",
-        "modelRemoveError": "Error al eliminar el modelo IA del proyecto",
-        "confirmRemove": "¿Está seguro que desea eliminar \"{name}\" de este proyecto?",
-        "confirmSwitch": "¿Está seguro de que desea cambiar de \"{from}\" a \"{to}\"?",
+        "modelAssigned": "Modelo de IA predeterminado configurado para este proyecto.",
+        "modelAssignError": "No se pudo establecer el modelo de IA predeterminado.",
+        "modelRemoved": "Modelo de IA predeterminado borrado",
+        "modelRemoveError": "No se pudo borrar el modelo de IA predeterminado.",
+        "confirmRemove": "¿Estás seguro de que quieres borrar \"{name}\" como valor predeterminado para este proyecto?",
+        "confirmSwitch": "¿Estás seguro de que quieres cambiar el valor predeterminado de \"{from}\" a \"{to}\"?",
         "currency": {
           "dollar": "$",
           "perMonth": "/mes"
@@ -1135,6 +1137,8 @@
           "effectiveLlm": "Maestría en Derecho eficaz",
           "source": "Fuente",
           "noOverride": "Sin anulación",
+          "noLlm": "Sin LLM (discapacitado)",
+          "disabledOverride": "Deshabilitado (Anulación)",
           "projectOverride": "Anulación del proyecto",
           "promptConfig": "Configuración de solicitud",
           "noLlmConfigured": "No se ha configurado ningún LLM",
@@ -2090,6 +2094,10 @@
       "buttonText": "Generar Casos de Prueba",
       "title": "Generar casos de prueba con IA",
       "description": "Utilice IA para generar automáticamente casos de prueba completos a partir de problemas o documentos externos.",
+      "generatingPreparing": "Preparando solicitud...",
+      "generatingCallingAi": "Esperando a que la IA genere los casos de prueba...",
+      "generatingProcessing": "Procesando los casos de prueba generados...",
+      "generatingHint": "Esto puede tardar un minuto, dependiendo de la complejidad del material de origen.",
       "steps": {
         "selectIssue": "Seleccionar fuente",
         "selectTemplate": "Elegir plantilla",
@@ -2154,7 +2162,7 @@
         "templateFields": "Campos de Plantilla:",
         "moreFields": "... y {count, plural, one {# más campos} other {# más campos}}"
       },
-      "generating": "Generando casos de prueba con AI...",
+      "generatingLegacy": "Generación de casos de prueba con IA...",
       "import": "{count, plural, =0 {Importar casos de prueba} =1 {Importar 1 caso de prueba} other {Importar # casos de prueba}}",
       "importing": "{count, plural, =0 {Importando casos de prueba...} =1 {Importando 1 caso de prueba...} other {Importando # casos de prueba...}}",
       "openInExternalSystem": "Abrir en {provider}",
@@ -2307,7 +2315,7 @@
       "tokenUsage": "{total} tokens utilizados",
       "noLlmIntegration": "Las funciones de IA requieren una integración LLM. Configúrela en la configuración del proyecto.",
       "configure": {
-        "title": "Configurar selección",
+        "title": "Alcance del caso de prueba",
         "description": "Se encontraron {count, plural, =1 {# caso de prueba} other {# casos de prueba}} en el repositorio",
         "descriptionFiltered": "Se encontraron {count, plural, =1 {# casos de prueba posiblemente relevantes} other {# casos de prueba posiblemente relevantes}} de {total, plural, =1 {# total} other {# total}} en el repositorio",
         "noMatchesTitle": "No se encontraron casos de prueba coincidentes",
@@ -2322,12 +2330,19 @@
       },
       "loading": {
         "batch": "Procesando lote {current} de {total}",
-        "analyzing": "Analizando casos de prueba..."
+        "analyzing": "Analizando casos de prueba...",
+        "progress": "Se analizaron {analyzed} de {total} casos de prueba...",
+        "waitingForAi": "Esperando respuesta de la IA (lote {batch} de {total})...",
+        "selectedSoFar": "{count, plural, =1 {# Caso de prueba seleccionado hasta ahora} other {# Casos de prueba seleccionados hasta ahora}}",
+        "resolving_integration": "Resolviendo la integración de la IA...",
+        "fetching_cases": "Obteniendo casos de prueba..."
       },
       "success": {
         "title": "Casos de prueba sugeridos",
         "description": "{count, plural, =1 {# caso de prueba seleccionado} other {# casos de prueba seleccionados}} según el contexto de ejecución de la prueba",
-        "linkedCasesAdded": "{count, plural, =1 {# caso vinculado incluido automáticamente} other {# casos vinculados incluidos automáticamente}}"
+        "linkedCasesAdded": "{count, plural, =1 {# caso vinculado incluido automáticamente} other {# casos vinculados incluidos automáticamente}}",
+        "truncationWarningTitle": "Resultados parciales",
+        "truncationWarning": "{count, plural, =1 {# el lote fue truncado} other {# los lotes fueron truncados}} por el modelo de IA: es posible que algunos casos de prueba no hayan sido evaluados."
       },
       "noSuggestions": {
         "title": "No hay casos de prueba coincidentes",
@@ -4091,6 +4106,7 @@
         "repo-cache": "Caché del repositorio",
         "copy-move": "Copiar y mover",
         "duplicate-scan": "Escaneo duplicado",
+        "magic-select": "Selección mágica",
         "step-scan": "Escaneo de secuencia de pasos"
       },
       "status": {

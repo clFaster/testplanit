@@ -16,6 +16,21 @@ export const LLM_FEATURES = {
 export type LlmFeature = (typeof LLM_FEATURES)[keyof typeof LLM_FEATURES];
 
 /**
+ * Sync-safe retry profile for API routes that respond synchronously.
+ * Workers use provider-config retryAttempts (typically 3-7); sync routes cap
+ * at 1 retry with short backoff to avoid blocking the HTTP response.
+ *
+ * Note: maxDelayMs is not yet wired to manager.chat() — with maxRetries=1 and
+ * baseDelayMs=1000, backoff never exceeds 1000ms regardless. The field
+ * documents the design constraint for future readers.
+ */
+export const SYNC_RETRY_PROFILE = {
+  maxRetries: 1,
+  baseDelayMs: 1000,
+  maxDelayMs: 10000,
+} as const;
+
+/**
  * A variable that can be substituted in a prompt template using {{NAME}} syntax.
  */
 export interface PromptVariable {
@@ -34,7 +49,7 @@ export const PROMPT_FEATURE_VARIABLES: Record<LlmFeature, PromptVariable[]> = {
     { name: "EXAMPLE_STRUCTURE", description: "JSON structure example based on template fields" },
     { name: "REQUIRED_FIELDS_LIST", description: "List of required template fields" },
     { name: "OPTIONAL_FIELDS_LIST", description: "List of optional template fields" },
-    { name: "QUANTITY_GUIDANCE", description: "Number range of test cases to generate" },
+    { name: "QUANTITY_GUIDANCE", description: "Quantity of test cases to generate (e.g. '4-6 test cases' or 'as many test cases as needed for comprehensive coverage')" },
     { name: "STEPS_INSTRUCTION", description: "Instructions for test steps" },
     { name: "PRIORITY_INSTRUCTION", description: "Instructions for priority field values" },
     { name: "TAG_INSTRUCTIONS", description: "Instructions for auto-generating tags" },
