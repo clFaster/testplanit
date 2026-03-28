@@ -128,8 +128,6 @@ export class TagAnalysisService {
 
     // 9. Process batches using shared executor (with per-batch error isolation)
     let totalTokensUsed = 0;
-    let entitiesProcessed = 0;
-    const totalEntities = entityContents.length;
     const allSuggestions: TagSuggestion[] = [];
     const truncatedEntityIds: number[] = [];
 
@@ -254,12 +252,6 @@ export class TagAnalysisService {
         }
       }
 
-      // Report sub-batch progress so the UI updates during recursive splits
-      entitiesProcessed += respondedEntityIds.size;
-      if (params.onBatchComplete) {
-        await params.onBatchComplete(entitiesProcessed, totalEntities);
-      }
-
       // If the response was truncated, retry missing entities with smaller batches
       if (parsed.truncated) {
         const missingEntities = batch.filter(
@@ -286,8 +278,7 @@ export class TagAnalysisService {
 
     const batchResult = await executeBatches({
       batches,
-      // Progress is reported from within processWithRetry as sub-batches
-      // complete, so we skip onBatchComplete here to avoid double-counting.
+      onBatchComplete: params.onBatchComplete,
       isCancelled: params.isCancelled,
       processBatch: async (batch) => {
         await processWithRetry(batch);
