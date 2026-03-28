@@ -1,3 +1,13 @@
+## [0.19.0](https://github.com/TestPlanIt/testplanit/compare/v0.18.12...v0.19.0) (2026-03-28)
+
+### Features
+
+* **coderepo:** Add Gitea support and enhance repository configuration ([#164](https://github.com/TestPlanIt/testplanit/issues/164)) ([3e349de](https://github.com/TestPlanIt/testplanit/commit/3e349de572ce059b5f75682a6c58f4bd18ff232a))
+
+### Bug Fixes
+
+* **ci:** fix Docker latest tag not updating and harden semantic-release version detection ([5167980](https://github.com/TestPlanIt/testplanit/commit/5167980c32bf51f1d9b5eea7e500eafc3f41ebbe))
+
 ## [0.18.12](https://github.com/TestPlanIt/testplanit/compare/v0.18.11...v0.18.12) (2026-03-28)
 
 ### Features
