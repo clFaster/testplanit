@@ -1,3 +1,13 @@
+## [0.18.12](https://github.com/TestPlanIt/testplanit/compare/v0.18.11...v0.18.12) (2026-03-28)
+
+### Features
+
+* Improve auto tagging ([#160](https://github.com/TestPlanIt/testplanit/issues/160)) ([2cd5ac6](https://github.com/TestPlanIt/testplanit/commit/2cd5ac64db78d9d83cb73d5e1c325b942bbc5284))
+
+### Enhancements
+
+* Enhance auto tag new tag handling ([#161](https://github.com/TestPlanIt/testplanit/issues/161)) ([d01bae1](https://github.com/TestPlanIt/testplanit/commit/d01bae17040735670229b524e2ce9ff02e3f8ff8))
+
 ## [0.18.11](https://github.com/TestPlanIt/testplanit/compare/v0.18.10...v0.18.11) (2026-03-28)
 
 ### Enhancements
