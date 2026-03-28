@@ -195,7 +195,9 @@ jobs:
           ghcr.io/${REPO_LC}:${VERSION}-workers-arm64
 
         # Only update 'latest' if this is the newest semantic version
-        LATEST_TAG=$(git tag -l 'v*' | sort -V | tail -n1)
+        # Filter to only 3-part semver tags (vX.Y.Z) to avoid non-semver tags like v1.1 breaking the comparison
+        LATEST_TAG=$(git tag -l 'v*.*.*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
+        echo "Current version: $VERSION, Latest semver tag: $LATEST_TAG"
         if [ "$VERSION" = "$LATEST_TAG" ]; then
           echo "Updating 'latest' tags to $VERSION"
           docker buildx imagetools create -t ghcr.io/${REPO_LC}:latest \
@@ -352,7 +354,9 @@ jobs:
           ghcr.io/${REPO_LC}:${VERSION}-workers-arm64
 
         # Update 'latest' if this is the newest semantic version
-        LATEST_TAG=$(git tag -l 'v*' | sort -V | tail -n1)
+        # Filter to only 3-part semver tags (vX.Y.Z) to avoid non-semver tags like v1.1 breaking the comparison
+        LATEST_TAG=$(git tag -l 'v*.*.*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
+        echo "Current version: $VERSION, Latest semver tag: $LATEST_TAG"
         if [ "$VERSION" = "$LATEST_TAG" ]; then
           echo "Updating 'latest' tags to $VERSION"
           docker buildx imagetools create -t ghcr.io/${REPO_LC}:latest \

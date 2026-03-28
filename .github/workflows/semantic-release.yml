@@ -55,18 +55,42 @@ jobs:
         run: |
           cd testplanit
           npx semantic-release 2>&1 | tee release-output.txt
-          # Extract the version if a release was made (macOS-compatible)
+          # Extract the version if a release was made
+          # Try multiple patterns to handle different semantic-release output formats
+          VERSION=""
+          # Pattern 1: "Published release X.Y.Z" (semantic-release <v24)
           if grep -q "Published release" release-output.txt; then
-            # Use sed instead of grep -oP for macOS compatibility
-            VERSION=$(grep "Published release" release-output.txt | sed -E 's/.*Published release ([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | head -1)
-            if [ -n "$VERSION" ] && [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              echo "version=v${VERSION}" >> $GITHUB_OUTPUT
-              echo "released=true" >> $GITHUB_OUTPUT
-            else
-              echo "Warning: Found 'Published release' but could not extract version number"
-              echo "released=false" >> $GITHUB_OUTPUT
+            VERSION=$(grep "Published release" release-output.txt | sed -E 's/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | head -1)
+          fi
+          # Pattern 2: "Created release X.Y.Z" or "Published GitHub release: X.Y.Z"
+          if [ -z "$VERSION" ] && grep -qE "(Created release|Published GitHub release)" release-output.txt; then
+            VERSION=$(grep -E "(Created release|Published GitHub release)" release-output.txt | sed -E 's/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | head -1)
+          fi
+          # Pattern 3: Fallback - look for any "vX.Y.Z" or "X.Y.Z" version pattern near "release" context
+          if [ -z "$VERSION" ] && grep -qE "release.*[0-9]+\.[0-9]+\.[0-9]+" release-output.txt; then
+            VERSION=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' release-output.txt | tail -1)
+          fi
+          # Pattern 4: Check the git tag that was just created
+          if [ -z "$VERSION" ]; then
+            LATEST_TAG=$(git tag -l 'v*.*.*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+            PREV_TAG=$(git tag -l 'v*.*.*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -2 | tail -1)
+            if [ "$LATEST_TAG" != "$PREV_TAG" ] && [ -n "$LATEST_TAG" ]; then
+              # A new tag was created during this run
+              TAG_COMMIT=$(git rev-list -n 1 "$LATEST_TAG" 2>/dev/null)
+              HEAD_COMMIT=$(git rev-parse HEAD 2>/dev/null)
+              if [ "$TAG_COMMIT" != "$HEAD_COMMIT" ]; then
+                VERSION="${LATEST_TAG#v}"
+                echo "Detected new release tag: $LATEST_TAG"
+              fi
             fi
+          fi
+
+          if [ -n "$VERSION" ] && [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Detected release version: $VERSION"
+            echo "version=v${VERSION}" >> $GITHUB_OUTPUT
+            echo "released=true" >> $GITHUB_OUTPUT
           else
+            echo "No release detected (version extraction result: '$VERSION')"
             echo "released=false" >> $GITHUB_OUTPUT
           fi
 
