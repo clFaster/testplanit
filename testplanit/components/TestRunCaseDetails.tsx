@@ -39,8 +39,9 @@ import { notifyTestCaseAssignment } from "~/app/actions/test-run-notifications";
 import { emptyEditorContent } from "~/app/constants";
 import { useProjectPermissions } from "~/hooks/useProjectPermissions";
 import { useFindFirstRepositoryCasesFiltered } from "~/hooks/useRepositoryCasesWithFilteredFields";
-import { useCreateTestRunResults, useFindFirstWorkflows, useFindManyStatus, useFindManyTestRunResults, useUpdateTestRunCases, useUpdateTestRuns } from "~/lib/hooks";
+import { useFindFirstWorkflows, useFindManyStatus, useUpdateTestRunCases } from "~/lib/hooks";
 import { useFindManyTemplates } from "~/lib/hooks/templates";
+import { submitTestRunResult } from "~/lib/test-run-result-submit";
 import { IconName } from "~/types/globals";
 import { ForecastDisplay } from "./ForecastDisplay";
 import LinkedCasesPanel from "./LinkedCasesPanel";
@@ -120,17 +121,7 @@ export function TestRunCaseDetails({
     setSelectedAttachments([]);
   };
 
-  const { mutateAsync: createTestRunResult } = useCreateTestRunResults();
   const { mutateAsync: updateTestRunCase } = useUpdateTestRunCases();
-  const { mutateAsync: updateTestRun } = useUpdateTestRuns();
-
-  // Check if this is the first result for this test run
-  const { data: existingResults } = useFindManyTestRunResults({
-    where: {
-      testRunId,
-    },
-    take: 1,
-  });
 
   // Find the first IN_PROGRESS workflow state for this project
   const { data: inProgressWorkflow } = useFindFirstWorkflows({
@@ -517,41 +508,15 @@ export function TestRunCaseDetails({
         return;
       }
 
-      // Create the test run result
-      await createTestRunResult({
-        data: {
-          testRunId,
-          testRunCaseId,
-          statusId: successStatus.id,
-          notes: emptyEditorContent,
-          evidence: {},
-          executedById: session.user.id,
-          attempt: 1,
-          testRunCaseVersion: testcase.currentVersion,
-        },
-      });
-
-      // If this is the first result and we have an IN_PROGRESS workflow state
-      if (existingResults?.length === 0 && inProgressWorkflow) {
-        // Update the test run's workflow state
-        await updateTestRun({
-          where: {
-            id: testRunId,
-          },
-          data: {
-            stateId: inProgressWorkflow.id,
-          },
-        });
-      }
-
-      // Update the test run case status
-      await updateTestRunCase({
-        where: {
-          id: testRunCaseId,
-        },
-        data: {
-          statusId: successStatus.id,
-        },
+      await submitTestRunResult({
+        testRunId,
+        testRunCaseId,
+        statusId: successStatus.id,
+        notes: emptyEditorContent,
+        evidence: {},
+        attempt: 1,
+        testRunCaseVersion: testcase.currentVersion,
+        inProgressStateId: inProgressWorkflow?.id ?? null,
       });
 
       // --- Trigger forecast update for this case ---
@@ -733,28 +698,16 @@ export function TestRunCaseDetails({
                             setIsSubmitting(true);
 
                             try {
-                              // Create the test run result
-                              await createTestRunResult({
-                                data: {
-                                  testRunId,
-                                  testRunCaseId,
-                                  statusId: status.id,
-                                  notes: emptyEditorContent,
-                                  evidence: {},
-                                  executedById: session.user.id,
-                                  attempt: 1,
-                                  testRunCaseVersion: testcase.currentVersion,
-                                },
-                              });
-
-                              // Update the test run case status
-                              await updateTestRunCase({
-                                where: {
-                                  id: testRunCaseId,
-                                },
-                                data: {
-                                  statusId: status.id,
-                                },
+                              await submitTestRunResult({
+                                testRunId,
+                                testRunCaseId,
+                                statusId: status.id,
+                                notes: emptyEditorContent,
+                                evidence: {},
+                                attempt: 1,
+                                testRunCaseVersion: testcase.currentVersion,
+                                inProgressStateId:
+                                  inProgressWorkflow?.id ?? null,
                               });
 
                               toast.success(tCommon("actions.resultAdded"), {
