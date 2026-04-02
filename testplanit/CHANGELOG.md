@@ -1,3 +1,9 @@
+## [0.20.2](https://github.com/TestPlanIt/testplanit/compare/v0.20.1...v0.20.2) (2026-04-02)
+
+### Bug Fixes
+
+* **ci:** prevent false version detection in semantic release workflow ([b1be150](https://github.com/TestPlanIt/testplanit/commit/b1be150afc737b65baaf40d22ae10c20179c8ddf))
+
 ## [0.20.1](https://github.com/TestPlanIt/testplanit/compare/v0.20.0...v0.20.1) (2026-04-02)
 
 ### Enhancements
