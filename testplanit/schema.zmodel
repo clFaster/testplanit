@@ -2328,7 +2328,21 @@ model TestRunCases {
         testRun.project.creator == auth() ||
         testRun.project.userPermissions?[user == auth() && accessType == 'SPECIFIC_ROLE' &&
                                          (role.name == 'Project Admin' ||
-                                          role.rolePermissions?[area == 'TestRuns' && canAddEdit])] ||
+                                          role.rolePermissions?[area == 'TestRuns' && canAddEdit] ||
+                                          role.rolePermissions?[area == 'TestRunResults' && canAddEdit])] ||
+        testRun.project.userPermissions?[user == auth() && accessType == 'GLOBAL_ROLE' &&
+                                         auth().role.rolePermissions?[area == 'TestRunResults' && canAddEdit]] ||
+        testRun.project.groupPermissions?[group.assignedUsers?[user == auth()] &&
+                                          accessType == 'SPECIFIC_ROLE' &&
+                                          role.rolePermissions?[area == 'TestRunResults' && canAddEdit]] ||
+        testRun.project.groupPermissions?[group.assignedUsers?[user == auth()] &&
+                                          accessType == 'GLOBAL_ROLE' &&
+                                          auth().role.rolePermissions?[area == 'TestRunResults' && canAddEdit]] ||
+        (testRun.project.defaultAccessType == 'GLOBAL_ROLE' && auth().role != null && auth().access != 'NONE' &&
+         auth().role.rolePermissions?[area == 'TestRunResults' && canAddEdit]) ||
+        (testRun.project.assignedUsers?[user == auth()] &&
+         testRun.project.defaultAccessType == 'SPECIFIC_ROLE' &&
+         testRun.project.defaultRole.rolePermissions?[area == 'TestRunResults' && canAddEdit]) ||
         testRun.project.assignedUsers?[user == auth() && auth().access == 'PROJECTADMIN']
     )
 
