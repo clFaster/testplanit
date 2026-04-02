@@ -41,7 +41,10 @@ import { useProjectPermissions } from "~/hooks/useProjectPermissions";
 import { useFindFirstRepositoryCasesFiltered } from "~/hooks/useRepositoryCasesWithFilteredFields";
 import { useFindFirstWorkflows, useFindManyStatus, useUpdateTestRunCases } from "~/lib/hooks";
 import { useFindManyTemplates } from "~/lib/hooks/templates";
-import { submitTestRunResult } from "~/lib/test-run-result-submit";
+import {
+  isPermissionDeniedSubmitResultError,
+  submitTestRunResult
+} from "~/lib/test-run-result-submit";
 import { IconName } from "~/types/globals";
 import { ForecastDisplay } from "./ForecastDisplay";
 import LinkedCasesPanel from "./LinkedCasesPanel";
@@ -546,9 +549,15 @@ export function TestRunCaseDetails({
       }
     } catch (error) {
       console.error("Error submitting result:", error);
-      toast.error(tCommon("errors.error"), {
-        description: tCommon("errors.somethingWentWrong"),
-      });
+      if (isPermissionDeniedSubmitResultError(error)) {
+        toast.error(tCommon("errors.accessDenied"), {
+          description: tCommon("errors.resultSubmitPermissionDenied"),
+        });
+      } else {
+        toast.error(tCommon("errors.error"), {
+          description: tCommon("errors.somethingWentWrong"),
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -738,11 +747,19 @@ export function TestRunCaseDetails({
                               }
                             } catch (error) {
                               console.error("Error submitting result:", error);
-                              toast.error(tCommon("errors.error"), {
-                                description: tCommon(
-                                  "errors.somethingWentWrong"
-                                ),
-                              });
+                              if (isPermissionDeniedSubmitResultError(error)) {
+                                toast.error(tCommon("errors.accessDenied"), {
+                                  description: tCommon(
+                                    "errors.resultSubmitPermissionDenied"
+                                  ),
+                                });
+                              } else {
+                                toast.error(tCommon("errors.error"), {
+                                  description: tCommon(
+                                    "errors.somethingWentWrong"
+                                  ),
+                                });
+                              }
                             } finally {
                               setIsSubmitting(false);
                             }

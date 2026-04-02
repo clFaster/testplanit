@@ -26,7 +26,10 @@ import { useProjectPermissions } from "~/hooks/useProjectPermissions";
 import {
   useCreateAttachments, useCreateResultFieldValues, useCreateTestRunStepResults, useFindFirstProjects, useFindFirstRepositoryCases, useFindFirstWorkflows, useFindManyIssue, useFindManySharedStepItem, useFindManyStatus, useFindManyTemplateResultAssignment, useFindManyTestRunResults, useUpdateTestRunCases
 } from "~/lib/hooks";
-import { submitTestRunResult } from "~/lib/test-run-result-submit";
+import {
+  isPermissionDeniedSubmitResultError,
+  submitTestRunResult
+} from "~/lib/test-run-result-submit";
 import { toHumanReadable } from "~/utils/duration";
 import { fetchSignedUrl } from "~/utils/fetchSignedUrl";
 import { ExtendedCases } from "./columns";
@@ -1244,9 +1247,15 @@ export function AddResultModal({
       onClose();
     } catch (error) {
       console.error("Error submitting result:", error);
-      toast.error(tCommon("errors.error"), {
-        description: tCommon("errors.somethingWentWrong"),
-      });
+      if (isPermissionDeniedSubmitResultError(error)) {
+        toast.error(tCommon("errors.accessDenied"), {
+          description: tCommon("errors.resultSubmitPermissionDenied"),
+        });
+      } else {
+        toast.error(tCommon("errors.error"), {
+          description: tCommon("errors.somethingWentWrong"),
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
