@@ -1,3 +1,9 @@
+## [0.20.1](https://github.com/TestPlanIt/testplanit/compare/v0.20.0...v0.20.1) (2026-04-02)
+
+### Enhancements
+
+* **tags:** Enhance Tag Detail Page with Filters and Improved Readability ([#171](https://github.com/TestPlanIt/testplanit/issues/171)) ([188461d](https://github.com/TestPlanIt/testplanit/commit/188461def6880d59a7a07224e83fe7350262f032))
+
 ## [0.20.0](https://github.com/TestPlanIt/testplanit/compare/v0.19.1...v0.20.0) (2026-04-01)
 
 ### Features
