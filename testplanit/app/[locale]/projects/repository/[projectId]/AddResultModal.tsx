@@ -228,6 +228,10 @@ export function AddResultModal({
   const locale = useLocale();
   const { data: session } = useSession();
   const queryClient = useQueryClient();
+  const invalidateAfterSubmit = async () => {
+    // submitTestRunResult uses a raw fetch call, so we manually invalidate caches.
+    await queryClient.invalidateQueries();
+  };
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [, setSelectedStatusColor] =
     useState<string>("#3b82f6");
@@ -1228,6 +1232,8 @@ export function AddResultModal({
       setSelectedMainIssues([]);
       setSelectedStepIssues({});
       setSelectedSharedItemIssues({}); // Reset shared item issues
+
+      await invalidateAfterSubmit();
 
       toast.success(
         isBulkResult

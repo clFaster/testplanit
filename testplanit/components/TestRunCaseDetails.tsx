@@ -21,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { AddResultModal } from "@/projects/repository/[projectId]/AddResultModal";
 import FieldValueRenderer from "@/projects/repository/[projectId]/[caseId]/FieldValueRenderer";
 import { Attachments, Prisma, Status } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Check,
   CheckCircle,
@@ -88,6 +89,7 @@ export function TestRunCaseDetails({
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
   const [selectedAttachmentIndex, setSelectedAttachmentIndex] = useState<
     number | null
   >(null);
@@ -99,6 +101,10 @@ export function TestRunCaseDetails({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [_showAssignModal, _setShowAssignModal] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
+  const invalidateAfterSubmit = async () => {
+    // submitTestRunResult uses a raw fetch call, so we manually invalidate caches.
+    await queryClient.invalidateQueries();
+  };
 
   // Fetch permissions
   const {
@@ -521,6 +527,7 @@ export function TestRunCaseDetails({
         testRunCaseVersion: testcase.currentVersion,
         inProgressStateId: inProgressWorkflow?.id ?? null,
       });
+      await invalidateAfterSubmit();
 
       // --- Trigger forecast update for this case ---
       fetch(`/api/forecast/update?caseId=${caseId}`);
@@ -718,6 +725,7 @@ export function TestRunCaseDetails({
                                 inProgressStateId:
                                   inProgressWorkflow?.id ?? null,
                               });
+                              await invalidateAfterSubmit();
 
                               toast.success(tCommon("actions.resultAdded"), {
                                 description: tCommon(
