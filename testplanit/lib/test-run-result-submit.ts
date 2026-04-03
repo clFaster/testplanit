@@ -22,15 +22,6 @@ export type SubmitResultError = Error & {
   code?: string;
 };
 
-const PERMISSION_DENIED_CODE = "PERMISSION_DENIED";
-const ACCESS_DENIED_PATTERNS = [
-  "permission denied",
-  "access policy",
-  "forbidden",
-  "not authorized",
-  "unauthorized",
-];
-
 export function isPermissionDeniedSubmitResultError(
   error: unknown
 ): error is SubmitResultError {
@@ -39,14 +30,10 @@ export function isPermissionDeniedSubmitResultError(
   }
 
   const submitError = error as SubmitResultError;
-  const normalizedMessage = submitError.message?.toLowerCase() ?? "";
 
   return (
     submitError.status === 403 ||
-    submitError.code === PERMISSION_DENIED_CODE ||
-    ACCESS_DENIED_PATTERNS.some((pattern) =>
-      normalizedMessage.includes(pattern)
-    )
+    submitError.code === "PERMISSION_DENIED"
   );
 }
 
